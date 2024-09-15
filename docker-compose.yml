@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  postgres:  # Сервис для базы данных PostgreSQL
+    image: postgres:13  # Используем образ PostgreSQL версии 13
+    environment:
+      POSTGRES_USER: myuser  # Имя пользователя базы данных
+      POSTGRES_PASSWORD: mypassword  # Пароль для пользователя
+      POSTGRES_DB: mydatabase  # Имя базы данных, которая будет создана
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Хранилище данных PostgreSQL
+    networks:
+      - bot-network
+    ports:
+      - "5432:5432"  # Пробрасываем порт 5432 для доступа к базе данных
+
+  picnic_bot:  # Сервис для твоего бота
+    build:
+      context: .  # Путь к Dockerfile, который ты уже создал
+      dockerfile: bot/Dockerfile_picnic_bot  # Dockerfile для бота
+    environment:
+      DATABASE_HOST: postgres  # Имя сервиса базы данных из этого же docker-compose файла
+      DATABASE_USER: myuser  # Имя пользователя базы данных
+      DATABASE_PASSWORD: mypassword  # Пароль для пользователя
+      DATABASE_NAME: mydatabase  # Имя базы данных
+    depends_on:
+      - postgres  # Зависимость от сервиса базы данных, чтобы бот ждал, пока БД будет готова
+    networks:
+      - bot-network  # Указываем ту же сеть, чтобы боты и база данных могли общаться друг с другом
+    ports:
+      - "8000:8000"  # Пробрасываем порт для общения с ботом (если потребуется)
+
+networks:
+  bot-network:  # Создаем общую сеть, чтобы бот и база данных могли взаимодействовать
+    driver: bridge
+
+volumes:
+  postgres_data:  # Переменная для постоянного хранения данных PostgreSQL

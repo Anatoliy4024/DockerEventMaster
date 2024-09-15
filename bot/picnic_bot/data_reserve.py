@@ -1,0 +1,83 @@
+import psycopg2  # Заменили sqlite3 на psycopg2
+import logging
+#from constants import DATABASE_PATH  # Не забываем обновить в дальнейшем, если понадобится
+from datetime import datetime, timedelta, time
+import os  # Для использования переменных окружения
+
+# Настройка логирования
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+def reserved_time_intervals(selected_date):
+    logging.info(f"Функция reserved_time_intervals вызвана для даты: {selected_date}")
+
+    # Создаем подключение к базе данных PostgreSQL
+    try:
+        conn = psycopg2.connect(
+            host=os.getenv('DATABASE_HOST', 'localhost'),  # Используем переменные окружения
+            database=os.getenv('DATABASE_NAME', 'event_db'),
+            user=os.getenv('DATABASE_USER', 'myuser'),
+            password=os.getenv('DATABASE_PASSWORD', 'mypassword')
+        )
+        logging.info("Соединение с базой данных успешно установлено.")
+    except Exception as e:
+        logging.error(f"Не удалось подключиться к базе данных: {e}")
+        return []
+
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("""
+            SELECT start_time, end_time 
+            FROM orders 
+            WHERE status > 2 AND selected_date = %s
+        """, (selected_date,))  # Используем %s вместо ?
+
+        reserved_times = cursor.fetchall()
+        logging.info(f"Зарезервированные интервалы: {reserved_times}")
+
+        if not reserved_times:
+            logging.warning("Нет зарезервированных интервалов для указанной даты.")
+            return []
+
+        return reserved_times
+
+    except Exception as e:
+        logging.error(f"Ошибка при выполнении SQL-запроса: {e}")
+        return []
+
+    finally:
+        cursor.close()  # Закрываем курсор
+        conn.close()  # Закрываем соединение
+        logging.info("Соединение с базой данных закрыто.")
+
+def check_time_reserved(cur_time, reserved_time_intervals):
+    """
+    Проверяет, пересекается ли временной интервал с уже зарезервированными временными интервалами.
+    """
+    timelist = create_reserved_timelist(reserved_time_intervals)
+
+    if cur_time in timelist:
+        return True
+    return False
+
+def get_reserved_times_for_date(selected_date):
+    logging.info(f"Функция get_reserved_times_for_date вызвана для даты: {selected_date}")
+
+    # Получаем все зарезервированные временные интервалы для указанной даты
+    reserved_intervals = reserved_time_intervals(selected_date)
+    print(reserved_intervals)
+    if not reserved_intervals:
+        logging.info(f"Для даты {selected_date} нет зарезервированных временных интервалов.")
+    return reserved_intervals
+
+def create_reserved_timelist(time_list):
+    reserved_time_list = list()
+
+    for i in time_list:
+        start = datetime.strptime(i[0], "%H:%M") - timedelta(hours=5)
+        end = datetime.strptime(i[1], "%H:%M") + timedelta(hours=5, minutes=30)
+        while start < end:
+            if start.time() > time(7, 30) and start.time() < time(22, 30):
+                reserved_time_list.append(start.strftime('%H:%M'))
+            start += timedelta(minutes=30)
+    return reserved_time_list
