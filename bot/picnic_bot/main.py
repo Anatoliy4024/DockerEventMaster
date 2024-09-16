@@ -17,11 +17,6 @@ import time
 import sqlite3
 
 
-
-
-
-
-
 # Включаем логирование и указываем файл для логов
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -70,10 +65,10 @@ def add_username_column():
 
 # Пути к видеофайлам
 VIDEO_PATHS = [
-    'bot/picnic_bot/media/IMG_5981 (online-video-cutter.com).mp4',
-    'bot/picnic_bot/media/IMG_6156 (online-video-cutter.com).mp4',
-    'bot/picnic_bot/media/IMG_4077_1 (online-video-cutter.com).mp4',
-    'bot/picnic_bot/media/IMG_6412 (online-video-cutter.com).mp4'
+    'media/IMG_5981 (online-video-cutter.com).mp4',
+    'media/IMG_6156 (online-video-cutter.com).mp4',
+    'media/IMG_4077_1 (online-video-cutter.com).mp4',
+    'media/IMG_6412 (online-video-cutter.com).mp4'
 ]
 
 # Замените 'YOUR_BOT_TOKEN' на токен вашего бота
@@ -238,7 +233,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         conn = create_connection()#(DATABASE_PATH)
         if conn is not None:
             try:
-                update_query = "UPDATE orders SET language = ? WHERE user_id = %s AND session_number = %s"
+                update_query = "UPDATE orders SET language = %s WHERE user_id = %s AND session_number = %s"
                 update_params = (language_code, update.callback_query.from_user.id, session_number)
                 execute_query_with_retry(conn, update_query, update_params)
             except Exception as e:

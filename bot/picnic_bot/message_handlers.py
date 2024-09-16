@@ -93,7 +93,7 @@ async def handle_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             # Проверка существования пользователя
             logging.info(f"Проверка существования пользователя с user_id: {update.message.from_user.id}")
-            select_query = "SELECT 1 FROM users WHERE user_id = ?"
+            select_query = "SELECT 1 FROM users WHERE user_id = %s"
             cursor = conn.cursor()
             cursor.execute(select_query, (update.message.from_user.id,))
             exists = cursor.fetchone()
@@ -103,7 +103,7 @@ async def handle_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 logging.info(f"Обновление имени пользователя: {user_data.get_name()}")
 
                 # Получаем session_number для обновления записи
-                session_number_query = "SELECT MAX(session_number) FROM orders WHERE user_id = ?"
+                session_number_query = "SELECT MAX(session_number) FROM orders WHERE user_id = %s"
                 cursor = conn.cursor()
                 cursor.execute(session_number_query, (update.message.from_user.id,))
                 session_number = cursor.fetchone()[0]
@@ -111,7 +111,7 @@ async def handle_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 if session_number is None:
                     logging.error("Не удалось получить session_number. Возможно, записи в базе данных отсутствуют.")
                 else:
-                    update_query = "UPDATE orders SET user_name = ? WHERE user_id = ? AND session_number = ?"
+                    update_query = "UPDATE orders SET user_name = %s WHERE user_id = %s AND session_number = %s"
                     update_params = (user_data.get_name(), update.message.from_user.id, session_number)
                     execute_query_with_retry(conn, update_query, update_params)
             else:
@@ -122,7 +122,7 @@ async def handle_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 status = 0  # Начальное значение для статуса
                 number_of_events = 0  # Начальное значение для счетчика событий
 
-                insert_query = "INSERT INTO users (user_id, username, status, number_of_events) VALUES (?, ?, ?, ?)"
+                insert_query = "INSERT INTO users (user_id, username, status, number_of_events) VALUES (%s, %s, %s, %s)"
                 insert_params = (update.message.from_user.id, user_data.get_username(), status, number_of_events)
                 execute_query_with_retry(conn, insert_query, insert_params)
 
@@ -170,7 +170,7 @@ def create_connection():
     try:
         # Заменяем подключение SQLite на подключение к PostgreSQL
         conn = psycopg2.connect(
-            host="db",  # В docker-compose.yml или в вашем конфиге
+            host="localhost",  # В docker-compose.yml или в вашем конфиге
             database="mydatabase",  # Название вашей базы данных
             user="myuser",  # Имя пользователя базы данных
             password="mypassword"  # Пароль пользователя базы данных
@@ -229,7 +229,7 @@ async def handle_date_selection(update: Update, context: ContextTypes.DEFAULT_TY
     user_id = update.callback_query.from_user.id
     selected_date = update.callback_query.data.split('_')[1]  # Извлекаем выбранную дату из callback_data
 
-    update_order_data(user_id, selected_date, "UPDATE orders SET selected_date = ? WHERE user_id = ?")
+    update_order_data(user_id, selected_date, "UPDATE orders SET selected_date = %s WHERE user_id = %s")
     print(f"Дата {selected_date} обновлена в таблице orders для user_id {user_id}")
 
     await update.callback_query.message.reply_text(f"Вы выбрали дату: {selected_date}")
@@ -331,7 +331,7 @@ async def handle_preferences(update: Update, context: ContextTypes.DEFAULT_TYPE)
     user_id = update.message.from_user.id if update.message else update.callback_query.from_user.id
 
     # Получаем session_number для обновления записи
-    session_number_query = "SELECT MAX(session_number) FROM orders WHERE user_id = ?"
+    session_number_query = "SELECT MAX(session_number) FROM orders WHERE user_id = %s"
     conn = create_connection#(DATABASE_PATH)
     cursor = conn.cursor()
     cursor.execute(session_number_query, (user_data.get_user_id(),))
@@ -344,7 +344,7 @@ async def handle_preferences(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
         # Обновляем запись только для последней сессии
         update_order_data(
-            "UPDATE orders SET preferences = ? WHERE user_id = ? AND session_number = ?",
+            "UPDATE orders SET preferences = %s WHERE user_id = %s AND session_number = %s",
             (update.message.text, user_data.get_user_id(), session_number),
             user_data.get_user_id()
         )
@@ -378,7 +378,7 @@ async def handle_city(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id if update.message else update.callback_query.from_user.id
 
     # Получаем session_number для обновления записи
-    session_number_query = "SELECT MAX(session_number) FROM orders WHERE user_id = ?"
+    session_number_query = "SELECT MAX(session_number) FROM orders WHERE user_id = %s"
     conn = create_connection#(DATABASE_PATH)
     cursor = conn.cursor()
     cursor.execute(session_number_query, (user_data.get_user_id(),))
@@ -391,7 +391,7 @@ async def handle_city(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Обновляем запись только для последней сессии
         update_order_data(
-            "UPDATE orders SET city = ? WHERE user_id = ? AND session_number = ?",
+            "UPDATE orders SET city = %s WHERE user_id = %s AND session_number = %s",
             (update.message.text, user_data.get_user_id(), session_number),
             user_data.get_user_id()
         )
@@ -409,7 +409,7 @@ async def handle_city(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.from_user.id if update.message else update.callback_query.from_user.id
 
     # Получаем session_number для обновления записи
-    session_number_query = "SELECT MAX(session_number) FROM orders WHERE user_id = ?"
+    session_number_query = "SELECT MAX(session_number) FROM orders WHERE user_id = %s"
     conn = create_connection#(DATABASE_PATH)
     cursor = conn.cursor()
     cursor.execute(session_number_query, (user_data.get_user_id(),))
@@ -422,7 +422,7 @@ async def handle_city(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Обновляем запись только для последней сессии
         update_order_data(
-            "UPDATE orders SET city = ? WHERE user_id = ? AND session_number = ?",
+            "UPDATE orders SET city = %s WHERE user_id = %s AND session_number = %s",
             (update.message.text, user_data.get_user_id(), session_number),
             user_data.get_user_id()
         )
@@ -994,7 +994,7 @@ def save_user_id_to_orders(user_id,user_n):
     if conn is not None:
         try:
             logging.info(f"Проверка существования записи в orders для user_id: {user_id}")
-            select_query = "SELECT 1 FROM orders WHERE user_id = ?"
+            select_query = "SELECT 1 FROM orders WHERE user_id = %s"
             cursor = conn.cursor()
             cursor.execute(select_query, (user_id,))
             exists = cursor.fetchone()
@@ -1003,7 +1003,7 @@ def save_user_id_to_orders(user_id,user_n):
                 logging.info(f"Запись для user_id {user_id} уже существует в таблице orders.")
             else:
                 logging.info(f"Вставка нового user_id {user_id} с null датой в таблицу orders.")
-                insert_query = "INSERT INTO orders (user_id, user_name, selected_date) VALUES (?, ?, ?)"
+                insert_query = "INSERT INTO orders (user_id, user_name, selected_date) VALUES (%s, %s, %s)"
                 cursor.execute(insert_query, (user_id, user_n, None))  # Передаем None для заполнения null в базе данных
                 conn.commit()
                 logging.info(f"user_id {user_id} успешно добавлен в таблицу orders с null датой.")
