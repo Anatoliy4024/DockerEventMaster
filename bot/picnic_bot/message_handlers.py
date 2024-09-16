@@ -13,11 +13,6 @@ from telegram.ext import ContextTypes
 from keyboards import yes_no_keyboard, generate_calendar_keyboard, generate_time_selection_keyboard, generate_person_selection_keyboard, generate_party_styles_keyboard
 from constants import UserData
 import logging
-from abstract_functions import create_connection, execute_query, execute_query_with_retry
-from constants import TemporaryData
-import logging
-
-
 from order_info_sender import send_order_info_to_servis, send_message_to_admin # функция отправки
                                                                      # сообщений АдминБоту для сценария админа и сервисной службы
 

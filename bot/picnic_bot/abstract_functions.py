@@ -1,8 +1,8 @@
 import psycopg2
 from psycopg2 import OperationalError
 import time
-from database_logger import log_message, log_query
-from constants import UserData
+from bot.picnic_bot.database_logger import log_message, log_query
+from bot.picnic_bot.constants import UserData
 
 
 def create_connection():

@@ -23,38 +23,58 @@
 #CMD ["python3", "-m", "bot.main"]
 
 # Базовый образ Python
+#FROM python:3.9.20-slim-bullseye
+#
+## Устанавливаем рабочую директорию в контейнере
+#WORKDIR /app
+#
+## Копируем файлы requirements.txt в рабочую директорию
+#COPY ./requirements.txt /app/requirements.txt
+#
+## Обновляем pip
+#RUN pip install --upgrade pip
+#
+## Устанавливаем зависимости с логированием в stdout и файл
+##RUN pip install --no-cache-dir -r requirements.txt --verbose | tee /app/install_log.txt || { echo 'Проблема с установкой зависимостей'; exit 1; }
+#RUN pip install --no-cache-dir -r requirements.txt --verbose | tee /app/install_log.txt && pip freeze | tee /app/installed_packages.txt
+#
+## Копируем все файлы бота в рабочую директорию
+#COPY ./bot /app/bot
+#
+## Копируем скрипт ожидание БД
+#COPY wait-for-it.sh /usr/local/bin/wait-for-it.sh
+#
+## Даем права на выполнение
+#RUN chmod +x /usr/local/bin/wait-for-it.sh
+#
+#
+## Устанавливаем переменные среды для базы данных PostgreSQL
+#ENV DATABASE_HOST=postgres
+#ENV DATABASE_USER=myuser
+#ENV DATABASE_PASSWORD=mypassword
+#ENV DATABASE_NAME=mydatabase
+#
+## Команда для запуска бота с ожиданием готовности базы данных
+#CMD ["wait-for-it.sh", "postgres:5432", "--timeout=10", "--", "python3", "-m", "bot.picnic_bot.main"]
+
+
+# Базовый образ
 FROM python:3.9.20-slim-bullseye
 
-# Устанавливаем рабочую директорию в контейнере
+# Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
 
-# Копируем файлы requirements.txt в рабочую директорию
+# Копируем файл зависимостей
 COPY ./requirements.txt /app/requirements.txt
 
-# Обновляем pip
+# Устанавливаем зависимости
 RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
-# Устанавливаем зависимости с логированием в stdout и файл
-#RUN pip install --no-cache-dir -r requirements.txt --verbose | tee /app/install_log.txt || { echo 'Проблема с установкой зависимостей'; exit 1; }
-RUN pip install --no-cache-dir -r requirements.txt --verbose | tee /app/install_log.txt && pip freeze | tee /app/installed_packages.txt
-
-# Копируем все файлы бота в рабочую директорию
+# Копируем файлы проекта в контейнер
 COPY ./bot /app/bot
 
-# Копируем скрипт ожидание БД
-COPY wait-for-it.sh /usr/local/bin/wait-for-it.sh
-
-# Даем права на выполнение
-RUN chmod +x /usr/local/bin/wait-for-it.sh
-
-
-# Устанавливаем переменные среды для базы данных PostgreSQL
-ENV DATABASE_HOST=postgres
-ENV DATABASE_USER=myuser
-ENV DATABASE_PASSWORD=mypassword
-ENV DATABASE_NAME=mydatabase
-
-# Команда для запуска бота с ожиданием готовности базы данных
-CMD ["wait-for-it.sh", "postgres:5432", "--timeout=10", "--", "python3", "-m", "bot.picnic_bot.main"]
+# Запускаем бота
+CMD ["python", "-m", "bot.picnic_bot.main"]
 
 

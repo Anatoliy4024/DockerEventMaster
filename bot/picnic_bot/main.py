@@ -2,19 +2,20 @@ import asyncio
 import os
 import logging
 import random
+import sqlite3
+
+from psycopg2 import OperationalError
+import time
+
 from datetime import datetime, timedelta
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaVideo
 from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, MessageHandler, ContextTypes, filters
-from abstract_functions import create_connection, execute_query, execute_query_with_retry
+from bot.picnic_bot.abstract_functions import create_connection, execute_query, execute_query_with_retry
 import psycopg2
-from constants import UserData, time_selection_headers, people_selection_headers, party_styles_headers, time_set_texts,ORDER_STATUS
-from database_logger import log_message, log_query
-from keyboards import language_selection_keyboard, yes_no_keyboard, generate_calendar_keyboard, generate_time_selection_keyboard, generate_person_selection_keyboard, generate_party_styles_keyboard
-from message_handlers import handle_message, handle_city_confirmation, update_order_data, handle_name, show_payment_page, show_payment_page_handler, show_proforma
-from constants import TemporaryData
-from psycopg2 import OperationalError
-import time
-import sqlite3
+from bot.picnic_bot.constants import UserData, TemporaryData, time_selection_headers, people_selection_headers, party_styles_headers, time_set_texts,ORDER_STATUS
+from bot.picnic_bot.database_logger import log_message, log_query
+from bot.picnic_bot.keyboards import language_selection_keyboard, yes_no_keyboard, generate_calendar_keyboard, generate_time_selection_keyboard, generate_person_selection_keyboard, generate_party_styles_keyboard
+from bot.picnic_bot.message_handlers import handle_message, handle_city_confirmation, update_order_data, handle_name, show_payment_page, show_payment_page_handler, show_proforma
 
 
 # Включаем логирование и указываем файл для логов

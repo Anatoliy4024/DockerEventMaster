@@ -2,7 +2,8 @@ import psycopg2
 import logging
 from telegram import Bot
 
-from bot.picnic_bot.abstract_functions import create_connection
+from abstract_functions import create_connection
+
 from constants import ORDER_STATUS
 
 async def send_order_info_to_servis(user_id, session_num):
