@@ -1,38 +1,34 @@
+import asyncio
+import logging
 import psycopg2
 from psycopg2 import OperationalError
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
-from keyboards import yes_no_keyboard, generate_calendar_keyboard, generate_time_selection_keyboard, generate_person_selection_keyboard, generate_party_styles_keyboard
-from constants import UserData
-import logging
 from datetime import datetime
-from abstract_functions import create_connection, execute_query, execute_query_with_retry
-from constants import TemporaryData, ORDER_STATUS
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ContextTypes
-from keyboards import yes_no_keyboard, generate_calendar_keyboard, generate_time_selection_keyboard, generate_person_selection_keyboard, generate_party_styles_keyboard
-from constants import UserData
-import logging
-from order_info_sender import send_order_info_to_servis, send_message_to_admin # функция отправки
-                                                                     # сообщений АдминБоту для сценария админа и сервисной службы
+from bot.picnic_bot.abstract_functions import create_connection, execute_query, execute_query_with_retry
+from bot.picnic_bot.constants import TemporaryData, ORDER_STATUS, UserData
+from bot.picnic_bot.keyboards import (yes_no_keyboard, generate_calendar_keyboard, generate_time_selection_keyboard,
+                       generate_person_selection_keyboard, generate_party_styles_keyboard)
+from bot.picnic_bot.order_info_sender import send_order_info_to_servis, send_message_to_admin  # функция отправки
+                                     # сообщений АдминБоту для сценария админа и сервисной службы
 
-# Обработчик текстовых сообщений
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_data = context.user_data.get('user_data', UserData())
-    context.user_data['user_data'] = user_data
-    step = user_data.get_step()
-
-    if step == 'greeting':
-        await handle_name(update, context)
-    elif step == 'preferences_request':
-        await handle_preferences(update, context)
-    elif step == 'city_request':
-        await handle_city(update, context)
-    else:
-        await update.message.reply_text(
-            get_translation(user_data, 'buttons_only'),  # Используем функцию для получения перевода
-            reply_markup=get_current_step_keyboard(step, user_data)
-        )
+# # Обработчик текстовых сообщений
+# async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     user_data = context.user_data.get('user_data', UserData())
+#     context.user_data['user_data'] = user_data
+#     step = user_data.get_step()
+#
+#     if step == 'greeting':
+#         await handle_name(update, context)
+#     elif step == 'preferences_request':
+#         await handle_preferences(update, context)
+#     elif step == 'city_request':
+#         await handle_city(update, context)
+#     else:
+#         await update.message.reply_text(
+#             get_translation(user_data, 'buttons_only'),  # Используем функцию для получения перевода
+#             reply_markup=get_current_step_keyboard(step, user_data)
+#         )
 
 
 # Обработчик текстовых сообщений
@@ -83,7 +79,7 @@ async def handle_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logging.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
     # Создайте соединение с базой данных
-    conn = create_connection#(DATABASE_PATH)
+    conn = create_connection()   #(DATABASE_PATH)
     if conn is not None:
         try:
             # Проверка существования пользователя
@@ -165,7 +161,7 @@ def create_connection():
     try:
         # Заменяем подключение SQLite на подключение к PostgreSQL
         conn = psycopg2.connect(
-            host="localhost",  # В docker-compose.yml или в вашем конфиге
+            host="postgres",  # В docker-compose.yml или в вашем конфиге
             database="mydatabase",  # Название вашей базы данных
             user="myuser",  # Имя пользователя базы данных
             password="mypassword"  # Пароль пользователя базы данных
@@ -176,7 +172,6 @@ def create_connection():
         logging.error(f"Ошибка подключения к базе данных: {e}")
         return None
 
-import psycopg2
 
 def update_order_data(query, params, user_id):
     """Обновляет данные в таблице orders с проверками и обработкой ошибок."""
@@ -211,7 +206,6 @@ def update_order_data(query, params, user_id):
         except psycopg2.Error as e:
             logging.error(f"Ошибка базы данных при выполнении запроса: {e}")
         finally:
-            cursor.close()
             conn.close()
             logging.info("Соединение с базой данных закрыто")
     else:
@@ -327,7 +321,7 @@ async def handle_preferences(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     # Получаем session_number для обновления записи
     session_number_query = "SELECT MAX(session_number) FROM orders WHERE user_id = %s"
-    conn = create_connection#(DATABASE_PATH)
+    conn = create_connection()   #(DATABASE_PATH)
     cursor = conn.cursor()
     cursor.execute(session_number_query, (user_data.get_user_id(),))
     session_number = cursor.fetchone()[0]
@@ -366,36 +360,34 @@ async def handle_preferences(update: Update, context: ContextTypes.DEFAULT_TYPE)
     user_data.set_step('city_request')
 
 
-# Функция для обработки города
-async def handle_city(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_data = context.user_data.get('user_data', UserData())
-    user_data.set_city(update.message.text)
-    user_id = update.message.from_user.id if update.message else update.callback_query.from_user.id
+# # Функция для обработки города
+# async def handle_city(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     user_data = context.user_data.get('user_data', UserData())
+#     user_data.set_city(update.message.text)
+#     user_id = update.message.from_user.id if update.message else update.callback_query.from_user.id
+#
+#     # Получаем session_number для обновления записи
+#     session_number_query = "SELECT MAX(session_number) FROM orders WHERE user_id = %s"
+#     conn = create_connection#(DATABASE_PATH)
+#     cursor = conn.cursor()
+#     cursor.execute(session_number_query, (user_data.get_user_id(),))
+#     session_number = cursor.fetchone()[0]
+#
+#     if session_number is None:
+#         logging.error("Не удалось получить session_number. Возможно, записи в базе данных отсутствуют.")
+#     else:
+#         logging.info(f"Используем session_number: {session_number} для обновления.")
+#
+#         # Обновляем запись только для последней сессии
+#         update_order_data(
+#             "UPDATE orders SET city = %s WHERE user_id = %s AND session_number = %s",
+#             (update.message.text, user_data.get_user_id(), session_number),
+#             user_data.get_user_id()
+#         )
+#
+#     # Переходим к следующему шагу
+#     await handle_city_confirmation(update, context)
 
-    # Получаем session_number для обновления записи
-    session_number_query = "SELECT MAX(session_number) FROM orders WHERE user_id = %s"
-    conn = create_connection#(DATABASE_PATH)
-    cursor = conn.cursor()
-    cursor.execute(session_number_query, (user_data.get_user_id(),))
-    session_number = cursor.fetchone()[0]
-
-    if session_number is None:
-        logging.error("Не удалось получить session_number. Возможно, записи в базе данных отсутствуют.")
-    else:
-        logging.info(f"Используем session_number: {session_number} для обновления.")
-
-        # Обновляем запись только для последней сессии
-        update_order_data(
-            "UPDATE orders SET city = %s WHERE user_id = %s AND session_number = %s",
-            (update.message.text, user_data.get_user_id(), session_number),
-            user_data.get_user_id()
-        )
-
-    # Переходим к следующему шагу
-    await handle_city_confirmation(update, context)
-
-
-import asyncio  # Добавляем импорт для работы с задержкой
 
 # Обработчик города
 async def handle_city(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -405,7 +397,7 @@ async def handle_city(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Получаем session_number для обновления записи
     session_number_query = "SELECT MAX(session_number) FROM orders WHERE user_id = %s"
-    conn = create_connection#(DATABASE_PATH)
+    conn = create_connection()    #(DATABASE_PATH)
     cursor = conn.cursor()
     cursor.execute(session_number_query, (user_data.get_user_id(),))
     session_number = cursor.fetchone()[0]
@@ -426,6 +418,7 @@ async def handle_city(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Переходим к следующему шагу
     await handle_city_confirmation(update, context)
+
 
 # Обработчик подтверждения города и отправка ордера
 async def handle_city_confirmation(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -686,7 +679,6 @@ def generate_order_summary(user_data):
     return order_text
 
 
-import asyncio
 
 async def show_payment_page(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_data = context.user_data.get('user_data', UserData())
@@ -789,6 +781,7 @@ import psycopg2
 
 async def show_proforma(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Получаем данные пользователя
+    global proforma_number
     user_data = context.user_data.get('user_data', UserData())
 
     # Получаем user_id из user_data
@@ -818,7 +811,6 @@ async def show_proforma(update: Update, context: ContextTypes.DEFAULT_TYPE):
         except psycopg2.Error as e:
             logging.error(f"Ошибка обновления статуса в таблице orders: {e}")
         finally:
-            cursor.close()
             conn.close()
 
     # Получаем номер проформы (номер ордера с добавлением статуса "_3")
@@ -985,7 +977,7 @@ translations = {
 
 def save_user_id_to_orders(user_id,user_n):
     """Сохраняет user_id в таблицу orders с начальным значением null для даты."""
-    conn = create_connection#(DATABASE_PATH)
+    conn = create_connection() #(DATABASE_PATH)
     if conn is not None:
         try:
             logging.info(f"Проверка существования записи в orders для user_id: {user_id}")

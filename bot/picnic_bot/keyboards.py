@@ -1,11 +1,11 @@
+import logging
+import calendar
 
-from calendar_reserve import reserved_date, check_date_reserved, reserved_month
+from bot.picnic_bot.calendar_reserve import reserved_date, check_date_reserved, reserved_month
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 from datetime import datetime, timedelta
-import calendar
-from data_reserve import get_reserved_times_for_date
+from bot.picnic_bot.data_reserve import check_time_reserved, get_reserved_times_for_date
 
-import logging
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -102,10 +102,6 @@ def generate_calendar_keyboard(month_offset=0, language='en'):
     return InlineKeyboardMarkup(calendar_buttons)
 
 
-import logging
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from datetime import datetime, timedelta
-from data_reserve import check_time_reserved, get_reserved_times_for_date
 
 def generate_time_selection_keyboard(language, stage='start', selected_date=None, start_time=None):
     start_time_dt = datetime.strptime('08:00', '%H:%M')

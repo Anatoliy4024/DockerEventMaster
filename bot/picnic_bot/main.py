@@ -3,7 +3,7 @@ import os
 import logging
 import random
 import sqlite3
-
+import psycopg2
 from psycopg2 import OperationalError
 import time
 
@@ -11,11 +11,17 @@ from datetime import datetime, timedelta
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaVideo
 from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, MessageHandler, ContextTypes, filters
 from bot.picnic_bot.abstract_functions import create_connection, execute_query, execute_query_with_retry
-import psycopg2
-from bot.picnic_bot.constants import UserData, TemporaryData, time_selection_headers, people_selection_headers, party_styles_headers, time_set_texts,ORDER_STATUS
+from bot.picnic_bot.constants import (UserData, TemporaryData, time_selection_headers, people_selection_headers,
+                                      party_styles_headers, time_set_texts,ORDER_STATUS)
 from bot.picnic_bot.database_logger import log_message, log_query
-from bot.picnic_bot.keyboards import language_selection_keyboard, yes_no_keyboard, generate_calendar_keyboard, generate_time_selection_keyboard, generate_person_selection_keyboard, generate_party_styles_keyboard
-from bot.picnic_bot.message_handlers import handle_message, handle_city_confirmation, update_order_data, handle_name, show_payment_page, show_payment_page_handler, show_proforma
+from bot.picnic_bot.keyboards import (language_selection_keyboard, yes_no_keyboard, generate_calendar_keyboard,
+                                      generate_time_selection_keyboard, generate_person_selection_keyboard,
+                                      generate_party_styles_keyboard)
+from bot.picnic_bot.message_handlers import (handle_message, handle_city_confirmation, update_order_data, handle_name,
+                                             show_payment_page, show_payment_page_handler, show_proforma)
+from bot.picnic_bot.calculations import calculate_total_cost
+
+
 
 
 # Включаем логирование и указываем файл для логов
@@ -46,30 +52,12 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
     if isinstance(update, Update):
         await update.message.reply_text("An error occurred. The administrator has been notified.")
 
-def add_username_column():
-    conn = create_connection()  # Соединение с базой данных
-    if conn is not None:
-        query = """
-        ALTER TABLE users ADD COLUMN username TEXT;
-        """
-        try:
-            cursor = conn.cursor()
-            cursor.execute(query)
-            conn.commit()
-            logging.info("Добавлен новый столбец username в таблицу users")
-        except Exception as e:
-            logging.error(f"Ошибка при добавлении столбца username: {e}")
-        finally:
-            conn.close()
-    else:
-        logging.error("Не удалось подключиться к базе данных для добавления нового столбца")
-
 # Пути к видеофайлам
 VIDEO_PATHS = [
-    'media/IMG_5981 (online-video-cutter.com).mp4',
-    'media/IMG_6156 (online-video-cutter.com).mp4',
-    'media/IMG_4077_1 (online-video-cutter.com).mp4',
-    'media/IMG_6412 (online-video-cutter.com).mp4'
+    'bot/picnic_bot/media/IMG_4077_1 (online-video-cutter.com).mp4',
+    'bot/picnic_bot/media/IMG_6156 (online-video-cutter.com).mp4',
+    'bot/picnic_bot/media/IMG_5981 (online-video-cutter.com).mp4',
+    'bot/picnic_bot/media/IMG_6412 (online-video-cutter.com).mp4'
 ]
 
 # Замените 'YOUR_BOT_TOKEN' на токен вашего бота
@@ -80,7 +68,8 @@ conn = create_connection()
 
 # Версия "соединение с базой данных" сделанная с 13.00 до 14.00 - 8.08.2024
 def execute_query_with_retry(conn, query, params=(), max_retries=5):
-    """Выполняет SQL-запрос с повторными попытками при блокировке базы данных."""
+    """Выполняет SQL-запрос с повторными попытками при ошибках базы данных."""
+    global cursor
     retries = 0
     while retries < max_retries:
         try:
@@ -88,21 +77,23 @@ def execute_query_with_retry(conn, query, params=(), max_retries=5):
             cursor.execute(query, params)
             conn.commit()
             return
-        except sqlite3.OperationalError as e:
-            if "database is locked" in str(e):
+        except psycopg2.OperationalError as e:
+            if retries < max_retries:
                 retries += 1
-                logging.warning(f"Database is locked, retrying {retries}/{max_retries}")
+                logging.warning(f"Error occurred, retrying {retries}/{max_retries}")
                 time.sleep(1)  # Задержка перед повторной попыткой
             else:
-                logging.error(f"Error executing query: {e}")
+                logging.error(f"Max retries reached. Error: {e}")
                 raise e
-
+        finally:
+            if cursor:
+                cursor.close()
 def create_connection():
     """Создает соединение с базой данных PostgreSQL."""
     try:
         # Здесь мы подключаемся к Postgres с нужными параметрами
         conn = psycopg2.connect(
-            host="localhost",  # Или имя хоста Docker, например "db"
+            host="postgres",  # Или имя хоста Docker, например "db"
             database="mydatabase",  # Имя базы данных
             user="myuser",  # Имя пользователя
             password="mypassword"  # Пароль
@@ -194,7 +185,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     logging.info("Функция start завершена")
 
-from calculations import calculate_total_cost
 
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logging.info("Функция button_callback запущена")

@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.9'
 
 services:
   postgres:  # Сервис для базы данных PostgreSQL
@@ -7,12 +7,14 @@ services:
       POSTGRES_USER: myuser  # Имя пользователя базы данных
       POSTGRES_PASSWORD: mypassword  # Пароль для пользователя
       POSTGRES_DB: mydatabase  # Имя базы данных, которая будет создана
+      POSTGRES_HOST_AUTH_METHOD: 'trust'
     volumes:
       - postgres_data:/var/lib/postgresql/data  # Хранилище данных PostgreSQL
     networks:
       - bot-network
     ports:
-      - "5432:5432"  # Пробрасываем порт 5432 для доступа к базе данных
+      - "127.0.0.1:5432:5432"  # Пробрасываем порт 5432 для доступа к базе данных
+    container_name: localhost  # Указываем имя контейнера
 
   picnic_bot:  # Сервис для твоего бота
     build:

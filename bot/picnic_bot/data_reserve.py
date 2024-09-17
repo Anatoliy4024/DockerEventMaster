@@ -74,10 +74,16 @@ def create_reserved_timelist(time_list):
     reserved_time_list = list()
 
     for i in time_list:
-        start = datetime.strptime(i[0], "%H:%M") - timedelta(hours=5)
-        end = datetime.strptime(i[1], "%H:%M") + timedelta(hours=5, minutes=30)
+        # start = datetime.strptime(i[0], "%H:%M") - timedelta(hours=5)
+        start = timedelta(hours=i[0].hour, minutes=i[0].minute) - timedelta(hours=5)
+        # end = datetime.strptime(i[1], "%H:%M") + timedelta(hours=5, minutes=30)
+        end = timedelta(hours=i[1].hour, minutes=i[1].minute) + timedelta(hours=5, minutes=30)
         while start < end:
-            if start.time() > time(7, 30) and start.time() < time(22, 30):
-                reserved_time_list.append(start.strftime('%H:%M'))
+            # if start.time() > time(7, 30) and start.time() < time(22, 30):
+            if start > timedelta(hours=7, minutes=30) and start < timedelta(hours=22, minutes=30):
+                hours = int(start.total_seconds() // 3600)
+                minutes = int((start.total_seconds() % 3600)//60)
+                # reserved_time_list.append(start.strftime('%H:%M'))
+                reserved_time_list.append(f"{hours}:{minutes:02d}")
             start += timedelta(minutes=30)
     return reserved_time_list

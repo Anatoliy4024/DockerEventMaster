@@ -12,7 +12,7 @@ def reserved_date(current_date):
     # Создаем подключение к базе данных PostgreSQL
     try:
         conn = psycopg2.connect(
-            host="db",  # Хост базы данных, например "localhost" или "db" для Docker
+            host="postgres",  # Хост базы данных, например "localhost" или "db" для Docker
             database="mydatabase",  # Имя базы данных
             user="myuser",  # Имя пользователя базы данных
             password="mypassword"  # Пароль для доступа к базе данных
@@ -75,13 +75,17 @@ def create_reserved_datelist(date_list):
         if i[1] is None or i[2] is None:
             continue
 
-        start = datetime.strptime(i[1], "%H:%M")
+        # start = datetime.strptime(i[1], "%H:%M")
+        start = timedelta(hours=i[1].hour, minutes=i[1].minute)
         start_with_5 = start - timedelta(hours=5)
-        end_with_5 = datetime.strptime(i[2], "%H:%M") + timedelta(hours=5)
+        # end_with_5 = datetime.strptime(i[2], "%H:%M") + timedelta(hours=5)
+        end_with_5 = timedelta(hours=i[2].hour, minutes=i[2].minute) + timedelta(hours=5)
 
-        start_dif = start_with_5 - datetime(start.year, start.month, start.day, 8, 0)
+        # start_dif = start_with_5 - datetime(start.year, start.month, start.day, 8, 0)
+        start_dif = start_with_5 - timedelta(hours=8)
         start_dif_int = start_dif.total_seconds() // 3600
-        end_dif = datetime(start.year, start.month, start.day, 22, 0) - end_with_5
+        # end_dif = datetime(start.year, start.month, start.day, 22, 0) - end_with_5
+        end_dif = timedelta(hours=22) - end_with_5
         end_dif_int = end_dif.total_seconds() // 3600
 
         if start_dif_int < 2 and end_dif_int < 2:
@@ -106,7 +110,7 @@ def reserved_month(current_date):
     # Создаем подключение к базе данных PostgreSQL
     try:
         conn = psycopg2.connect(
-            host="db",  # Хост базы данных, например "localhost" или "db" для Docker
+            host="postgres",  # Хост базы данных, например "localhost" или "db" для Docker
             database="mydatabase",  # Имя базы данных
             user="myuser",  # Имя пользователя базы данных
             password="mypassword"  # Пароль для доступа к базе данных
@@ -134,7 +138,7 @@ def reserved_month(current_date):
 
         if not user_info:
             logging.warning("Нет записей в orders для указанного месяца.")
-            return None
+            return list()
 
         return user_info
 

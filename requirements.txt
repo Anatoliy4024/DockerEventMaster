@@ -33,11 +33,13 @@ pickleshare==0.7.5
 pipreqs==0.5.0
 platformdirs==4.3.3
 prompt_toolkit==3.0.47
-psycopg2==2.9.9
+
+psycopg2-binary==2.9.9
+
 pure_eval==0.2.3
 Pygments==2.18.0
 python-dateutil==2.9.0.post0
-pywin32==306
+
 pyzmq==26.2.0
 referencing==0.35.1
 requests==2.32.3
@@ -53,3 +55,8 @@ urllib3==2.2.3
 wcwidth==0.2.13
 webencodings==0.5.1
 yarg==0.1.9
+
+python-telegram-bot==20.3
+
+
+

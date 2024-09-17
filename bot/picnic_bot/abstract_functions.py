@@ -9,7 +9,7 @@ def create_connection():
     """Создает соединение с базой данных PostgreSQL."""
     try:
         conn = psycopg2.connect(
-            host="localhost",
+            host="postgres",
             database="mydatabase",
             user="myuser",
             password="mypassword",
