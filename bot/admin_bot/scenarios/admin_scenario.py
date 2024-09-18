@@ -1,22 +1,26 @@
-## bot/admin_bot/scenarios/admin_scenario.py
-import sqlite3
+import psycopg2  # Заменяем sqlite3 на psycopg2 для работы с PostgreSQL
 import subprocess
-
 import logging
 from asyncio.log import logger
 import telegram
 from bot.admin_bot.helpers.calendar_helpers import generate_calendar_keyboard
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
-
 from bot.admin_bot.helpers.database_helpers import get_full_proforma
 from bot.admin_bot.keyboards.admin_keyboards import irina_service_menu, yes_no_keyboard
-from shared.config import DATABASE_PATH
-from shared.constants import UserData
-from shared.helpers import create_connection
+from bot.admin_bot.constants import UserData
 from bot.admin_bot.helpers.calendar_helpers import disable_calendar_buttons
-from shared.translations import translations, language_selection_keyboard
+from bot.admin_bot.translations import translations, language_selection_keyboard
+import os  # Для работы с переменными окружения
 
+# Функция для подключения к базе данных
+def get_db_connection():
+    return psycopg2.connect(
+        host=os.getenv('DATABASE_HOST', 'localhost'),
+        dbname=os.getenv('DATABASE_NAME', 'mydatabase'),
+        user=os.getenv('DATABASE_USER', 'myuser'),
+        password=os.getenv('DATABASE_PASSWORD', 'mypassword')
+    )
 
 async def admin_welcome_message(update: Update):
     # Приветственное сообщение для выбора языка
@@ -25,21 +29,6 @@ async def admin_welcome_message(update: Update):
         reply_markup=language_selection_keyboard()
     )
     return message
-
-
-
-
-# async def admin_welcome_message(update: Update):
-#     # Приветственное сообщение для Администратора
-#     message = await update.message.reply_text(
-#         "Привет, Иринушка! Я - твой АдминБот."
-#     )
-#     # Отображаем меню с 3 кнопками для Ирины
-#     options_message = await update.message.reply_text(
-#         "Выбери действие:",
-#         reply_markup=irina_service_menu()
-#     )
-#     return message, options_message
 
 
 # Функция для показа календаря и редактирования сообщения
@@ -77,32 +66,19 @@ async def show_calendar_to_admin(update, context, month_offset=0):
          # Нажата кнопка "Показать календарь"
         await show_calendar_to_admin(update, context)
 
+
 async def handle_delete_client_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     Обрабатывает нажатие на кнопку 'Удалить клиента из базы данных'.
     """
     await show_calendar_to_admin(update, context)
+
+
 async def handle_find_client_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     Обрабатывает нажатие на кнопку 'Удалить клиента из базы данных'.
     """
     await show_calendar_to_admin(update, context)
-
-
-# def extract_date_from_callback(callback_data):
-#     """
-#     Функция для извлечения даты из callback_data кнопки с красным флажком или без.
-#     Ожидаемые форматы:
-#     - 'date_YYYY-MM-DD'
-#     - 'reserved_date_YYYY-MM-DD'
-#     """
-#     if callback_data.startswith('date_'):
-#         return callback_data.split('_')[1]
-#     elif callback_data.startswith('reserved_date_'):
-#         return callback_data.split('_')[2]
-#     else:
-#         return None
-#
 
 
 async def handle_date_selection(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -146,23 +122,6 @@ async def handle_date_selection(update: Update, context: ContextTypes.DEFAULT_TY
             await query.message.reply_text("Ошибка: выбранная дата не найдена.")
 
 
-# async def handle_calendar_navigation(update, context):
-#     query = update.callback_query
-#     data = query.data
-#
-#     if data.startswith('date_'):
-#         # Получаем дату с помощью функции
-#         selected_date = extract_date_from_callback(data)
-#
-#         if selected_date:
-#             # Отключаем все остальные кнопки и оставляем выбранную с красной точкой
-#             #from bot.admin_bot.scenarios.admin_scenario import disable_calendar_buttons
-#             new_reply_markup = disable_calendar_buttons(query.message.reply_markup, selected_date)
-#             await query.edit_message_reply_markup(reply_markup=new_reply_markup)
-#
-#             # Переход на следующий шаг — формирование кнопок для проформ
-#             await query.message.reply_text(f"Вы выбрали дату {selected_date}. Формирую проформы...")
-
 
 def generate_proforma_buttons(proforma_list):
     keyboard = []
@@ -177,7 +136,7 @@ def generate_proforma_buttons(proforma_list):
 
 async def generate_proforma_buttons_by_date(selected_date):
     # Пример запроса в базу данных
-    conn = sqlite3.connect(DATABASE_PATH)
+    conn = get_db_connection()  # Используем подключение к PostgreSQL
     cursor = conn.cursor()
 
     try:
@@ -185,7 +144,7 @@ async def generate_proforma_buttons_by_date(selected_date):
         cursor.execute("""
             SELECT user_id, session_number, status
             FROM orders
-            WHERE selected_date = ? AND status >= 3
+            WHERE selected_date = %s AND status >= 3
         """, (selected_date,))
 
         proforma_list = cursor.fetchall()
@@ -201,14 +160,12 @@ async def generate_proforma_buttons_by_date(selected_date):
             # Выводим callback_data в консоль для проверки
             print(f"Callback data для кнопки: {proforma_number}")
 
-            # callback_data = f"{proforma['user_id']}_{proforma['session_number']}_{proforma['status']}"
-            # buttons.append([InlineKeyboardButton(proforma_number, callback_data=callback_data)])
-
             buttons.append([InlineKeyboardButton(proforma_number, callback_data=f"{proforma[0]}_{proforma[1]}_{proforma[2]}")])
 
         return InlineKeyboardMarkup(buttons)
 
     finally:
+        cursor.close()
         conn.close()
 
 
@@ -266,13 +223,13 @@ async def handle_proforma_button_click(update: Update, context: ContextTypes.DEF
 
 def null_status(order_id):
     # Создаем подключение к базе данных
-    conn = sqlite3.connect(DATABASE_PATH)
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     try:
         # Обновляем статус ордера
         logging.info(f"Updating order status for order_id: {order_id}")
-        cursor.execute("UPDATE orders SET status = 0 WHERE order_id = ?",
+        cursor.execute("UPDATE orders SET status = 0 WHERE order_id = %s",
                        (order_id,))
         conn.commit()
 
@@ -284,6 +241,6 @@ def null_status(order_id):
         print(f"Принт: Ошибка при отправке сообщения: {e}")
 
     finally:
+        cursor.close()
         conn.close()
         logging.info(f"Database connection closed for order_id: {order_id}")
-

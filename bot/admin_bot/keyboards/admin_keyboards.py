@@ -7,10 +7,10 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 from bot.admin_bot.helpers.database_helpers import get_full_proforma
 from bot.admin_bot.scenarios.user_scenario import get_latest_session_number
-from shared.translations import translations, button_texts
+from bot.admin_bot.translations import translations, button_texts
+from bot.admin_bot.config import BOT_TOKEN
 
 
-from shared.config import DATABASE_PATH
 
 def irina_service_menu():
     keyboard = [

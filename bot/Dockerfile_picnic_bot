@@ -74,11 +74,6 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 # Копируем файлы проекта в контейнер
 COPY ./bot /app/bot
 
-## Устанавливаем переменные среды для базы данных PostgreSQL
-#ENV DATABASE_HOST=postgres
-#ENV DATABASE_USER=myuser
-#ENV DATABASE_PASSWORD=mypassword
-#ENV DATABASE_NAME=mydatabase
 
 # Запускаем бота
 CMD ["python", "-m", "bot.picnic_bot.main"]

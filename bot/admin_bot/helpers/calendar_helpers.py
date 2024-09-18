@@ -1,17 +1,23 @@
-## calendar_helpers.py
-
+import os
+import psycopg2  # Импортируем psycopg2 для работы с PostgreSQL
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from datetime import datetime, timedelta
 import calendar
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-import sqlite3
-from shared.config import DATABASE_PATH  # Путь к базе данных
+import logging
 
 
 def get_dates_with_active_proformas():
     """
     Получает даты, на которые есть хотя бы одна проформа со статусом >= 3.
     """
-    conn = sqlite3.connect(DATABASE_PATH)
+    # Устанавливаем соединение с PostgreSQL
+    conn = psycopg2.connect(
+        host="postgres",
+        database="mydatabase",
+        user="myuser",
+        password="mypassword",
+        client_encoding="UTF8"
+    )
     cursor = conn.cursor()
 
     try:
@@ -23,19 +29,13 @@ def get_dates_with_active_proformas():
         dates = cursor.fetchall()  # Получаем все даты, на которые есть активные проформы
         return [date[0] for date in dates]  # Возвращаем список дат в формате YYYY-MM-DD
     finally:
+        cursor.close()
         conn.close()
 
 
 def check_date_reserved(date, reserved_dates):
     """Проверяет, зарезервирована ли дата."""
     return date in reserved_dates
-
-
-# bot/admin_bot/helpers/calendar_helpers.py
-from datetime import datetime, timedelta
-import calendar
-import logging
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 
 def to_superscript(num_str):

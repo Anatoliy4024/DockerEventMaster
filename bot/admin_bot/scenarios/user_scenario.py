@@ -1,25 +1,24 @@
-import sqlite3
+import psycopg2  # Заменяем sqlite3 на psycopg2 для работы с PostgreSQL
 import logging
 from telegram import Update, Bot
 from telegram.ext import ContextTypes
-from bot.admin_bot.helpers.database_helpers import get_latest_session_number, get_full_proforma
-from shared.config import BOT_TOKEN
-from shared.constants import UserData, ORDER_STATUS
-from shared.translations import language_selection_keyboard, translations
 
-from shared.config import DATABASE_PATH
+from bot.admin_bot.config import BOT_TOKEN
+from bot.admin_bot.constants import ORDER_STATUS
+from bot.admin_bot.helpers.database_helpers import get_latest_session_number, get_full_proforma
+from bot.admin_bot.translations import language_selection_keyboard, translations
 
 ORDER_STATUS_REVERSE = {v: k for k, v in ORDER_STATUS.items()}
 
-import logging
-
-# Логирование
-# logging.basicConfig(
-#     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-#     level=logging.INFO,
-#     filename=r'C:\Users\USER\PycharmProjects\EventMaster\bot\admin_bot\helpers\logs'  # Укажите путь к файлу лога
-# )
-# logger = logging.getLogger(__name__)
+# Функция для подключения к базе данных
+def get_db_connection():
+    return psycopg2.connect(
+        host="postgres",
+        database="mydatabase",
+        user="myuser",
+        password="mypassword",
+        client_encoding="UTF8"
+    )
 
 async def user_welcome_message(update: Update, first_name):
     return await update.message.reply_text(
@@ -51,7 +50,6 @@ async def send_proforma_to_user(user_id, session_number, user_data):
             f"{trans['amount_to_pay']} {float(order_info[8]) - 20} евро\n"
             f"\n{trans['delivery_info']}"
         )
-        print("???????????????????????????????????????????????")
 
         # Отправляем сообщение пользователю
         bot = Bot(token=BOT_TOKEN)
@@ -60,10 +58,10 @@ async def send_proforma_to_user(user_id, session_number, user_data):
         logging.info(f"Message sent to user {user_id}.")
 
         # Обновляем статус ордера
-        conn = sqlite3.connect(DATABASE_PATH)
+        conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
-            "UPDATE orders SET status = ? WHERE user_id = ? AND session_number = ?",
+            "UPDATE orders SET status = %s WHERE user_id = %s AND session_number = %s",
             (ORDER_STATUS["5-Заказчик зашел в АдминБот и просмотрел свою ПРОФОРМУ"], user_id, session_number)
         )
         conn.commit()
@@ -73,12 +71,6 @@ async def send_proforma_to_user(user_id, session_number, user_data):
     except Exception as e:
         logging.error(f"Failed to send order info to user: {e}")
 
-    if conn:  # Проверяем, инициализирована ли переменная
-
-        conn.close()
-
-
-
-
-
-
+    finally:
+        if conn:  # Проверяем, инициализирована ли переменная
+            conn.close()

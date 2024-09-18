@@ -1,0 +1,19 @@
+# Базовый образ
+FROM python:3.9.20-slim-bullseye
+
+# Устанавливаем рабочую директорию внутри контейнера
+WORKDIR /app
+
+# Копируем файл зависимостей
+COPY ./requirements.txt /app/requirements.txt
+
+# Устанавливаем зависимости
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+# Копируем файлы проекта в контейнер
+COPY ./bot /app/bot
+
+
+# Запускаем бота
+CMD ["python", "-m", "bot.admin_bot.main"]

@@ -32,8 +32,24 @@ services:
     ports:
       - "8000:8000"  # Пробрасываем порт для общения с ботом (если потребуется)
 
+  admin_bot:  # Сервис для admin_bot
+    build:
+      context: .  # Путь к проекту
+      dockerfile: bot/Dockerfile_admin_bot  # Dockerfile для admin_bot
+    environment:
+      DATABASE_HOST: postgres  # Имя сервиса базы данных
+      DATABASE_USER: myuser  # Имя пользователя базы данных
+      DATABASE_PASSWORD: mypassword  # Пароль для пользователя
+      DATABASE_NAME: mydatabase  # Имя базы данных
+    depends_on:
+      - postgres  # Зависимость от сервиса базы данных
+    networks:
+      - bot-network  # Сеть для общения с другими сервисами
+    ports:
+      - "8001:8000"  # Пробрасываем порт для admin_bot (если потребуется)
+
 networks:
-  bot-network:  # Создаем общую сеть, чтобы бот и база данных могли взаимодействовать
+  bot-network:  # Создаем общую сеть для ботов и базы данных
     driver: bridge
 
 volumes:
