@@ -15,25 +15,39 @@ from bot.admin_bot.scenarios.admin_scenario import admin_welcome_message, handle
     handle_find_client_callback, null_status, handle_delete_client_callback
 from bot.admin_bot.scenarios.service_scenario import service_welcome_message
 from bot.admin_bot.translations import language_selection_keyboard
+from bot.admin_bot.database_logger import log_message, log_query
+
 
 ORDER_STATUS_REVERSE = {v: k for k, v in ORDER_STATUS.items()}
 
 
-# Определяем путь к файлу лога
-log_dir = r'C:\Users\USER\PycharmProjects\EventMaster\bot\admin_bot\helpers\logs'
-log_file = os.path.join(log_dir, 'admin_bot.log')
+# # Определяем путь к файлу лога
+# log_dir = r'C:\Users\USER\PycharmProjects\Docker_Event_Master\bot\admin_bot\helpers\logs'
+# log_file = os.path.join(log_dir, 'admin_bot.log')
+#
+# # Создаем директорию, если она не существует
+# os.makedirs(log_dir, exist_ok=True)
+#
+# # Настраиваем логирование
+# logging.basicConfig(
+#     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+#     level=logging.INFO,
+#     filename=log_file,
+#     encoding='utf-8'
+# )
+# logger = logging.getLogger(__name__)
 
-# Создаем директорию, если она не существует
-os.makedirs(log_dir, exist_ok=True)
 
-# Настраиваем логирование
+# Включаем логирование и указываем файл для логов
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO,
-    filename=log_file,
-    encoding='utf-8'
+    level=logging.DEBUG,  # Установите уровень на DEBUG для детальной информации
+    filename='db_operations.log',  # Укажите имя файла для логов
+    filemode='w'  # 'w' - перезаписывать файл при каждом запуске, 'a' - добавлять к существующему файлу
 )
+
 logger = logging.getLogger(__name__)
+
 
 # Функция для подключения к базе данных PostgreSQL
 def get_db_connection():

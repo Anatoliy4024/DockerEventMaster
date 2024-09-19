@@ -97,12 +97,7 @@ def create_reserved_datelist(date_list):
 def check_date_reserved(cur_date, order_list):
     reserved_list = list(create_reserved_datelist(order_list))
 
-    date_str = cur_date.strftime("%Y-%m-%d")
-    if date_str in reserved_list:
-        return True
-
-    return False
-
+    return cur_date in reserved_list
 
 def reserved_month(current_date):
     logging.info(f"Функция reserved_month вызвана для даты: {current_date}")

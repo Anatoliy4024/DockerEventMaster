@@ -35,6 +35,7 @@ def get_dates_with_active_proformas():
 
 def check_date_reserved(date, reserved_dates):
     """Проверяет, зарезервирована ли дата."""
+
     return date in reserved_dates
 
 
@@ -65,6 +66,7 @@ def generate_calendar_keyboard(month_offset=0, language='en'):
         base_year -= 1
 
     first_of_month = datetime(base_year, base_month, 1)
+
     last_day = calendar.monthrange(first_of_month.year, first_of_month.month)[1]
     last_of_month = first_of_month.replace(day=last_day)
 
@@ -81,7 +83,7 @@ def generate_calendar_keyboard(month_offset=0, language='en'):
 
     reserved_dates = get_dates_with_active_proformas()  # Get reserved dates
 
-    # Заполняем календарь днями месяца
+  # Заполняем календарь днями месяца
     for _ in range(5):  # 5 строк (максимум) для дней месяца
         for day in range(len(calendar_buttons)):
             if current_date.day == 1 and day < start_weekday:
@@ -92,7 +94,7 @@ def generate_calendar_keyboard(month_offset=0, language='en'):
                 day_text = to_superscript(str(current_date.day))
 
                 # Check if the date is reserved
-                if check_date_reserved(current_date.strftime("%Y-%m-%d"), reserved_dates):
+                if check_date_reserved(current_date, reserved_dates):
                     calendar_buttons[day].append(InlineKeyboardButton(f"🔻 {day_text}", callback_data=f'date_{current_date.strftime("%Y-%m-%d")}'))
                 else:
                     calendar_buttons[day].append(InlineKeyboardButton(f" {current_date.day}",

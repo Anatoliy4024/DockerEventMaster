@@ -616,6 +616,7 @@ async def show_calendar(query, month_offset, language):
     calendar_keyboard = generate_calendar_keyboard(month_offset, language)
     logging.info(f"Календарная клавиатура сгенерирована для month_offset={month_offset}, language={language}")
 
+
     # Тексты для выбора даты на разных языках
     select_date_text = {
         'en': "Select a date:",
