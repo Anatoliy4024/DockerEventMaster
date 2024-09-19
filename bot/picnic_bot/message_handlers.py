@@ -13,6 +13,8 @@ from bot.picnic_bot.order_info_sender import send_order_info_to_servis, send_mes
                                      # сообщений АдминБоту для сценария админа и сервисной службы
 
 
+
+
 # Обработчик текстовых сообщений
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_data = context.user_data.get('user_data', UserData())
@@ -207,11 +209,9 @@ async def handle_date_selection(update: Update, context: ContextTypes.DEFAULT_TY
 
 
 
-
 def get_translation(user_data, key):
     language_code = user_data.get_language()  # Получаем код языка пользователя
     return translations.get(language_code, translations['en'])  # Возвращаем перевод или английский по умолчанию
-
 
 
 # Функция для обработки имени
@@ -287,35 +287,6 @@ async def handle_preferences(update: Update, context: ContextTypes.DEFAULT_TYPE)
         city_request_texts.get(language_code, 'Please specify the city for the event.')
     )
     user_data.set_step('city_request')
-
-
-# # Функция для обработки города
-# async def handle_city(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     user_data = context.user_data.get('user_data', UserData())
-#     user_data.set_city(update.message.text)
-#     user_id = update.message.from_user.id if update.message else update.callback_query.from_user.id
-#
-#     # Получаем session_number для обновления записи
-#     session_number_query = "SELECT MAX(session_number) FROM orders WHERE user_id = %s"
-#     conn = create_connection#(DATABASE_PATH)
-#     cursor = conn.cursor()
-#     cursor.execute(session_number_query, (user_data.get_user_id(),))
-#     session_number = cursor.fetchone()[0]
-#
-#     if session_number is None:
-#         logging.error("Не удалось получить session_number. Возможно, записи в базе данных отсутствуют.")
-#     else:
-#         logging.info(f"Используем session_number: {session_number} для обновления.")
-#
-#         # Обновляем запись только для последней сессии
-#         update_order_data(
-#             "UPDATE orders SET city = %s WHERE user_id = %s AND session_number = %s",
-#             (update.message.text, user_data.get_user_id(), session_number),
-#             user_data.get_user_id()
-#         )
-#
-#     # Переходим к следующему шагу
-#     await handle_city_confirmation(update, context)
 
 
 # Обработчик города
@@ -608,7 +579,6 @@ def generate_order_summary(user_data):
     return order_text
 
 
-
 async def show_payment_page(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_data = context.user_data.get('user_data', UserData())
     payment_message_texts = {
@@ -642,6 +612,8 @@ async def show_payment_page(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(payment_message)
     await asyncio.sleep(1)
     await show_proforma(update, context)
+
+
 def show_payment_page_handler(context: ContextTypes.DEFAULT_TYPE):
     user_data = context.user_data.get('user_data', UserData())
     payment_message_texts = {
@@ -674,39 +646,6 @@ def show_payment_page_handler(context: ContextTypes.DEFAULT_TYPE):
     payment_message = payment_message_texts.get(language_code, payment_message_texts['en'])
     return payment_message
 
-# async def show_proforma(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     # Получаем данные пользователя
-#     user_data = context.user_data.get('user_data', UserData())
-#
-#        # Получаем user_id из user_data
-#     user_id = user_data.get_user_id()
-#
-#     # Обновляем статус пользователя в таблице orders до "зарезервировано"
-#     conn = create_connection#(DATABASE_PATH)
-#     if conn is not None:
-#         try:
-#             # Проверка текущего максимального session_number для user_id
-#             select_query = "SELECT MAX(session_number) FROM orders WHERE user_id = ?"
-#             cursor = conn.cursor()
-#             cursor.execute(select_query, (user_id,))
-#             current_session = cursor.fetchone()[0]
-#
-#             user_data.set_session_number(current_session)
-#
-#             if current_session is None:
-#                 logging.error(f"Ошибка обновления статуса в таблице orders для user_id {user_id}")
-#             else:
-#                 # Обновляем статус заказа
-#                 update_query = "UPDATE orders SET status = ? WHERE user_id = ? AND session_number = ?"
-#                 cursor.execute(update_query, (ORDER_STATUS["3-зарезервировано - заказчик оплатил аванс"], user_id, current_session,))
-#                 conn.commit()
-#                 logging.info(f"User {user_id}: статус обновлен до 'зарезервировано'.")
-#         except sqlite3.Error as e:
-#             logging.error(f"Ошибка обновления статуса в таблице orders: {e}")
-#         finally:
-#             conn.close()
-
-import psycopg2
 
 async def show_proforma(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Получаем данные пользователя
@@ -933,7 +872,7 @@ def save_user_id_to_orders(user_id,user_n):
         logging.error("Не удалось создать соединение с базой данных для работы с таблицей orders")
 
 
-#№№№Функция для получения перевода на основе языка пользователя
+# Функция для получения перевода на основе языка пользователя
 def get_translation(user_data, key):
     language_code = user_data.get_language()  # Получаем код языка пользователя
     return translations.get(language_code, translations['en'])  # Возвращаем перевод или английский по умолчанию
