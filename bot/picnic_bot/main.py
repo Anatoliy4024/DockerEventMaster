@@ -36,7 +36,28 @@ logger = logging.getLogger(__name__)
 # logger.info(f"Database path: {DATABASE_PATH}")
 
 #########################################################################
+def get_user_status(user_id):
+    try:
+        # Подключаемся к базе данных PostgreSQL
+        conn = create_connection()
+        cursor = conn.cursor()
 
+        # Выполняем SQL-запрос для получения статуса пользователя
+        cursor.execute("SELECT status FROM users WHERE user_id = %s", (user_id,))
+        result = cursor.fetchone()
+
+        if result:
+            return result[0]  # Возвращаем статус пользователя
+        else:
+            return None  # Если пользователь не найден
+
+    except psycopg2.Error as e:
+        print(f"Ошибка при получении статуса: {e}")
+        return None
+
+    finally:
+        if conn:
+            conn.close()
 
 
 # добавление обработчика ошибок
@@ -307,8 +328,12 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         elif user_data.get_step() == 'order_sent':
             user_data.set_step('order_confirmation')
             # await show_payment_page(update, context)
-            await query.message.reply_text(show_payment_page_handler(context))
-            await asyncio.sleep(3)
+
+            user_status = get_user_status(user_data.get_user_id())
+            if user_status != 1:
+                await query.message.reply_text(show_payment_page_handler(context))
+                await asyncio.sleep(3)
+
             await show_proforma(update, context)
 
         elif user_data.get_step() == 'time_confirmation':

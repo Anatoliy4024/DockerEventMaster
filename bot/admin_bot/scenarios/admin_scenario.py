@@ -84,7 +84,7 @@ async def handle_find_client_callback(update: Update, context: ContextTypes.DEFA
 async def handle_date_selection(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     data = query.data
-
+    logger.info(f"ЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦЦ: {data}")
     if data.startswith('date_'):
         # Извлекаем выбранную дату
         selected_date = data.split('_')[1]
@@ -135,6 +135,7 @@ def generate_proforma_buttons(proforma_list):
 
 
 async def generate_proforma_buttons_by_date(selected_date):
+    logging.info(f"{selected_date}, {type(selected_date)}!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     # Пример запроса в базу данных
     conn = get_db_connection()  # Используем подключение к PostgreSQL
     cursor = conn.cursor()

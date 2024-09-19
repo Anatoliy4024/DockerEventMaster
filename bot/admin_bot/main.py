@@ -20,24 +20,6 @@ from bot.admin_bot.database_logger import log_message, log_query
 
 ORDER_STATUS_REVERSE = {v: k for k, v in ORDER_STATUS.items()}
 
-
-# # Определяем путь к файлу лога
-# log_dir = r'C:\Users\USER\PycharmProjects\Docker_Event_Master\bot\admin_bot\helpers\logs'
-# log_file = os.path.join(log_dir, 'admin_bot.log')
-#
-# # Создаем директорию, если она не существует
-# os.makedirs(log_dir, exist_ok=True)
-#
-# # Настраиваем логирование
-# logging.basicConfig(
-#     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-#     level=logging.INFO,
-#     filename=log_file,
-#     encoding='utf-8'
-# )
-# logger = logging.getLogger(__name__)
-
-
 # Включаем логирование и указываем файл для логов
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -332,6 +314,10 @@ if __name__ == '__main__':
     application = ApplicationBuilder().token(BOT_TOKEN).build()
 
     application.add_handler(CommandHandler('start', start))
+    application.add_handler(CallbackQueryHandler(handle_date_selection, pattern=r'^date_\d{4}-\d{2}-\d{2}$'))
+    # Обработчик для кнопок проформы
+    application.add_handler(CallbackQueryHandler(handle_proforma_button_click, pattern=r'^\d+_\d+_\d+$'))
+
     application.add_handler(CallbackQueryHandler(button_callback))
 
     application.run_polling()

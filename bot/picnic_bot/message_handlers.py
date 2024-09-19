@@ -12,24 +12,6 @@ from bot.picnic_bot.keyboards import (yes_no_keyboard, generate_calendar_keyboar
 from bot.picnic_bot.order_info_sender import send_order_info_to_servis, send_message_to_admin  # функция отправки
                                      # сообщений АдминБоту для сценария админа и сервисной службы
 
-# # Обработчик текстовых сообщений
-# async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     user_data = context.user_data.get('user_data', UserData())
-#     context.user_data['user_data'] = user_data
-#     step = user_data.get_step()
-#
-#     if step == 'greeting':
-#         await handle_name(update, context)
-#     elif step == 'preferences_request':
-#         await handle_preferences(update, context)
-#     elif step == 'city_request':
-#         await handle_city(update, context)
-#     else:
-#         await update.message.reply_text(
-#             get_translation(user_data, 'buttons_only'),  # Используем функцию для получения перевода
-#             reply_markup=get_current_step_keyboard(step, user_data)
-#         )
-
 
 # Обработчик текстовых сообщений
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -224,60 +206,7 @@ async def handle_date_selection(update: Update, context: ContextTypes.DEFAULT_TY
     await update.callback_query.message.reply_text(f"Вы выбрали дату: {selected_date}")
 
 
-# def update_order_date(user_id, start_time):
-#     """Обновляет дату в таблице orders для указанного user_id."""
-#     conn = create_connection(DATABASE_PATH)
-#     if conn is not None:
-#         try:
-#             logging.info(f"Обновление записи в orders для user_id: {user_id} с датой: {start_time}")
-#             date_object = datetime.strptime(start_time, "%Y-%m-%d")
-#             update_query = "UPDATE orders SET selected_date = ? WHERE user_id = ?"
-#             execute_query_with_retry(conn, update_query, (date_object, user_id))
-#             logging.info(f"Принт: Дата {start_time} успешно обновлена для user_id {user_id}")
-#             logging.info(f"Дата {start_time} успешно обновлена для user_id {user_id}")
-#             print(f"Принт: +++++++++++++++++++Дата {start_time} успешно обновлена для user_id {user_id}")
-#         except Exception as e:
-#             logging.error(f"Ошибка базы данных при обновлении даты в таблице orders: {e}")
-#         finally:
-#             conn.close()
-#             logging.info("Соединение с базой данных закрыто")
-#     else:
-#         logging.error("Не удалось создать соединение с базой данных для работы с таблицей orders")
 
-# def update_order_data(user_id, object, query):
-#     """Обновляет дату в таблице orders для указанного user_id."""
-#     conn = create_connection(DATABASE_PATH)
-#     if conn is not None:
-#         try:
-#             logging.info(f"Обновление записи в orders для user_id: {user_id} с датой: {object}")
-#             if isinstance(object,datetime):
-#                 object = datetime.strptime(object, "%Y-%m-%d")
-#             elif isinstance(object,int):
-#                 object = object
-#             execute_query_with_retry(conn, query, (object, user_id))
-#             logging.info(f"Принт: Дата {object} успешно обновлена для user_id {user_id}")
-#             logging.info(f"Дата {object} успешно обновлена для user_id {user_id}")
-#             print(f"Принт: +++++++++++++++++++Дата {object} успешно обновлена для user_id {user_id}")
-#         except Exception as e:
-#             logging.error(f"Ошибка базы данных при обновлении даты в таблице orders: {e}")
-#         finally:
-#             conn.close()
-#             logging.info("Соединение с базой данных закрыто")
-#     else:
-#         logging.error("Не удалось создать соединение с базой данных для работы с таблицей orders")
-#
-#
-# # Словарь с переводами сообщения "Выбор только кнопками" на разные языки
-# translations = {
-#     'en': "Please use the buttons",
-#     'ru': "Выбор только кнопками",
-#     'es': "Por favor, usa los botones",
-#     'fr': "Veuillez utiliser les boutons",
-#     'de': "Bitte verwenden Sie die Tasten",
-#     'it': "Si prega di utilizzare i pulsanti",
-#     'uk': "Будь ласка, використовуйте кнопки",
-#     'pl': "Proszę użyć przycisków"
-# }
 
 def get_translation(user_data, key):
     language_code = user_data.get_language()  # Получаем код языка пользователя
