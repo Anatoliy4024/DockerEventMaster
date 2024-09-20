@@ -1,7 +1,7 @@
 # shared/config.py
 
 # Путь к базе данных
-DATABASE_PATH = r'C:\Users\USER\PycharmProjects\sandbox_project\sqlite.db'
+# DATABASE_PATH = r'C:\Users\USER\PycharmProjects\sandbox_project\sqlite.db'
 
 #DATABASE_PATH = r'C:\Users\USER\PycharmProjects\EventMaster\shared\db\sqlite.db'
 
