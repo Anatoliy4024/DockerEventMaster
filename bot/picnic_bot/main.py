@@ -285,21 +285,46 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await context.bot.send_message(chat_id=update.effective_chat.id, text="Video file not found.")
             await loading_message.delete()
+        #
+        # greeting_texts = {
+        #     'en': 'Hello! What is your name?',
+        #     'ru': 'Привет! Как вас зовут?',
+        #     'es': '¡Hola! ¿Cómo te llamas?',
+        #     'fr': 'Salut! Quel est votre nom ?',
+        #     'uk': 'Привіт! Як вас звати?',
+        #     'pl': 'Cześć! Jak masz на імʼя?',
+        #     'de': 'Hallo! Wie heißt du?',
+        #     'it': 'Ciao! Come ti chiami?'
+        # }
+        # await context.bot.send_message(
+        #     chat_id=update.effective_chat.id,
+        #     text=greeting_texts.get(language_code, 'Hello! What is your name?')
+        # )
 
+        # Пример текста с гиперссылкой в зависимости от выбранного языка
         greeting_texts = {
-            'en': 'Hello! What is your name?',
-            'ru': 'Привет! Как вас зовут?',
-            'es': '¡Hola! ¿Cómo te llamas?',
-            'fr': 'Salut! Quel est votre nom ?',
-            'uk': 'Привіт! Як вас звати?',
-            'pl': 'Cześć! Jak masz на імʼя?',
-            'de': 'Hallo! Wie heißt du?',
-            'it': 'Ciao! Come ti chiami?'
+            'en': 'Hello! What is your name? We respect and protect your [privacy](https://telegra.ph/Privacy-Policy-09-19-96).',
+            'ru': 'Привет! Как вас зовут? Мы уважаем и защищаем вашу [конфиденциальность](https://telegra.ph/Politika-konfidencialnosti-09-19-5).',
+            'es': '¡Hola! ¿Cómo te llamas? Respetamos y protegemos tu [privacidad](https://telegra.ph/Pol%C3%ADtica-de-privacidad-09-19-8).',
+            'fr': 'Salut! Quel est votre nom ? Nous respectons et protégeons votre [confidentialité](https://telegra.ph/Politique-de-confidentialit%C3%A9-09-19-3).',
+            'uk': 'Привіт! Як вас звати? Ми поважаємо і захищаємо вашу [конфіденційність](https://telegra.ph/Pol%D1%96tika-konf%D1%96denc%D1%96jnost%D1%96-09-19).',
+            'pl': 'Cześć! Jak masz на імʼя? Szanujemy i chronimy twoją [prywatność](https://telegra.ph/Polityka-prywatno%C5%9Bci-09-19).',
+            'de': 'Hallo! Wie heißt du? Wir respektieren und schützen deine [Privatsphäre](https://telegra.ph/Datenschutzrichtlinie-09-19).',
+            'it': 'Ciao! Come ti chiami? Rispettiamo e proteggiamo la tua [privacy](https://telegra.ph/Politica-sulla-privacy-09-19).'
         }
+
+        # Отправляем сообщение с приветствием и ссылкой, отключая предварительный просмотр
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text=greeting_texts.get(language_code, 'Hello! What is your name?')
+            text=greeting_texts.get(language_code,
+                                    'Hello! What is your name? We respect and protect your [privacy](https://telegra.ph/Privacy-Policy-09-19-96).'),
+            parse_mode='Markdown',
+            disable_web_page_preview=True  # Отключаем предварительный просмотр
         )
+
+
+
+
 
     elif query.data == 'yes':
         if user_data.get_step() == 'name_received':
