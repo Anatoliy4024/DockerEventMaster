@@ -63,7 +63,7 @@ async def handle_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logging.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
     # Создайте соединение с базой данных
-    conn = create_connection()   #(DATABASE_PATH)
+    conn = create_connection()
     if conn is not None:
         try:
             # Проверка существования пользователя
@@ -89,6 +89,11 @@ async def handle_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     update_query = "UPDATE orders SET user_name = %s WHERE user_id = %s AND session_number = %s"
                     update_params = (user_data.get_name(), update.message.from_user.id, session_number)
                     execute_query_with_retry(conn, update_query, update_params)
+
+                # Теперь сохраняем user_id в таблицу orders
+                save_user_id_to_orders(update.message.from_user.id, user_data.get_name())
+
+
             else:
                 # Вставка нового пользователя в users
                 logging.info(f"Вставка нового пользователя: {user_data.get_username()}")
@@ -101,9 +106,7 @@ async def handle_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 insert_params = (update.message.from_user.id, user_data.get_username(), status, number_of_events)
                 execute_query_with_retry(conn, insert_query, insert_params)
 
-            # Теперь сохраняем user_id в таблицу orders
-            save_user_id_to_orders(update.message.from_user.id, user_data.get_name())
-            print(f"Принт 9: user_id {update.message.from_user.id} сохранен в таблицу orders")
+                print(f"Принт 9: user_id {update.message.from_user.id} сохранен в таблицу orders")
 
         except Exception as e:
             logging.error(f"Ошибка базы данных: {e}")
@@ -174,8 +177,8 @@ def update_order_data(query, params, user_id):
             else:
                 logging.info(f"Вставка нового user_id {user_id} в таблицу orders.")
                 insert_query = """
-                    INSERT INTO orders (user_id, selected_date, start_time, end_time, duration, people_count, selected_party_style, city, preferences, status)
-                    VALUES (%s, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1)
+                    INSERT INTO orders (user_id, session_number, user_name, language, selected_date, start_time, end_time, duration, people_count, selected_party_style, city, preferences, status)
+                    VALUES (%s, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1)
                 """
                 cursor.execute(insert_query, (user_id,))
                 conn.commit()
@@ -845,7 +848,7 @@ translations = {
 
 def save_user_id_to_orders(user_id,user_n):
     """Сохраняет user_id в таблицу orders с начальным значением null для даты."""
-    conn = create_connection() #(DATABASE_PATH)
+    conn = create_connection()
     if conn is not None:
         try:
             logging.info(f"Проверка существования записи в orders для user_id: {user_id}")

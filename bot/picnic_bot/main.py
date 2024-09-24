@@ -154,20 +154,30 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     logging.info(f"Получен user_id: {user_id}, username: {username}, language: {user_data.get_language()}")
 
+    logging.info("ЗАПИС КОРИСТУВАЧА")
+    await handle_name(update, context)
+
+
     # Создаем новую запись в таблице orders с новым session_number
-    conn = create_connection()  # (DATABASE_PATH)
+    conn = create_connection()
     if conn is not None:
         try:
             # Проверка текущего максимального session_number для user_id
             select_query = "SELECT MAX(session_number) FROM orders WHERE user_id = %s"
             cursor = conn.cursor()
             cursor.execute(select_query, (user_id,))
-            current_session = cursor.fetchone()[0]
 
-            if current_session is None:
-                new_session_number = 1
-            else:
+            # Получаем результат запроса
+            result = cursor.fetchone()
+            logging.info("(((((((((((((((((((((((((((((((((((((((((((((((")
+            logging.info(result)
+
+            # Проверка, что результат не None и session_number существует
+            if result and result[0] is not None:
+                current_session = result[0]
                 new_session_number = current_session + 1
+            else:
+                new_session_number = 1  # Если записей нет или session_number пустой
 
             user_data.set_session_number(new_session_number)
 
@@ -183,7 +193,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             cursor.execute(insert_query, (user_id, new_session_number))
             conn.commit()
 
-            logging.info(f"Создана новая запись в таблице orders для user_id: {user_id} с session_number: {new_session_number}")
+            logging.info(
+                f"Создана новая запись в таблице orders для user_id: {user_id} с session_number: {new_session_number}")
 
         except Exception as e:
             logging.error(f"Ошибка базы данных: {e}")
