@@ -316,14 +316,14 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Пример текста с гиперссылкой в зависимости от выбранного языка
         greeting_texts = {
-            'en': 'Hello! What is your name? We respect and protect your [Terms, booking conditions, and privacy policy](https://telegra.ph/Privacy-Policy-09-19-96).',
-            'ru': 'Привет! Как вас зовут? Мы уважаем и защищаем вашу [Термины, условия бронирования и политика конфиденциальности](https://telegra.ph/Politika-konfidencialnosti-09-19-5).',
-            'es': '¡Hola! ¿Cómo te llamas? Respetamos y protegemos tu [Términos y condiciones de reserva y política de privacidad](https://telegra.ph/Pol%C3%ADtica-de-privacidad-09-19-8).',
-            'fr': 'Salut! Quel est votre nom ? Nous respectons et protégeons votre [confidentialité](https://telegra.ph/Politique-de-confidentialit%C3%A9-09-19-3).',
-            'uk': 'Привіт! Як вас звати? Ми поважаємо і захищаємо вашу [Терміни, умови бронювання і політика конфіденційності](https://telegra.ph/Pol%D1%96tika-konf%D1%96denc%D1%96jnost%D1%96-09-19).',
-            'pl': 'Cześć! Jak masz на імʼя? Szanujemy i chronimy twoją [Umowy, warunki rezerwacji i polityka prywatności ](https://telegra.ph/Polityka-prywatno%C5%9Bci-09-19).',
-            'de': 'Hallo! Wie heißt du? Wir respektieren und schützen deine [Allgemeine Geschäftsbedingungen und Datenschutzrichtlinie](https://telegra.ph/Datenschutzrichtlinie-09-19).',
-            'it': 'Ciao! Come ti chiami? Rispettiamo e proteggiamo la tua [Termini, condizioni di prenotazione e informativa sulla privacy](https://telegra.ph/Politica-sulla-privacy-09-19).'
+            'en': 'Hello! What is your name?   [(terms, booking conditions, and privacy policy)](https://telegra.ph/Privacy-Policy-09-19-96).',
+            'ru': 'Привет! Как вас зовут?   [(термины, условия бронирования и политика конфиденциальности)](https://telegra.ph/Politika-konfidencialnosti-09-19-5).',
+            'es': '¡Hola! ¿Cómo te llamas?  [(términos y condiciones de reserva y política de privacidad)](https://telegra.ph/Pol%C3%ADtica-de-privacidad-09-19-8).',
+            'fr': 'Salut! Quel est votre nom ?   [(conditions générales de réservation et politique de confidentialité)](https://telegra.ph/Politique-de-confidentialit%C3%A9-09-19-3).',
+            'uk': 'Привіт! Як вас звати?   [(терміни, умови бронювання і політика конфіденційності)](https://telegra.ph/Pol%D1%96tika-konf%D1%96denc%D1%96jnost%D1%96-09-19).',
+            'pl': 'Cześć! Jak masz на імʼя?   [(umowy, warunki rezerwacji i polityka prywatności)](https://telegra.ph/Polityka-prywatno%C5%9Bci-09-19).',
+            'de': 'Hallo! Wie heißt du?   [(allgemeine Geschäftsbedingungen und Datenschutzrichtlinie)](https://telegra.ph/Datenschutzrichtlinie-09-19).',
+            'it': 'Ciao! Come ti chiami?   [(termini, condizioni di prenotazione e informativa sulla privacy)](https://telegra.ph/Politica-sulla-privacy-09-19).'
         }
 
         # Отправляем сообщение с приветствием и ссылкой, отключая предварительный просмотр
