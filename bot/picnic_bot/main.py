@@ -18,7 +18,8 @@ from bot.picnic_bot.keyboards import (language_selection_keyboard, yes_no_keyboa
                                       generate_time_selection_keyboard, generate_person_selection_keyboard,
                                       generate_party_styles_keyboard)
 from bot.picnic_bot.message_handlers import (handle_message, handle_city_confirmation, update_order_data, handle_name,
-                                             show_payment_page, show_payment_page_handler, show_proforma)
+                                             show_payment_page, show_payment_page_handler, show_proforma,
+                                             check_client_is_exist)
 from bot.picnic_bot.calculations import calculate_total_cost
 
 
@@ -155,7 +156,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logging.info(f"Получен user_id: {user_id}, username: {username}, language: {user_data.get_language()}")
 
     logging.info("ЗАПИС КОРИСТУВАЧА")
-    await handle_name(update, context)
+    # await handle_name(update, context)
+    check_client_is_exist(update, context)
 
 
     # Создаем новую запись в таблице orders с новым session_number
@@ -314,14 +316,14 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Пример текста с гиперссылкой в зависимости от выбранного языка
         greeting_texts = {
-            'en': 'Hello! What is your name? We respect and protect your [privacy](https://telegra.ph/Privacy-Policy-09-19-96).',
-            'ru': 'Привет! Как вас зовут? Мы уважаем и защищаем вашу [конфиденциальность](https://telegra.ph/Politika-konfidencialnosti-09-19-5).',
-            'es': '¡Hola! ¿Cómo te llamas? Respetamos y protegemos tu [privacidad](https://telegra.ph/Pol%C3%ADtica-de-privacidad-09-19-8).',
+            'en': 'Hello! What is your name? We respect and protect your [Terms, booking conditions, and privacy policy](https://telegra.ph/Privacy-Policy-09-19-96).',
+            'ru': 'Привет! Как вас зовут? Мы уважаем и защищаем вашу [Термины, условия бронирования и политика конфиденциальности](https://telegra.ph/Politika-konfidencialnosti-09-19-5).',
+            'es': '¡Hola! ¿Cómo te llamas? Respetamos y protegemos tu [Términos y condiciones de reserva y política de privacidad](https://telegra.ph/Pol%C3%ADtica-de-privacidad-09-19-8).',
             'fr': 'Salut! Quel est votre nom ? Nous respectons et protégeons votre [confidentialité](https://telegra.ph/Politique-de-confidentialit%C3%A9-09-19-3).',
-            'uk': 'Привіт! Як вас звати? Ми поважаємо і захищаємо вашу [конфіденційність](https://telegra.ph/Pol%D1%96tika-konf%D1%96denc%D1%96jnost%D1%96-09-19).',
-            'pl': 'Cześć! Jak masz на імʼя? Szanujemy i chronimy twoją [prywatność](https://telegra.ph/Polityka-prywatno%C5%9Bci-09-19).',
-            'de': 'Hallo! Wie heißt du? Wir respektieren und schützen deine [Privatsphäre](https://telegra.ph/Datenschutzrichtlinie-09-19).',
-            'it': 'Ciao! Come ti chiami? Rispettiamo e proteggiamo la tua [privacy](https://telegra.ph/Politica-sulla-privacy-09-19).'
+            'uk': 'Привіт! Як вас звати? Ми поважаємо і захищаємо вашу [Терміни, умови бронювання і політика конфіденційності](https://telegra.ph/Pol%D1%96tika-konf%D1%96denc%D1%96jnost%D1%96-09-19).',
+            'pl': 'Cześć! Jak masz на імʼя? Szanujemy i chronimy twoją [Umowy, warunki rezerwacji i polityka prywatności ](https://telegra.ph/Polityka-prywatno%C5%9Bci-09-19).',
+            'de': 'Hallo! Wie heißt du? Wir respektieren und schützen deine [Allgemeine Geschäftsbedingungen und Datenschutzrichtlinie](https://telegra.ph/Datenschutzrichtlinie-09-19).',
+            'it': 'Ciao! Come ti chiami? Rispettiamo e proteggiamo la tua [Termini, condizioni di prenotazione e informativa sulla privacy](https://telegra.ph/Politica-sulla-privacy-09-19).'
         }
 
         # Отправляем сообщение с приветствием и ссылкой, отключая предварительный просмотр
@@ -503,6 +505,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             update_order_data(
                 "UPDATE orders SET start_time = %s WHERE user_id = %s AND session_number = %s",
                 (selected_time, user_data.get_user_id(), session_number),
+
                 user_data.get_user_id()
             )
             # time.sleep(1.5)  # Задержка перед повторной попыткой

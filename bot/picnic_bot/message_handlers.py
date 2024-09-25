@@ -9,7 +9,8 @@ from bot.picnic_bot.abstract_functions import create_connection, execute_query, 
 from bot.picnic_bot.constants import TemporaryData, ORDER_STATUS, UserData
 from bot.picnic_bot.keyboards import (yes_no_keyboard, generate_calendar_keyboard, generate_time_selection_keyboard,
                        generate_person_selection_keyboard, generate_party_styles_keyboard)
-from bot.picnic_bot.order_info_sender import send_order_info_to_servis, send_message_to_admin  # функция отправки
+from bot.picnic_bot.order_info_sender import send_order_info_to_servis, send_message_to_admin, \
+    send_message_to_admin_and_service  # функция отправки
                                      # сообщений АдминБоту для сценария админа и сервисной службы
 
 
@@ -32,6 +33,48 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             get_translation(user_data, 'buttons_only'),  # Используем функцию для получения перевода
             reply_markup=get_current_step_keyboard(step, user_data)
         )
+
+def check_client_is_exist(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Инициализация данных пользователя
+    user_data = context.user_data.get('user_data', UserData())
+    context.user_data['user_data'] = user_data
+
+    # Создайте соединение с базой данных
+    conn = create_connection()
+    if conn is not None:
+        try:
+            # Проверка существования пользователя
+            logging.info(f"Проверка существования пользователя с user_id: {update.message.from_user.id}")
+            select_query = "SELECT 1 FROM users WHERE user_id = %s"
+            cursor = conn.cursor()
+            cursor.execute(select_query, (update.message.from_user.id,))
+            exists = cursor.fetchone()
+
+            if not exists:
+                # Вставка нового пользователя в users
+                logging.info(f"Вставка нового пользователя: {user_data.get_username()}")
+
+                # Задаем начальные значения для status и number_of_events которые ввели для АдминБота
+                status = 0  # Начальное значение для статуса
+                number_of_events = 0  # Начальное значение для счетчика событий
+
+                insert_query = "INSERT INTO users (user_id, username, status, number_of_events) VALUES (%s, %s, %s, %s)"
+                insert_params = (update.message.from_user.id, user_data.get_username(), status, number_of_events)
+                execute_query_with_retry(conn, insert_query, insert_params)
+
+                print(f"Принт 9: user_id {update.message.from_user.id} сохранен в таблицу orders")
+                return False
+
+            return True
+
+        except Exception as e:
+            logging.error(f"Ошибка базы данных: {e}")
+        finally:
+            conn.close()
+            logging.info("Соединение с базой данных закрыто")
+    else:
+        logging.error("Не удалось создать соединение с базой данных")
+        return False
 
 
 async def handle_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -62,18 +105,15 @@ async def handle_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     logging.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
-    # Создайте соединение с базой данных
-    conn = create_connection()
-    if conn is not None:
-        try:
-            # Проверка существования пользователя
-            logging.info(f"Проверка существования пользователя с user_id: {update.message.from_user.id}")
-            select_query = "SELECT 1 FROM users WHERE user_id = %s"
-            cursor = conn.cursor()
-            cursor.execute(select_query, (update.message.from_user.id,))
-            exists = cursor.fetchone()
+    # Проверка существования пользователя
+    exists = check_client_is_exist(update, context)
 
-            if exists:
+    if exists:
+        # Создайте соединение с базой данных
+        conn = create_connection()
+        if conn is not None:
+            try:
+
                 # Обновление имени пользователя в таблице orders
                 logging.info(f"Обновление имени пользователя: {user_data.get_name()}")
 
@@ -93,28 +133,13 @@ async def handle_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 # Теперь сохраняем user_id в таблицу orders
                 save_user_id_to_orders(update.message.from_user.id, user_data.get_name())
 
-
-            else:
-                # Вставка нового пользователя в users
-                logging.info(f"Вставка нового пользователя: {user_data.get_username()}")
-
-                # Задаем начальные значения для status и number_of_events которые ввели для АдминБота
-                status = 0  # Начальное значение для статуса
-                number_of_events = 0  # Начальное значение для счетчика событий
-
-                insert_query = "INSERT INTO users (user_id, username, status, number_of_events) VALUES (%s, %s, %s, %s)"
-                insert_params = (update.message.from_user.id, user_data.get_username(), status, number_of_events)
-                execute_query_with_retry(conn, insert_query, insert_params)
-
-                print(f"Принт 9: user_id {update.message.from_user.id} сохранен в таблицу orders")
-
-        except Exception as e:
-            logging.error(f"Ошибка базы данных: {e}")
-        finally:
-            conn.close()
-            logging.info("Соединение с базой данных закрыто")
-    else:
-        logging.error("Не удалось создать соединение с базой данных")
+            except Exception as e:
+                logging.error(f"Ошибка базы данных: {e}")
+            finally:
+                conn.close()
+                logging.info("Соединение с базой данных закрыто")
+        else:
+            logging.error("Не удалось создать соединение с базой данных")
 
     greeting_texts = {
         'en': f'Hello {user_data.get_name()}! Do you want to see available dates?',
@@ -808,12 +833,15 @@ async def show_proforma(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Добавление кнопки в разметку и отправка пользователю
     reply_markup = InlineKeyboardMarkup([[button]])
     await context.bot.send_message(chat_id=update.effective_chat.id, text=proforma_text, reply_markup=reply_markup)
+    #
+    # # Вызов функции для отправки сообщения админботу
+    # await send_order_info_to_servis(user_data.get_user_id(), user_data.get_session_number())
+    #
+    # # Вызов функции для отправки сообщения Ирине
+    # await send_message_to_admin(user_data.get_user_id(), user_data.get_session_number())
+    #
 
-    # Вызов функции для отправки сообщения админботу
-    await send_order_info_to_servis(user_data.get_user_id(), user_data.get_session_number())
-
-    # Вызов функции для отправки сообщения Ирине
-    await send_message_to_admin(user_data.get_user_id(), user_data.get_session_number())
+    await send_message_to_admin_and_service(user_data.get_user_id(), user_data.get_session_number())
 
 
     # Функция для получения текущей клавиатуры для шага
