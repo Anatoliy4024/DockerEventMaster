@@ -298,23 +298,9 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await context.bot.send_message(chat_id=update.effective_chat.id, text="Video file not found.")
             await loading_message.delete()
-        #
-        # greeting_texts = {
-        #     'en': 'Hello! What is your name?',
-        #     'ru': 'Привет! Как вас зовут?',
-        #     'es': '¡Hola! ¿Cómo te llamas?',
-        #     'fr': 'Salut! Quel est votre nom ?',
-        #     'uk': 'Привіт! Як вас звати?',
-        #     'pl': 'Cześć! Jak masz на імʼя?',
-        #     'de': 'Hallo! Wie heißt du?',
-        #     'it': 'Ciao! Come ti chiami?'
-        # }
-        # await context.bot.send_message(
-        #     chat_id=update.effective_chat.id,
-        #     text=greeting_texts.get(language_code, 'Hello! What is your name?')
-        # )
 
-        # Пример текста с гиперссылкой в зависимости от выбранного языка
+
+        # Тексты с гиперссылкой в зависимости от выбранного языка
         greeting_texts = {
             'en': 'Hello! What is your name?   [(terms, booking conditions, and privacy policy)](https://telegra.ph/Privacy-Policy-09-19-96).',
             'ru': 'Привет! Как вас зовут?   [(термины, условия бронирования и политика конфиденциальности)](https://telegra.ph/Politika-konfidencialnosti-09-19-5).',
