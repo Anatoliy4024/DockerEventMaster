@@ -483,7 +483,9 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif query.data.startswith('time_'):
         selected_time = query.data.split('_')[1]
-
+        logging.info("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM")
+        logging.info(user_data.get_start_time())
+        logging.info(query.data)
         if not user_data.get_start_time():
             user_data.set_start_time(selected_time)
 

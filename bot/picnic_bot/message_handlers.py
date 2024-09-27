@@ -833,16 +833,26 @@ async def show_proforma(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Добавление кнопки в разметку и отправка пользователю
     reply_markup = InlineKeyboardMarkup([[button]])
     await context.bot.send_message(chat_id=update.effective_chat.id, text=proforma_text, reply_markup=reply_markup)
-    #
-    # # Вызов функции для отправки сообщения админботу
-    # await send_order_info_to_servis(user_data.get_user_id(), user_data.get_session_number())
-    #
-    # # Вызов функции для отправки сообщения Ирине
-    # await send_message_to_admin(user_data.get_user_id(), user_data.get_session_number())
-    #
 
     await send_message_to_admin_and_service(user_data.get_user_id(), user_data.get_session_number())
 
+
+    # чистка кеша - обнуление класса USER_DATA
+    reset_user_data(user_data)
+
+def reset_user_data(data):
+    data.name = None
+    data.preferences = None
+    data.city = None
+    data.month_offset = 0
+    data.step = None
+    data.start_time = None
+    data.end_time = None
+    data.person_count = None
+    data.style = None
+    data.date = None
+    data.session_number = None  # Добавляем свойство session_number
+    data.calculated_cost = None  # Добавляем новое свойство
 
     # Функция для получения текущей клавиатуры для шага
 def get_current_step_keyboard(step, user_data):
