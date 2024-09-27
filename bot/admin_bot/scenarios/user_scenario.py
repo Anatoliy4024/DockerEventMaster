@@ -1,14 +1,19 @@
+import os
+
 import psycopg2  # Заменяем sqlite3 на psycopg2 для работы с PostgreSQL
 import logging
 from telegram import Update, Bot
 from telegram.ext import ContextTypes
 
-from bot.admin_bot.config import BOT_TOKEN
 from bot.admin_bot.constants import ORDER_STATUS
 from bot.admin_bot.helpers.database_helpers import get_latest_session_number, get_full_proforma
 from bot.admin_bot.translations import language_selection_keyboard, translations
 
+
 ORDER_STATUS_REVERSE = {v: k for k, v in ORDER_STATUS.items()}
+
+from dotenv import load_dotenv
+BOT_TOKEN = os.getenv('TELEGRAM_TOKEN_ADMIN')  # Получаем токен из .env файла
 
 # Функция для подключения к базе данных
 def get_db_connection():
