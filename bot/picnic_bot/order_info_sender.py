@@ -1,13 +1,27 @@
+import os
+
 import psycopg2
 import logging
 from telegram import Bot
 from bot.picnic_bot.abstract_functions import create_connection
 from bot.picnic_bot.constants import ORDER_STATUS
 
-async def send_message_to_admin_and_service(user_id, session_num):
-    """Отправляет информацию о заказе Сервисной службе"""
+from dotenv import load_dotenv
 
-    bot_token = '7495955549:AAGG0PQNvFC-SN0PO4rx0WVi2HEeIM8mnVg'  # Токен админбота
+# Загрузка переменных окружения из .env файла
+load_dotenv()
+
+async def send_message_to_admin_and_service(user_id, session_num):
+    """Отправляет информацию о заказе Администратору и Сервисной службе"""
+
+    # bot_token = '7495955549:AAGG0PQNvFC-SN0PO4rx0WVi2HEeIM8mnVg'  # Токен админбота
+    # admin_and_service_list = list()
+
+    # Получаем токен из переменных окружения
+    bot_token = os.getenv('TELEGRAM_TOKEN_ADMIN')  # Убедись, что этот токен есть в .env
+    if not bot_token:
+        raise ValueError("Bot token is not set in the environment variables")
+
     admin_and_service_list = list()
 
     # Создаем подключение к базе данных PostgreSQL
@@ -16,7 +30,7 @@ async def send_message_to_admin_and_service(user_id, session_num):
 
     try:
         logging.info(f"Executing SELECT for user_id: {user_id}, session_number: {session_num}")
-        cursor.execute("SELECT user_id, status FROM users WHERE status in (1,2)")
+        cursor.execute("SELECT user_id, status FROM users WHERE status in (2,1)")
         admin_and_service_list = cursor.fetchall()
 
         logging.info(f"Executing SELECT for user_id: {user_id}, session_number: {session_num}")

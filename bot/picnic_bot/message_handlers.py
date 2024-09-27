@@ -1,5 +1,7 @@
 import asyncio
 import logging
+import os
+
 import psycopg2
 from psycopg2 import OperationalError
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -12,7 +14,9 @@ from bot.picnic_bot.keyboards import (yes_no_keyboard, generate_calendar_keyboar
 from bot.picnic_bot.order_info_sender import send_order_info_to_servis, send_message_to_admin, \
     send_message_to_admin_and_service  # функция отправки
                                      # сообщений АдминБоту для сценария админа и сервисной службы
-
+from dotenv import load_dotenv
+# Загрузка переменных из .env файла
+load_dotenv()
 
 
 
@@ -171,18 +175,37 @@ async def handle_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def create_connection():
     """Создает соединение с базой данных PostgreSQL."""
     try:
-        # Заменяем подключение SQLite на подключение к PostgreSQL
+        # Получаем параметры подключения из переменных окружения
         conn = psycopg2.connect(
-            host="postgres",  # В docker-compose.yml или в вашем конфиге
-            database="mydatabase",  # Название вашей базы данных
-            user="myuser",  # Имя пользователя базы данных
-            password="mypassword"  # Пароль пользователя базы данных
+            host=os.getenv('DB_HOST'),
+            database=os.getenv('DB_NAME'),
+            user=os.getenv('DB_USER'),
+            password=os.getenv('DB_PASSWORD')
         )
-        logging.info("Соединение с базой данных установлено")
+        logging.info("Database connected")
         return conn
     except OperationalError as e:
-        logging.error(f"Ошибка подключения к базе данных: {e}")
+        logging.error(f"Error connecting to database: {e}")
         return None
+
+
+
+
+# def create_connection():
+#     """Создает соединение с базой данных PostgreSQL."""
+#     try:
+#         # Заменяем подключение SQLite на подключение к PostgreSQL
+#         conn = psycopg2.connect(
+#             host="postgres",  # В docker-compose.yml или в вашем конфиге
+#             database="mydatabase",  # Название вашей базы данных
+#             user="myuser",  # Имя пользователя базы данных
+#             password="mypassword"  # Пароль пользователя базы данных
+#         )
+#         logging.info("Соединение с базой данных установлено")
+#         return conn
+#     except OperationalError as e:
+#         logging.error(f"Ошибка подключения к базе данных: {e}")
+#         return None
 
 
 def update_order_data(query, params, user_id):

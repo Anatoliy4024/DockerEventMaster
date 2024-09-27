@@ -1,7 +1,7 @@
 asttokens==2.4.1
 attrs==24.2.0
 backcall==0.2.0
-beautifulsoup4==4.12.3
+beautifulsoup4~=4.12.3
 bleach==6.1.0
 certifi==2024.8.30
 charset-normalizer==3.3.2
@@ -34,7 +34,8 @@ pipreqs==0.5.0
 platformdirs==4.3.3
 prompt_toolkit==3.0.47
 
-psycopg2-binary==2.9.9
+#psycopg2-binary==2.9.9
+psycopg2-binary~=2.9.9
 
 pure_eval==0.2.3
 Pygments==2.18.0
@@ -47,9 +48,9 @@ rpds-py==0.20.0
 six==1.16.0
 soupsieve==2.6
 stack-data==0.6.3
-telegram==0.0.1
+telegram~=0.0.1
 tinycss2==1.3.0
-tornado==6.4.1
+tornado~=6.4.1
 traitlets==5.14.3
 urllib3==2.2.3
 wcwidth==0.2.13
@@ -57,6 +58,13 @@ webencodings==0.5.1
 yarg==0.1.9
 
 python-telegram-bot==20.3
+python-dotenv
 
 
 
+
+#psycopg2~=2.9.9
+python-dotenv~=1.0.1
+chardet~=5.2.0
+pytz~=2024.2
+httpx~=0.24.1

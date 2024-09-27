@@ -22,7 +22,9 @@ from bot.picnic_bot.message_handlers import (handle_message, handle_city_confirm
                                              check_client_is_exist)
 from bot.picnic_bot.calculations import calculate_total_cost
 
-
+from dotenv import load_dotenv
+# Загрузка переменных из .env файла
+load_dotenv()
 
 
 # Включаем логирование и указываем файл для логов
@@ -34,9 +36,7 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
-# logger.info(f"Database path: {DATABASE_PATH}")
 
-#########################################################################
 def get_user_status(user_id):
     try:
         # Подключаемся к базе данных PostgreSQL
@@ -83,7 +83,10 @@ VIDEO_PATHS = [
 ]
 
 # Замените 'YOUR_BOT_TOKEN' на токен вашего бота
-BOT_TOKEN = '7407529729:AAErOT5NBpMSO-V-HPAW-MDu_1WQt0TtXng'
+# BOT_TOKEN = '7407529729:AAErOT5NBpMSO-V-HPAW-MDu_1WQt0TtXng'
+
+BOT_TOKEN = os.getenv('TELEGRAM_TOKEN_PICNIC')  # Получаем токен из .env файла
+
 
 # Создайте соединение с базой данных
 conn = create_connection()
@@ -110,21 +113,40 @@ def execute_query_with_retry(conn, query, params=(), max_retries=5):
         finally:
             if cursor:
                 cursor.close()
+
 def create_connection():
     """Создает соединение с базой данных PostgreSQL."""
     try:
-        # Здесь мы подключаемся к Postgres с нужными параметрами
+        # Получаем параметры подключения из переменных окружения
         conn = psycopg2.connect(
-            host="postgres",  # Или имя хоста Docker, например "db"
-            database="mydatabase",  # Имя базы данных
-            user="myuser",  # Имя пользователя
-            password="mypassword"  # Пароль
+            host=os.getenv('DB_HOST'),
+            database=os.getenv('DB_NAME'),
+            user=os.getenv('DB_USER'),
+            password=os.getenv('DB_PASSWORD')
         )
         logging.info("Database connected")
         return conn
     except OperationalError as e:
         logging.error(f"Error connecting to database: {e}")
         return None
+
+
+
+# def create_connection():
+#     """Создает соединение с базой данных PostgreSQL."""
+#     try:
+#         # Здесь мы подключаемся к Postgres с нужными параметрами
+#         conn = psycopg2.connect(
+#             host="postgres",  # Или имя хоста Docker, например "db"
+#             database="mydatabase",  # Имя базы данных
+#             user="myuser",  # Имя пользователя
+#             password="mypassword"  # Пароль
+#         )
+#         logging.info("Database connected")
+#         return conn
+#     except OperationalError as e:
+#         logging.error(f"Error connecting to database: {e}")
+#         return None
 
 def execute_query(conn, query, params=()):
     """Выполняет SQL-запрос."""

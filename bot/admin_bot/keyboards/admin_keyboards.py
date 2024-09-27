@@ -1,6 +1,7 @@
 ## keybords.py
 
 import logging
+import os
 import urllib.parse
 import sqlite3
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -8,7 +9,8 @@ from telegram.ext import CallbackContext
 from bot.admin_bot.helpers.database_helpers import get_full_proforma
 from bot.admin_bot.scenarios.user_scenario import get_latest_session_number
 from bot.admin_bot.translations import translations, button_texts
-from bot.admin_bot.config import BOT_TOKEN
+from dotenv import load_dotenv
+BOT_TOKEN = os.getenv('TELEGRAM_TOKEN_PICNIC')  # Получаем токен из .env файла
 
 
 

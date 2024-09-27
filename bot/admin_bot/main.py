@@ -5,7 +5,6 @@ import psycopg2  # Используем psycopg2 вместо sqlite3 для Pos
 import logging
 from telegram import Update
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, CallbackQueryHandler, MessageHandler, filters
-from bot.admin_bot.config import BOT_TOKEN
 from bot.admin_bot.constants import UserData, ORDER_STATUS
 from bot.admin_bot.scenarios.user_scenario import send_proforma_to_user, get_full_proforma, get_latest_session_number
 from bot.admin_bot.keyboards.admin_keyboards import user_options_keyboard, irina_service_menu, service_menu_keyboard
@@ -16,9 +15,11 @@ from bot.admin_bot.scenarios.admin_scenario import admin_welcome_message, handle
 from bot.admin_bot.scenarios.service_scenario import service_welcome_message
 from bot.admin_bot.translations import language_selection_keyboard
 from bot.admin_bot.database_logger import log_message, log_query
-
+from psycopg2 import OperationalError
+from dotenv import load_dotenv
 
 ORDER_STATUS_REVERSE = {v: k for k, v in ORDER_STATUS.items()}
+BOT_TOKEN = os.getenv('TELEGRAM_TOKEN_ADMIN')
 
 # Включаем логирование и указываем файл для логов
 logging.basicConfig(
@@ -31,14 +32,34 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-# Функция для подключения к базе данных PostgreSQL
+# Загружаем переменные окружения из .env файла
+load_dotenv()
+
 def get_db_connection():
-    return psycopg2.connect(
-        host=os.getenv('DATABASE_HOST', 'localhost'),
-        dbname=os.getenv('DATABASE_NAME', 'mydatabase'),
-        user=os.getenv('DATABASE_USER', 'myuser'),
-        password=os.getenv('DATABASE_PASSWORD', 'mypassword')
-    )
+    try:
+        # Подключаемся к базе данных, используя переменные окружения
+        return psycopg2.connect(
+            host=os.getenv('DB_HOST', 'localhost'),
+            database=os.getenv('DB_NAME', 'mydatabase'),
+            user=os.getenv('DB_USER', 'myuser'),
+            password=os.getenv('DB_PASSWORD', 'mypassword')
+        )
+    except OperationalError as e:
+        print(f"Ошибка при подключении к базе данных: {e}")
+        return None
+
+
+
+
+
+# Функция для подключения к базе данных PostgreSQL
+# def get_db_connection():
+#     return psycopg2.connect(
+#         host=os.getenv('DATABASE_HOST', 'localhost'),
+#         dbname=os.getenv('DATABASE_NAME', 'mydatabase'),
+#         user=os.getenv('DATABASE_USER', 'myuser'),
+#         password=os.getenv('DATABASE_PASSWORD', 'mypassword')
+#     )
 
 # Функция для получения user_id и username по user_id
 def get_user_info_by_user_id(user_id):
