@@ -12,34 +12,16 @@ from bot.admin_bot.constants import UserData
 from bot.admin_bot.helpers.calendar_helpers import disable_calendar_buttons
 from bot.admin_bot.translations import translations, language_selection_keyboard
 import os  # Для работы с переменными окружения
-
-# Функция для подключения к базе данных
-# def get_db_connection():
-#     return psycopg2.connect(
-#         host=os.getenv('DATABASE_HOST', 'localhost'),
-#         dbname=os.getenv('DATABASE_NAME', 'mydatabase'),
-#         user=os.getenv('DATABASE_USER', 'myuser'),
-#         password=os.getenv('DATABASE_PASSWORD', 'mypassword')
-#     )
-
-import os
-import psycopg2
 from dotenv import load_dotenv
 
-# Загрузка переменных окружения из .env файла
-load_dotenv()
-
+#Функция для подключения к базе данных
 def get_db_connection():
-    """Создает подключение к базе данных PostgreSQL с использованием переменных окружения."""
     return psycopg2.connect(
         host=os.getenv('DATABASE_HOST', 'localhost'),
         dbname=os.getenv('DATABASE_NAME', 'mydatabase'),
         user=os.getenv('DATABASE_USER', 'myuser'),
         password=os.getenv('DATABASE_PASSWORD', 'mypassword')
     )
-
-
-
 
 async def admin_welcome_message(update: Update):
     # Приветственное сообщение для выбора языка

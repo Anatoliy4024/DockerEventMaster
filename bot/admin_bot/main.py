@@ -6,7 +6,8 @@ import logging
 from telegram import Update
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, CallbackQueryHandler, MessageHandler, filters
 from bot.admin_bot.constants import UserData, ORDER_STATUS
-from bot.admin_bot.scenarios.user_scenario import send_proforma_to_user, get_full_proforma, get_latest_session_number
+from bot.admin_bot.scenarios.user_scenario import send_proforma_to_user, get_full_proforma
+from bot.admin_bot.helpers.database_helpers import get_latest_session_number
 from bot.admin_bot.keyboards.admin_keyboards import user_options_keyboard, irina_service_menu, service_menu_keyboard
 from bot.admin_bot.scenarios.user_scenario import user_welcome_message
 from bot.admin_bot.scenarios.admin_scenario import admin_welcome_message, handle_find_client_callback, \
@@ -127,7 +128,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Сохраняем ID сообщения с кнопками
     if message:
-        context.user_data['language_message_id'] = message.message_id
+        context.user_data['language_message_id'] = message.message_id[0]
 
 
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):

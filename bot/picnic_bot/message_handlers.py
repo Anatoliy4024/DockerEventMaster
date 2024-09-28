@@ -11,7 +11,7 @@ from bot.picnic_bot.abstract_functions import create_connection, execute_query, 
 from bot.picnic_bot.constants import TemporaryData, ORDER_STATUS, UserData
 from bot.picnic_bot.keyboards import (yes_no_keyboard, generate_calendar_keyboard, generate_time_selection_keyboard,
                        generate_person_selection_keyboard, generate_party_styles_keyboard)
-from bot.picnic_bot.order_info_sender import send_order_info_to_servis, send_message_to_admin, \
+from bot.picnic_bot.order_info_sender import send_order_info_to_servis, send_message_to_admin, send_message_to_admin_and_service, \
     send_message_to_admin_and_service  # функция отправки
                                      # сообщений АдминБоту для сценария админа и сервисной службы
 from dotenv import load_dotenv

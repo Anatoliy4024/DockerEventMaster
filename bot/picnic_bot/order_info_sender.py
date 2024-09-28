@@ -54,7 +54,7 @@ async def send_message_to_admin_and_service(user_id, session_num):
         # Формируем сообщение для отправки админботу
         admin_message = (
             f"Привет твой id соответствует\n"
-            f"номеру Сервисной службы AdminPicnicsAlicanteBot\n"
+            f"администратору AdminPicnicsAlicanteBot\n"
             f"https://t.me/AssistPicnicsBot\n"
             f"Сейчас пришло сообщение от PicnicsAlicanteBot:\n"
             f"____________________\n"
@@ -65,7 +65,7 @@ async def send_message_to_admin_and_service(user_id, session_num):
         )
 
         service_message = (
-            f"!!!!!!!!!!!!!!!!!Привет твой id соответствует\n"
+            f"Привет твой id соответствует\n"
             f"номеру Сервисной службы AdminPicnicsAlicanteBot\n"
             f"https://t.me/AssistPicnicsBot\n"
             f"Сейчас пришло сообщение от PicnicsAlicanteBot:\n"

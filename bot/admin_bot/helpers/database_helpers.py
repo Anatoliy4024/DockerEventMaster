@@ -1,18 +1,37 @@
-import psycopg2  # Заменяем sqlite3 на psycopg2 для работы с PostgreSQL
+import psycopg2
 import logging
 from bot.admin_bot.constants import ORDER_STATUS
 from bot.admin_bot.translations import translations
 import os  # Для работы с переменными окружения
+from psycopg2 import OperationalError
+from dotenv import load_dotenv
+
+# Загружаем переменные окружения из .env файла
+load_dotenv()
 
 # Функция для подключения к базе данных
 def get_db_connection():
-    return psycopg2.connect(
-        host=os.getenv('DATABASE_HOST', 'localhost'),
-        dbname=os.getenv('DATABASE_NAME', 'mydatabase'),
-        user=os.getenv('DATABASE_USER', 'myuser'),
-        password=os.getenv('DATABASE_PASSWORD', 'mypassword')
-    )
+    try:
+        # Подключаемся к базе данных, используя переменные окружения
+        return psycopg2.connect(
+            host=os.getenv('DB_HOST', 'localhost'),
+            database=os.getenv('DB_NAME', 'mydatabase'),
+            user=os.getenv('DB_USER', 'myuser'),
+            password=os.getenv('DB_PASSWORD', 'mypassword')
+        )
+    except OperationalError as e:
+        print(f"Ошибка при подключении к базе данных: {e}")
+        return None
 
+
+# def get_db_connection():
+#     return psycopg2.connect(
+#         host=os.getenv('DATABASE_HOST', 'localhost'),
+#         dbname=os.getenv('DATABASE_NAME', 'mydatabase'),
+#         user=os.getenv('DATABASE_USER', 'myuser'),
+#         password=os.getenv('DATABASE_PASSWORD', 'mypassword')
+#     )
+#
 
 def get_full_proforma(user_id, session_number):
     """
