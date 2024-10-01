@@ -55,33 +55,6 @@ def get_dates_with_active_proformas():
         conn.close()  # Закрываем соединение с базой данных
 
 
-# def get_dates_with_active_proformas():
-#     """
-#     Получает даты, на которые есть хотя бы одна проформа со статусом >= 3.
-#     """
-#     # Устанавливаем соединение с PostgreSQL
-#     conn = psycopg2.connect(
-#         host="postgres",
-#         database="mydatabase",
-#         user="myuser",
-#         password="mypassword",
-#         client_encoding="UTF8"
-#     )
-#     cursor = conn.cursor()
-#
-#     try:
-#         cursor.execute("""
-#             SELECT DISTINCT selected_date
-#             FROM orders
-#             WHERE status >= 3
-#         """)
-#         dates = cursor.fetchall()  # Получаем все даты, на которые есть активные проформы
-#         return [date[0] for date in dates]  # Возвращаем список дат в формате YYYY-MM-DD
-#     finally:
-#         cursor.close()
-#         conn.close()
-
-
 def check_date_reserved(date, reserved_dates):
     """Проверяет, зарезервирована ли дата."""
 
