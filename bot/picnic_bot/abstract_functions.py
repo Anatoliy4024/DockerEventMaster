@@ -27,22 +27,6 @@ def create_connection():
         return None
 
 
-# def create_connection():
-#     """Создает соединение с базой данных PostgreSQL."""
-#     try:
-#         conn = psycopg2.connect(
-#             host="postgres",
-#             database="mydatabase",
-#             user="myuser",
-#             password="mypassword",
-#             client_encoding="UTF8"
-#         )
-#         log_message("Database connected")
-#         return conn
-#     except OperationalError as e:
-#         log_message(f"Error connecting to database: {e}")
-#         return None
-
 def execute_query(conn, query, params=()):
     """Выполняет SQL-запрос в PostgreSQL."""
     if conn is None:
