@@ -1,0 +1,50 @@
+
+
+
+1.контейнеры остановлены:
+docker-compose down
+
+
+2.запустить сборку и запуск всех сервисов:
+docker-compose up --build
+
+
+3.проверка логов контейнеров:
+docker-compose logs
+
+
+4.проверка(имена), что контейнеры работают:
+docker ps
+
+
+5.подключение к базе данных PostgreSQL:
+docker exec -it localhost psql -U myuser -d mydatabase
+
+6.лист таблиц БД
+ \db
+
+7.лист зависимостей в БД
+ \dt
+
+8.отобразить содержимое таблицы
+SELECT * FROM users;
+SELECT * FROM orders;
+
+9.вывод логов по контейнеру пикник-бота
+docker logs docker_event_master-picnic_bot-1
+
+10.просмотр логов конкретного контейнера:
+docker logs <container_id>            docker logs 7324ba9f642f это  docker_event_master-picnic_bot
+
+11.просмотр логов в реальном времени:
+docker logs -f <container_id>
+
+12.Войти внутрь контейнера
+docker exec -it <container_id_or_name> /bin/bash
+docker exec -it 9ee5312cbb04 bash
+docker exec -it docker_event_master-picnic_bot-1 bash
+docker exec -it docker_event_master-admin_bot-1 bash
+
+13.просмотр логов бота
+cat db_operations.log
+
