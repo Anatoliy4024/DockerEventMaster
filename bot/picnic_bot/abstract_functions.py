@@ -1,25 +1,47 @@
+import os
 import psycopg2
+from dotenv import load_dotenv
 from psycopg2 import OperationalError
 import time
 from bot.picnic_bot.database_logger import log_message, log_query
 from bot.picnic_bot.constants import UserData
 
+# Загружаем переменные окружения из файла .env
+load_dotenv()
 
 def create_connection():
     """Создает соединение с базой данных PostgreSQL."""
     try:
+        # Подключение к базе данных с использованием переменных из .env
         conn = psycopg2.connect(
-            host="postgres",
-            database="mydatabase",
-            user="myuser",
-            password="mypassword",
-            client_encoding="UTF8"
+            host=os.getenv('DB_HOST', 'localhost'),           # Хост базы данных
+            database=os.getenv('DB_NAME', 'mydatabase'),       # Имя базы данных
+            user=os.getenv('DB_USER', 'myuser'),               # Пользователь базы данных
+            password=os.getenv('DB_PASSWORD', 'mypassword'),   # Пароль пользователя
+            client_encoding="UTF8"                            # Кодировка
         )
         log_message("Database connected")
         return conn
     except OperationalError as e:
         log_message(f"Error connecting to database: {e}")
         return None
+
+
+# def create_connection():
+#     """Создает соединение с базой данных PostgreSQL."""
+#     try:
+#         conn = psycopg2.connect(
+#             host="postgres",
+#             database="mydatabase",
+#             user="myuser",
+#             password="mypassword",
+#             client_encoding="UTF8"
+#         )
+#         log_message("Database connected")
+#         return conn
+#     except OperationalError as e:
+#         log_message(f"Error connecting to database: {e}")
+#         return None
 
 def execute_query(conn, query, params=()):
     """Выполняет SQL-запрос в PostgreSQL."""
@@ -64,3 +86,5 @@ def execute_query_with_retry(conn, query, params=(), max_retries=5):
         finally:
             if retries >= max_retries:
                 log_message(f"Failed to execute query after {max_retries} retries")
+
+

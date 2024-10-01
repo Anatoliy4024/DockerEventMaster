@@ -50,9 +50,6 @@ def get_db_connection():
         return None
 
 
-
-
-
 # Функция для подключения к базе данных PostgreSQL
 # def get_db_connection():
 #     return psycopg2.connect(
@@ -128,7 +125,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Сохраняем ID сообщения с кнопками
     if message:
-        context.user_data['language_message_id'] = message.message_id[0]
+        context.user_data['language_message_id'] = message.message_id
 
 
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):

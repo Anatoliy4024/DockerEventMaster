@@ -3,6 +3,8 @@ import subprocess
 import logging
 from asyncio.log import logger
 import telegram
+from psycopg2 import OperationalError
+
 from bot.admin_bot.helpers.calendar_helpers import generate_calendar_keyboard
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
@@ -14,14 +16,28 @@ from bot.admin_bot.translations import translations, language_selection_keyboard
 import os  # Для работы с переменными окружения
 from dotenv import load_dotenv
 
-#Функция для подключения к базе данных
 def get_db_connection():
-    return psycopg2.connect(
-        host=os.getenv('DATABASE_HOST', 'localhost'),
-        dbname=os.getenv('DATABASE_NAME', 'mydatabase'),
-        user=os.getenv('DATABASE_USER', 'myuser'),
-        password=os.getenv('DATABASE_PASSWORD', 'mypassword')
-    )
+    try:
+        # Подключаемся к базе данных, используя переменные окружения
+        return psycopg2.connect(
+            host=os.getenv('DB_HOST', 'localhost'),
+            database=os.getenv('DB_NAME', 'mydatabase'),
+            user=os.getenv('DB_USER', 'myuser'),
+            password=os.getenv('DB_PASSWORD', 'mypassword')
+        )
+    except OperationalError as e:
+        print(f"Ошибка при подключении к базе данных: {e}")
+        return None
+
+
+#Функция для подключения к базе данных
+# def get_db_connection():
+#     return psycopg2.connect(
+#         host=os.getenv('DATABASE_HOST', 'localhost'),
+#         dbname=os.getenv('DATABASE_NAME', 'mydatabase'),
+#         user=os.getenv('DATABASE_USER', 'myuser'),
+#         password=os.getenv('DATABASE_PASSWORD', 'mypassword')
+#     )
 
 async def admin_welcome_message(update: Update):
     # Приветственное сообщение для выбора языка
