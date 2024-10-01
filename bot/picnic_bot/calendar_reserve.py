@@ -1,6 +1,12 @@
-import psycopg2  # Заменили sqlite3 на psycopg2
+import os
+
+import psycopg2
 import logging
 from datetime import datetime, timedelta, time
+
+from dotenv import load_dotenv
+# Загрузка переменных из .env файла
+load_dotenv()
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -11,11 +17,12 @@ def reserved_date(current_date):
 
     # Создаем подключение к базе данных PostgreSQL
     try:
+        # Получаем параметры подключения из переменных окружения
         conn = psycopg2.connect(
-            host="postgres",  # Хост базы данных, например "localhost" или "db" для Docker
-            database="mydatabase",  # Имя базы данных
-            user="myuser",  # Имя пользователя базы данных
-            password="mypassword"  # Пароль для доступа к базе данных
+            host=os.getenv('DB_HOST'),
+            database=os.getenv('DB_NAME'),
+            user=os.getenv('DB_USER'),
+            password=os.getenv('DB_PASSWORD')
         )
         logging.info("Соединение с базой данных успешно установлено.")
     except Exception as e:
@@ -29,7 +36,7 @@ def reserved_date(current_date):
         logging.info(f"Выполнение SQL-запроса для даты {current_date.date()}")
         cursor.execute(
             "SELECT COUNT(order_id) FROM orders WHERE status > 2 AND selected_date = %s",
-            (current_date.date(),)  # Используем %s для PostgreSQL
+            (current_date.date(),)
         )
 
         # Получаем результат
