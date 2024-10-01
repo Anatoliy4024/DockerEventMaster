@@ -4,20 +4,42 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from datetime import datetime, timedelta
 import calendar
 import logging
+from dotenv import load_dotenv
+
+from bot.picnic_bot.database_logger import log_message
+
+# Загружаем переменные окружения из файла .env
+load_dotenv()
+
+def get_db_connection():
+    """Создает и возвращает подключение к базе данных PostgreSQL."""
+    try:
+        # Подключение к базе данных с использованием переменных из .env
+        conn = psycopg2.connect(
+            host=os.getenv('DB_HOST', 'localhost'),
+            database=os.getenv('DB_NAME', 'mydatabase'),
+            user=os.getenv('DB_USER', 'myuser'),
+            password=os.getenv('DB_PASSWORD', 'mypassword'),
+            client_encoding='UTF8'
+        )
+        log_message("Database connected")
+        return conn
+    except psycopg2.OperationalError as e:
+        log_message(f"Ошибка подключения к базе данных: {e}")
+        return None
 
 
 def get_dates_with_active_proformas():
     """
     Получает даты, на которые есть хотя бы одна проформа со статусом >= 3.
     """
-    # Устанавливаем соединение с PostgreSQL
-    conn = psycopg2.connect(
-        host="postgres",
-        database="mydatabase",
-        user="myuser",
-        password="mypassword",
-        client_encoding="UTF8"
-    )
+    # Получаем соединение с базой данных
+    conn = get_db_connection()
+
+    if conn is None:
+        print("Не удалось подключиться к базе данных.")
+        return []
+
     cursor = conn.cursor()
 
     try:
@@ -30,7 +52,34 @@ def get_dates_with_active_proformas():
         return [date[0] for date in dates]  # Возвращаем список дат в формате YYYY-MM-DD
     finally:
         cursor.close()
-        conn.close()
+        conn.close()  # Закрываем соединение с базой данных
+
+
+# def get_dates_with_active_proformas():
+#     """
+#     Получает даты, на которые есть хотя бы одна проформа со статусом >= 3.
+#     """
+#     # Устанавливаем соединение с PostgreSQL
+#     conn = psycopg2.connect(
+#         host="postgres",
+#         database="mydatabase",
+#         user="myuser",
+#         password="mypassword",
+#         client_encoding="UTF8"
+#     )
+#     cursor = conn.cursor()
+#
+#     try:
+#         cursor.execute("""
+#             SELECT DISTINCT selected_date
+#             FROM orders
+#             WHERE status >= 3
+#         """)
+#         dates = cursor.fetchall()  # Получаем все даты, на которые есть активные проформы
+#         return [date[0] for date in dates]  # Возвращаем список дат в формате YYYY-MM-DD
+#     finally:
+#         cursor.close()
+#         conn.close()
 
 
 def check_date_reserved(date, reserved_dates):

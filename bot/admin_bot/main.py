@@ -50,16 +50,6 @@ def get_db_connection():
         return None
 
 
-# Функция для подключения к базе данных PostgreSQL
-# def get_db_connection():
-#     return psycopg2.connect(
-#         host=os.getenv('DATABASE_HOST', 'localhost'),
-#         dbname=os.getenv('DATABASE_NAME', 'mydatabase'),
-#         user=os.getenv('DATABASE_USER', 'myuser'),
-#         password=os.getenv('DATABASE_PASSWORD', 'mypassword')
-#     )
-
-# Функция для получения user_id и username по user_id
 def get_user_info_by_user_id(user_id):
     conn = get_db_connection()
     cursor = conn.cursor()
