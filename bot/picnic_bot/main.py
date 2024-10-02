@@ -131,23 +131,6 @@ def create_connection():
         return None
 
 
-
-# def create_connection():
-#     """Создает соединение с базой данных PostgreSQL."""
-#     try:
-#         # Здесь мы подключаемся к Postgres с нужными параметрами
-#         conn = psycopg2.connect(
-#             host="postgres",  # Или имя хоста Docker, например "db"
-#             database="mydatabase",  # Имя базы данных
-#             user="myuser",  # Имя пользователя
-#             password="mypassword"  # Пароль
-#         )
-#         logging.info("Database connected")
-#         return conn
-#     except OperationalError as e:
-#         logging.error(f"Error connecting to database: {e}")
-#         return None
-
 def execute_query(conn, query, params=()):
     """Выполняет SQL-запрос."""
     try:

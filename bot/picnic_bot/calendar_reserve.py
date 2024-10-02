@@ -111,11 +111,12 @@ def reserved_month(current_date):
 
     # Создаем подключение к базе данных PostgreSQL
     try:
+        # Получаем параметры подключения из переменных окружения
         conn = psycopg2.connect(
-            host="postgres",  # Хост базы данных, например "localhost" или "db" для Docker
-            database="mydatabase",  # Имя базы данных
-            user="myuser",  # Имя пользователя базы данных
-            password="mypassword"  # Пароль для доступа к базе данных
+            host=os.getenv('DB_HOST'),
+            database=os.getenv('DB_NAME'),
+            user=os.getenv('DB_USER'),
+            password=os.getenv('DB_PASSWORD')
         )
         logging.info("Соединение с базой данных успешно установлено.")
     except Exception as e:
