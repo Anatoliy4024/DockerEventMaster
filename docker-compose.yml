@@ -17,6 +17,7 @@ services:
     container_name: localhost
     env_file: # Загружаем переменные из .env файла
       - .env
+    restart: always  # Добавляем параметр для авто-перезапуска контейнера
 
   picnic_bot:
     build:
@@ -30,6 +31,7 @@ services:
       - bot-network
     ports:
       - "8000:8000"  # Настроить, если нужен доступ к боту через внешний порт
+    restart: always  # Добавляем параметр для авто-перезапуска контейнера
 
   admin_bot:
     build:
@@ -43,6 +45,7 @@ services:
       - bot-network
     ports:
       - "8001:8001"  # Настроить, если нужен доступ к admin_bot через внешний порт
+    restart: always  # Добавляем параметр для авто-перезапуска контейнера
 
 networks:
   bot-network:
