@@ -1,37 +1,3 @@
-## Базовый образ Python
-#FROM python:3.9.20-slim-bullseye
-#
-## Устанавливаем рабочую директорию внутри контейнера
-#WORKDIR /app
-#
-## Копируем файл зависимостей
-#COPY ./requirements.txt /app/requirements.txt
-#
-## Устанавливаем зависимости
-#RUN pip install --upgrade pip
-#RUN pip install --no-cache-dir -r /app/requirements.txt
-#
-## Копируем файлы проекта в контейнер
-#COPY ./bot /app/bot
-#
-## Копируем скрипт ожидания готовности базы данных
-#COPY wait-for-it.sh /usr/local/bin/wait-for-it.sh
-#
-## Даем права на выполнение скрипта
-#RUN chmod +x /usr/local/bin/wait-for-it.sh
-#
-## Устанавливаем переменные среды для базы данных PostgreSQL
-#ENV DATABASE_HOST=postgres
-#ENV DATABASE_USER=myuser
-#ENV DATABASE_PASSWORD=mypassword
-#ENV DATABASE_NAME=mydatabase
-#
-## Команда для запуска бота с ожиданием готовности базы данных
-#CMD ["wait-for-it.sh", "postgres:5432", "--timeout=5", "--", "python", "-m", "bot.picnic_bot.main"]
-#
-
-
-
 # Базовый образ Python
 FROM python:3.9.20-slim-bullseye
 
