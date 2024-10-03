@@ -1,0 +1,28 @@
+__pycache__/
+logs/
+*.log
+config/config.py
+.env
+
+
+# created by virtualenv automatically
+
+.venv/
+venv/
+ENV/
+env/
+
+# PyCharm files
+.idea/
+
+# Python bytecode files
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.egg
+*.eggs
+
+# Database files
+*.sqlite3
+*.db

@@ -75,7 +75,7 @@ def create_reserved_timelist(time_list):
 
     for i in time_list:
         # start = datetime.strptime(i[0], "%H:%M") - timedelta(hours=5)
-        start = timedelta(hours=i[0].hour, minutes=i[0].minute) - timedelta(hours=5)
+        start = timedelta(hours=i[0].hour, minutes=i[0].minute) - timedelta(hours=4, minutes=30)
         # end = datetime.strptime(i[1], "%H:%M") + timedelta(hours=5, minutes=30)
         end = timedelta(hours=i[1].hour, minutes=i[1].minute) + timedelta(hours=5, minutes=30)
         while start < end:

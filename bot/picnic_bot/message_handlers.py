@@ -1,5 +1,7 @@
 import asyncio
 import logging
+import os
+
 import psycopg2
 from psycopg2 import OperationalError
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -9,26 +11,11 @@ from bot.picnic_bot.abstract_functions import create_connection, execute_query, 
 from bot.picnic_bot.constants import TemporaryData, ORDER_STATUS, UserData
 from bot.picnic_bot.keyboards import (yes_no_keyboard, generate_calendar_keyboard, generate_time_selection_keyboard,
                        generate_person_selection_keyboard, generate_party_styles_keyboard)
-from bot.picnic_bot.order_info_sender import send_order_info_to_servis, send_message_to_admin  # функция отправки
+from bot.picnic_bot.order_info_sender import send_message_to_admin_and_service  # функция отправки
                                      # сообщений АдминБоту для сценария админа и сервисной службы
-
-# # Обработчик текстовых сообщений
-# async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     user_data = context.user_data.get('user_data', UserData())
-#     context.user_data['user_data'] = user_data
-#     step = user_data.get_step()
-#
-#     if step == 'greeting':
-#         await handle_name(update, context)
-#     elif step == 'preferences_request':
-#         await handle_preferences(update, context)
-#     elif step == 'city_request':
-#         await handle_city(update, context)
-#     else:
-#         await update.message.reply_text(
-#             get_translation(user_data, 'buttons_only'),  # Используем функцию для получения перевода
-#             reply_markup=get_current_step_keyboard(step, user_data)
-#         )
+from dotenv import load_dotenv
+# Загрузка переменных из .env файла
+load_dotenv()
 
 
 # Обработчик текстовых сообщений
@@ -48,6 +35,48 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             get_translation(user_data, 'buttons_only'),  # Используем функцию для получения перевода
             reply_markup=get_current_step_keyboard(step, user_data)
         )
+
+def check_client_is_exist(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Инициализация данных пользователя
+    user_data = context.user_data.get('user_data', UserData())
+    context.user_data['user_data'] = user_data
+
+    # Создайте соединение с базой данных
+    conn = create_connection()
+    if conn is not None:
+        try:
+            # Проверка существования пользователя
+            logging.info(f"Проверка существования пользователя с user_id: {update.message.from_user.id}")
+            select_query = "SELECT 1 FROM users WHERE user_id = %s"
+            cursor = conn.cursor()
+            cursor.execute(select_query, (update.message.from_user.id,))
+            exists = cursor.fetchone()
+
+            if not exists:
+                # Вставка нового пользователя в users
+                logging.info(f"Вставка нового пользователя: {user_data.get_username()}")
+
+                # Задаем начальные значения для status и number_of_events которые ввели для АдминБота
+                status = 0  # Начальное значение для статуса
+                number_of_events = 0  # Начальное значение для счетчика событий
+
+                insert_query = "INSERT INTO users (user_id, username, status, number_of_events) VALUES (%s, %s, %s, %s)"
+                insert_params = (update.message.from_user.id, user_data.get_username(), status, number_of_events)
+                execute_query_with_retry(conn, insert_query, insert_params)
+
+                print(f"Принт 9: user_id {update.message.from_user.id} сохранен в таблицу orders")
+                return False
+
+            return True
+
+        except Exception as e:
+            logging.error(f"Ошибка базы данных: {e}")
+        finally:
+            conn.close()
+            logging.info("Соединение с базой данных закрыто")
+    else:
+        logging.error("Не удалось создать соединение с базой данных")
+        return False
 
 
 async def handle_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -78,18 +107,15 @@ async def handle_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     logging.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
-    # Создайте соединение с базой данных
-    conn = create_connection()   #(DATABASE_PATH)
-    if conn is not None:
-        try:
-            # Проверка существования пользователя
-            logging.info(f"Проверка существования пользователя с user_id: {update.message.from_user.id}")
-            select_query = "SELECT 1 FROM users WHERE user_id = %s"
-            cursor = conn.cursor()
-            cursor.execute(select_query, (update.message.from_user.id,))
-            exists = cursor.fetchone()
+    # Проверка существования пользователя
+    exists = check_client_is_exist(update, context)
 
-            if exists:
+    if exists:
+        # Создайте соединение с базой данных
+        conn = create_connection()
+        if conn is not None:
+            try:
+
                 # Обновление имени пользователя в таблице orders
                 logging.info(f"Обновление имени пользователя: {user_data.get_name()}")
 
@@ -105,29 +131,17 @@ async def handle_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     update_query = "UPDATE orders SET user_name = %s WHERE user_id = %s AND session_number = %s"
                     update_params = (user_data.get_name(), update.message.from_user.id, session_number)
                     execute_query_with_retry(conn, update_query, update_params)
-            else:
-                # Вставка нового пользователя в users
-                logging.info(f"Вставка нового пользователя: {user_data.get_username()}")
 
-                # Задаем начальные значения для status и number_of_events которые ввели для АдминБота
-                status = 0  # Начальное значение для статуса
-                number_of_events = 0  # Начальное значение для счетчика событий
+                # Теперь сохраняем user_id в таблицу orders
+                save_user_id_to_orders(update.message.from_user.id, user_data.get_name())
 
-                insert_query = "INSERT INTO users (user_id, username, status, number_of_events) VALUES (%s, %s, %s, %s)"
-                insert_params = (update.message.from_user.id, user_data.get_username(), status, number_of_events)
-                execute_query_with_retry(conn, insert_query, insert_params)
-
-            # Теперь сохраняем user_id в таблицу orders
-            save_user_id_to_orders(update.message.from_user.id, user_data.get_name())
-            print(f"Принт 9: user_id {update.message.from_user.id} сохранен в таблицу orders")
-
-        except Exception as e:
-            logging.error(f"Ошибка базы данных: {e}")
-        finally:
-            conn.close()
-            logging.info("Соединение с базой данных закрыто")
-    else:
-        logging.error("Не удалось создать соединение с базой данных")
+            except Exception as e:
+                logging.error(f"Ошибка базы данных: {e}")
+            finally:
+                conn.close()
+                logging.info("Соединение с базой данных закрыто")
+        else:
+            logging.error("Не удалось создать соединение с базой данных")
 
     greeting_texts = {
         'en': f'Hello {user_data.get_name()}! Do you want to see available dates?',
@@ -159,18 +173,19 @@ async def handle_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def create_connection():
     """Создает соединение с базой данных PostgreSQL."""
     try:
-        # Заменяем подключение SQLite на подключение к PostgreSQL
+        # Получаем параметры подключения из переменных окружения
         conn = psycopg2.connect(
-            host="postgres",  # В docker-compose.yml или в вашем конфиге
-            database="mydatabase",  # Название вашей базы данных
-            user="myuser",  # Имя пользователя базы данных
-            password="mypassword"  # Пароль пользователя базы данных
+            host=os.getenv('DB_HOST'),
+            database=os.getenv('DB_NAME'),
+            user=os.getenv('DB_USER'),
+            password=os.getenv('DB_PASSWORD')
         )
-        logging.info("Соединение с базой данных установлено")
+        logging.info("Database connected")
         return conn
     except OperationalError as e:
-        logging.error(f"Ошибка подключения к базе данных: {e}")
+        logging.error(f"Error connecting to database: {e}")
         return None
+
 
 
 def update_order_data(query, params, user_id):
@@ -190,8 +205,8 @@ def update_order_data(query, params, user_id):
             else:
                 logging.info(f"Вставка нового user_id {user_id} в таблицу orders.")
                 insert_query = """
-                    INSERT INTO orders (user_id, selected_date, start_time, end_time, duration, people_count, selected_party_style, city, preferences, status)
-                    VALUES (%s, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1)
+                    INSERT INTO orders (user_id, session_number, user_name, language, selected_date, start_time, end_time, duration, people_count, selected_party_style, city, preferences, status)
+                    VALUES (%s, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1)
                 """
                 cursor.execute(insert_query, (user_id,))
                 conn.commit()
@@ -224,65 +239,10 @@ async def handle_date_selection(update: Update, context: ContextTypes.DEFAULT_TY
     await update.callback_query.message.reply_text(f"Вы выбрали дату: {selected_date}")
 
 
-# def update_order_date(user_id, start_time):
-#     """Обновляет дату в таблице orders для указанного user_id."""
-#     conn = create_connection(DATABASE_PATH)
-#     if conn is not None:
-#         try:
-#             logging.info(f"Обновление записи в orders для user_id: {user_id} с датой: {start_time}")
-#             date_object = datetime.strptime(start_time, "%Y-%m-%d")
-#             update_query = "UPDATE orders SET selected_date = ? WHERE user_id = ?"
-#             execute_query_with_retry(conn, update_query, (date_object, user_id))
-#             logging.info(f"Принт: Дата {start_time} успешно обновлена для user_id {user_id}")
-#             logging.info(f"Дата {start_time} успешно обновлена для user_id {user_id}")
-#             print(f"Принт: +++++++++++++++++++Дата {start_time} успешно обновлена для user_id {user_id}")
-#         except Exception as e:
-#             logging.error(f"Ошибка базы данных при обновлении даты в таблице orders: {e}")
-#         finally:
-#             conn.close()
-#             logging.info("Соединение с базой данных закрыто")
-#     else:
-#         logging.error("Не удалось создать соединение с базой данных для работы с таблицей orders")
-
-# def update_order_data(user_id, object, query):
-#     """Обновляет дату в таблице orders для указанного user_id."""
-#     conn = create_connection(DATABASE_PATH)
-#     if conn is not None:
-#         try:
-#             logging.info(f"Обновление записи в orders для user_id: {user_id} с датой: {object}")
-#             if isinstance(object,datetime):
-#                 object = datetime.strptime(object, "%Y-%m-%d")
-#             elif isinstance(object,int):
-#                 object = object
-#             execute_query_with_retry(conn, query, (object, user_id))
-#             logging.info(f"Принт: Дата {object} успешно обновлена для user_id {user_id}")
-#             logging.info(f"Дата {object} успешно обновлена для user_id {user_id}")
-#             print(f"Принт: +++++++++++++++++++Дата {object} успешно обновлена для user_id {user_id}")
-#         except Exception as e:
-#             logging.error(f"Ошибка базы данных при обновлении даты в таблице orders: {e}")
-#         finally:
-#             conn.close()
-#             logging.info("Соединение с базой данных закрыто")
-#     else:
-#         logging.error("Не удалось создать соединение с базой данных для работы с таблицей orders")
-#
-#
-# # Словарь с переводами сообщения "Выбор только кнопками" на разные языки
-# translations = {
-#     'en': "Please use the buttons",
-#     'ru': "Выбор только кнопками",
-#     'es': "Por favor, usa los botones",
-#     'fr': "Veuillez utiliser les boutons",
-#     'de': "Bitte verwenden Sie die Tasten",
-#     'it': "Si prega di utilizzare i pulsanti",
-#     'uk': "Будь ласка, використовуйте кнопки",
-#     'pl': "Proszę użyć przycisków"
-# }
 
 def get_translation(user_data, key):
     language_code = user_data.get_language()  # Получаем код языка пользователя
     return translations.get(language_code, translations['en'])  # Возвращаем перевод или английский по умолчанию
-
 
 
 # Функция для обработки имени
@@ -358,35 +318,6 @@ async def handle_preferences(update: Update, context: ContextTypes.DEFAULT_TYPE)
         city_request_texts.get(language_code, 'Please specify the city for the event.')
     )
     user_data.set_step('city_request')
-
-
-# # Функция для обработки города
-# async def handle_city(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     user_data = context.user_data.get('user_data', UserData())
-#     user_data.set_city(update.message.text)
-#     user_id = update.message.from_user.id if update.message else update.callback_query.from_user.id
-#
-#     # Получаем session_number для обновления записи
-#     session_number_query = "SELECT MAX(session_number) FROM orders WHERE user_id = %s"
-#     conn = create_connection#(DATABASE_PATH)
-#     cursor = conn.cursor()
-#     cursor.execute(session_number_query, (user_data.get_user_id(),))
-#     session_number = cursor.fetchone()[0]
-#
-#     if session_number is None:
-#         logging.error("Не удалось получить session_number. Возможно, записи в базе данных отсутствуют.")
-#     else:
-#         logging.info(f"Используем session_number: {session_number} для обновления.")
-#
-#         # Обновляем запись только для последней сессии
-#         update_order_data(
-#             "UPDATE orders SET city = %s WHERE user_id = %s AND session_number = %s",
-#             (update.message.text, user_data.get_user_id(), session_number),
-#             user_data.get_user_id()
-#         )
-#
-#     # Переходим к следующему шагу
-#     await handle_city_confirmation(update, context)
 
 
 # Обработчик города
@@ -679,7 +610,6 @@ def generate_order_summary(user_data):
     return order_text
 
 
-
 async def show_payment_page(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_data = context.user_data.get('user_data', UserData())
     payment_message_texts = {
@@ -713,6 +643,8 @@ async def show_payment_page(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(payment_message)
     await asyncio.sleep(1)
     await show_proforma(update, context)
+
+
 def show_payment_page_handler(context: ContextTypes.DEFAULT_TYPE):
     user_data = context.user_data.get('user_data', UserData())
     payment_message_texts = {
@@ -745,39 +677,6 @@ def show_payment_page_handler(context: ContextTypes.DEFAULT_TYPE):
     payment_message = payment_message_texts.get(language_code, payment_message_texts['en'])
     return payment_message
 
-# async def show_proforma(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     # Получаем данные пользователя
-#     user_data = context.user_data.get('user_data', UserData())
-#
-#        # Получаем user_id из user_data
-#     user_id = user_data.get_user_id()
-#
-#     # Обновляем статус пользователя в таблице orders до "зарезервировано"
-#     conn = create_connection#(DATABASE_PATH)
-#     if conn is not None:
-#         try:
-#             # Проверка текущего максимального session_number для user_id
-#             select_query = "SELECT MAX(session_number) FROM orders WHERE user_id = ?"
-#             cursor = conn.cursor()
-#             cursor.execute(select_query, (user_id,))
-#             current_session = cursor.fetchone()[0]
-#
-#             user_data.set_session_number(current_session)
-#
-#             if current_session is None:
-#                 logging.error(f"Ошибка обновления статуса в таблице orders для user_id {user_id}")
-#             else:
-#                 # Обновляем статус заказа
-#                 update_query = "UPDATE orders SET status = ? WHERE user_id = ? AND session_number = ?"
-#                 cursor.execute(update_query, (ORDER_STATUS["3-зарезервировано - заказчик оплатил аванс"], user_id, current_session,))
-#                 conn.commit()
-#                 logging.info(f"User {user_id}: статус обновлен до 'зарезервировано'.")
-#         except sqlite3.Error as e:
-#             logging.error(f"Ошибка обновления статуса в таблице orders: {e}")
-#         finally:
-#             conn.close()
-
-import psycopg2
 
 async def show_proforma(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Получаем данные пользователя
@@ -938,12 +837,25 @@ async def show_proforma(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = InlineKeyboardMarkup([[button]])
     await context.bot.send_message(chat_id=update.effective_chat.id, text=proforma_text, reply_markup=reply_markup)
 
-    # Вызов функции для отправки сообщения админботу
-    await send_order_info_to_servis(user_data.get_user_id(), user_data.get_session_number())
+    await send_message_to_admin_and_service(user_data.get_user_id(), user_data.get_session_number())
 
-    # Вызов функции для отправки сообщения Ирине
-    await send_message_to_admin(user_data.get_user_id(), user_data.get_session_number())
 
+    # чистка кеша - обнуление класса USER_DATA
+    reset_user_data(user_data)
+
+def reset_user_data(data):
+    data.name = None
+    data.preferences = None
+    data.city = None
+    data.month_offset = 0
+    data.step = None
+    data.start_time = None
+    data.end_time = None
+    data.person_count = None
+    data.style = None
+    data.date = None
+    data.session_number = None  # Добавляем свойство session_number
+    data.calculated_cost = None  # Добавляем новое свойство
 
     # Функция для получения текущей клавиатуры для шага
 def get_current_step_keyboard(step, user_data):
@@ -977,7 +889,7 @@ translations = {
 
 def save_user_id_to_orders(user_id,user_n):
     """Сохраняет user_id в таблицу orders с начальным значением null для даты."""
-    conn = create_connection() #(DATABASE_PATH)
+    conn = create_connection()
     if conn is not None:
         try:
             logging.info(f"Проверка существования записи в orders для user_id: {user_id}")
@@ -1004,7 +916,7 @@ def save_user_id_to_orders(user_id,user_n):
         logging.error("Не удалось создать соединение с базой данных для работы с таблицей orders")
 
 
-#№№№Функция для получения перевода на основе языка пользователя
+# Функция для получения перевода на основе языка пользователя
 def get_translation(user_data, key):
     language_code = user_data.get_language()  # Получаем код языка пользователя
     return translations.get(language_code, translations['en'])  # Возвращаем перевод или английский по умолчанию

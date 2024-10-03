@@ -2,19 +2,7 @@ import psycopg2
 from psycopg2 import OperationalError
 import logging
 
-# Создаем подключение к базе данных PostgreSQL
-def create_connection():
-    try:
-        conn = psycopg2.connect(
-            host="localhost",  # Хост, где расположена база данных (если через Docker, то может быть другой адрес)
-            database="your_database_name",  # Имя твоей базы данных
-            user="your_user_name",  # Имя пользователя базы данных
-            password="your_password"  # Пароль пользователя
-        )
-        return conn
-    except OperationalError as e:
-        logging.error(f"Ошибка подключения к базе данных: {e}")
-        return None
+from bot.picnic_bot.abstract_functions import create_connection
 
 # Функция для инициализации базы данных
 def initialize_db():

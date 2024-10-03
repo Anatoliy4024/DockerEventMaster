@@ -18,10 +18,13 @@ from bot.picnic_bot.keyboards import (language_selection_keyboard, yes_no_keyboa
                                       generate_time_selection_keyboard, generate_person_selection_keyboard,
                                       generate_party_styles_keyboard)
 from bot.picnic_bot.message_handlers import (handle_message, handle_city_confirmation, update_order_data, handle_name,
-                                             show_payment_page, show_payment_page_handler, show_proforma)
+                                             show_payment_page, show_payment_page_handler, show_proforma,
+                                             check_client_is_exist)
 from bot.picnic_bot.calculations import calculate_total_cost
 
-
+from dotenv import load_dotenv
+# Загрузка переменных из .env файла
+load_dotenv()
 
 
 # Включаем логирование и указываем файл для логов
@@ -33,10 +36,29 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
-# logger.info(f"Database path: {DATABASE_PATH}")
 
-#########################################################################
+def get_user_status(user_id):
+    try:
+        # Подключаемся к базе данных PostgreSQL
+        conn = create_connection()
+        cursor = conn.cursor()
 
+        # Выполняем SQL-запрос для получения статуса пользователя
+        cursor.execute("SELECT status FROM users WHERE user_id = %s", (user_id,))
+        result = cursor.fetchone()
+
+        if result:
+            return result[0]  # Возвращаем статус пользователя
+        else:
+            return None  # Если пользователь не найден
+
+    except psycopg2.Error as e:
+        print(f"Ошибка при получении статуса: {e}")
+        return None
+
+    finally:
+        if conn:
+            conn.close()
 
 
 # добавление обработчика ошибок
@@ -61,7 +83,10 @@ VIDEO_PATHS = [
 ]
 
 # Замените 'YOUR_BOT_TOKEN' на токен вашего бота
-BOT_TOKEN = '7407529729:AAErOT5NBpMSO-V-HPAW-MDu_1WQt0TtXng'
+# BOT_TOKEN = '7407529729:AAErOT5NBpMSO-V-HPAW-MDu_1WQt0TtXng'
+
+BOT_TOKEN = os.getenv('TELEGRAM_TOKEN_PICNIC')  # Получаем токен из .env файла
+
 
 # Создайте соединение с базой данных
 conn = create_connection()
@@ -88,21 +113,23 @@ def execute_query_with_retry(conn, query, params=(), max_retries=5):
         finally:
             if cursor:
                 cursor.close()
+
 def create_connection():
     """Создает соединение с базой данных PostgreSQL."""
     try:
-        # Здесь мы подключаемся к Postgres с нужными параметрами
+        # Получаем параметры подключения из переменных окружения
         conn = psycopg2.connect(
-            host="postgres",  # Или имя хоста Docker, например "db"
-            database="mydatabase",  # Имя базы данных
-            user="myuser",  # Имя пользователя
-            password="mypassword"  # Пароль
+            host=os.getenv('DB_HOST'),
+            database=os.getenv('DB_NAME'),
+            user=os.getenv('DB_USER'),
+            password=os.getenv('DB_PASSWORD')
         )
         logging.info("Database connected")
         return conn
     except OperationalError as e:
         logging.error(f"Error connecting to database: {e}")
         return None
+
 
 def execute_query(conn, query, params=()):
     """Выполняет SQL-запрос."""
@@ -133,20 +160,31 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     logging.info(f"Получен user_id: {user_id}, username: {username}, language: {user_data.get_language()}")
 
+    logging.info("ЗАПИС КОРИСТУВАЧА")
+    # await handle_name(update, context)
+    check_client_is_exist(update, context)
+
+
     # Создаем новую запись в таблице orders с новым session_number
-    conn = create_connection()  # (DATABASE_PATH)
+    conn = create_connection()
     if conn is not None:
         try:
             # Проверка текущего максимального session_number для user_id
             select_query = "SELECT MAX(session_number) FROM orders WHERE user_id = %s"
             cursor = conn.cursor()
             cursor.execute(select_query, (user_id,))
-            current_session = cursor.fetchone()[0]
 
-            if current_session is None:
-                new_session_number = 1
-            else:
+            # Получаем результат запроса
+            result = cursor.fetchone()
+            logging.info("(((((((((((((((((((((((((((((((((((((((((((((((")
+            logging.info(result)
+
+            # Проверка, что результат не None и session_number существует
+            if result and result[0] is not None:
+                current_session = result[0]
                 new_session_number = current_session + 1
+            else:
+                new_session_number = 1  # Если записей нет или session_number пустой
 
             user_data.set_session_number(new_session_number)
 
@@ -162,7 +200,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             cursor.execute(insert_query, (user_id, new_session_number))
             conn.commit()
 
-            logging.info(f"Создана новая запись в таблице orders для user_id: {user_id} с session_number: {new_session_number}")
+            logging.info(
+                f"Создана новая запись в таблице orders для user_id: {user_id} с session_number: {new_session_number}")
 
         except Exception as e:
             logging.error(f"Ошибка базы данных: {e}")
@@ -265,20 +304,31 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await context.bot.send_message(chat_id=update.effective_chat.id, text="Video file not found.")
             await loading_message.delete()
 
+
+        # Тексты с гиперссылкой в зависимости от выбранного языка
         greeting_texts = {
-            'en': 'Hello! What is your name?',
-            'ru': 'Привет! Как вас зовут?',
-            'es': '¡Hola! ¿Cómo te llamas?',
-            'fr': 'Salut! Quel est votre nom ?',
-            'uk': 'Привіт! Як вас звати?',
-            'pl': 'Cześć! Jak masz на імʼя?',
-            'de': 'Hallo! Wie heißt du?',
-            'it': 'Ciao! Come ti chiami?'
+            'en': 'Hello! What is your name?   [(terms, booking conditions, and privacy policy)](https://telegra.ph/Privacy-Policy-09-19-96).',
+            'ru': 'Привет! Как вас зовут?   [(термины, условия бронирования и политика конфиденциальности)](https://telegra.ph/Politika-konfidencialnosti-09-19-5).',
+            'es': '¡Hola! ¿Cómo te llamas?  [(términos y condiciones de reserva y política de privacidad)](https://telegra.ph/Pol%C3%ADtica-de-privacidad-09-19-8).',
+            'fr': 'Salut! Quel est votre nom ?   [(conditions générales de réservation et politique de confidentialité)](https://telegra.ph/Politique-de-confidentialit%C3%A9-09-19-3).',
+            'uk': 'Привіт! Як вас звати?   [(терміни, умови бронювання і політика конфіденційності)](https://telegra.ph/Pol%D1%96tika-konf%D1%96denc%D1%96jnost%D1%96-09-19).',
+            'pl': 'Cześć! Jak masz на імʼя?   [(umowy, warunki rezerwacji i polityka prywatności)](https://telegra.ph/Polityka-prywatno%C5%9Bci-09-19).',
+            'de': 'Hallo! Wie heißt du?   [(allgemeine Geschäftsbedingungen und Datenschutzrichtlinie)](https://telegra.ph/Datenschutzrichtlinie-09-19).',
+            'it': 'Ciao! Come ti chiami?   [(termini, condizioni di prenotazione e informativa sulla privacy)](https://telegra.ph/Politica-sulla-privacy-09-19).'
         }
+
+        # Отправляем сообщение с приветствием и ссылкой, отключая предварительный просмотр
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text=greeting_texts.get(language_code, 'Hello! What is your name?')
+            text=greeting_texts.get(language_code,
+                                    'Hello! What is your name? We respect and protect your [privacy](https://telegra.ph/Privacy-Policy-09-19-96).'),
+            parse_mode='Markdown',
+            disable_web_page_preview=True  # Отключаем предварительный просмотр
         )
+
+
+
+
 
     elif query.data == 'yes':
         if user_data.get_step() == 'name_received':
@@ -307,8 +357,12 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         elif user_data.get_step() == 'order_sent':
             user_data.set_step('order_confirmation')
             # await show_payment_page(update, context)
-            await query.message.reply_text(show_payment_page_handler(context))
-            await asyncio.sleep(3)
+
+            user_status = get_user_status(user_data.get_user_id())
+            if user_status != 1:
+                await query.message.reply_text(show_payment_page_handler(context))
+                await asyncio.sleep(3)
+
             await show_proforma(update, context)
 
         elif user_data.get_step() == 'time_confirmation':
@@ -434,7 +488,9 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif query.data.startswith('time_'):
         selected_time = query.data.split('_')[1]
-
+        logging.info("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM")
+        logging.info(user_data.get_start_time())
+        logging.info(query.data)
         if not user_data.get_start_time():
             user_data.set_start_time(selected_time)
 
@@ -442,6 +498,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             update_order_data(
                 "UPDATE orders SET start_time = %s WHERE user_id = %s AND session_number = %s",
                 (selected_time, user_data.get_user_id(), session_number),
+
                 user_data.get_user_id()
             )
             # time.sleep(1.5)  # Задержка перед повторной попыткой
@@ -615,6 +672,7 @@ async def show_calendar(query, month_offset, language):
     # Генерация клавиатуры календаря
     calendar_keyboard = generate_calendar_keyboard(month_offset, language)
     logging.info(f"Календарная клавиатура сгенерирована для month_offset={month_offset}, language={language}")
+
 
     # Тексты для выбора даты на разных языках
     select_date_text = {
