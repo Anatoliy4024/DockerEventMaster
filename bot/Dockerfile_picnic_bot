@@ -54,11 +54,5 @@ COPY wait-for-it.sh /usr/local/bin/wait-for-it.sh
 # Даем права на выполнение скрипта
 RUN chmod +x /usr/local/bin/wait-for-it.sh
 
-# Устанавливаем переменные среды для базы данных PostgreSQL
-ENV DATABASE_HOST=postgres
-ENV DATABASE_USER=myuser
-ENV DATABASE_PASSWORD=mypassword
-ENV DATABASE_NAME=mydatabase
-
 # Команда для запуска бота с ожиданием готовности базы данных
 CMD ["wait-for-it.sh", "postgres:5432", "--timeout=5", "--", "python", "-m", "bot.picnic_bot.main"]

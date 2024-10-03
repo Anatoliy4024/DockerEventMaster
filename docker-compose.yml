@@ -4,9 +4,9 @@ services:
   postgres:
     image: postgres:13
     environment:
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: mydatabase
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
       POSTGRES_HOST_AUTH_METHOD: 'trust'
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -15,6 +15,8 @@ services:
     ports:
       - "127.0.0.1:5432:5432"
     container_name: localhost
+    env_file: # Загружаем переменные из .env файла
+      - .env
 
   picnic_bot:
     build:
