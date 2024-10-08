@@ -98,9 +98,9 @@ async def send_message_to_admin_and_service(user_id, session_num):
         logging.info(f"Order status updated for user_id: {user_id}, session_number: {session_num}")
 
         # Обновляем количество зарезервированных ордеров - number_of_events
-        logging.info(f"Counting orders for user_id: {user_id} with status 3 or 4")
+        logging.info(f"Counting orders for user_id: {user_id} with status > 2")
         cursor.execute(
-            "SELECT COUNT(order_id) FROM orders WHERE user_id = %s AND status IN (3,4)",
+            "SELECT COUNT(order_id) FROM orders WHERE user_id = %s AND status > 2",
             (user_id,)
         )
         events_num = cursor.fetchone()[0]

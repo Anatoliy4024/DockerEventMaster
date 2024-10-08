@@ -10,7 +10,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 from bot.admin_bot.helpers.database_helpers import get_full_proforma
 from bot.admin_bot.keyboards.admin_keyboards import irina_service_menu, yes_no_keyboard
-from bot.admin_bot.constants import UserData
+from bot.admin_bot.constants import UserData, ORDER_STATUS
 from bot.admin_bot.helpers.calendar_helpers import disable_calendar_buttons
 from bot.admin_bot.translations import translations, language_selection_keyboard
 import os  # Для работы с переменными окружения
@@ -222,12 +222,22 @@ async def handle_proforma_button_click(update: Update, context: ContextTypes.DEF
                 message = await query.message.reply_text(full_proforma_text)
                 context.user_data['delete_messages'].append(message.message_id)
 
+                #logging.info(f"Updating order status for order_id: {ORDER_STATUS['6-Администратор зашел в АдминБот и просмотрел новую ПРОФОРМУ']}YYYYYYYYYYYYYYYYYYYYYYY")
+
+                # Обновляем статус ордера
+                conn = get_db_connection()
+                cursor = conn.cursor()
+                cursor.execute(
+                    "UPDATE orders SET status = %s WHERE user_id = %s AND session_number = %s",
+                    (ORDER_STATUS['6-Администратор зашел в АдминБот и просмотрел новую ПРОФОРМУ'], user_id, session_number)
+                )
+                conn.commit()
+
                 if user_data.get_step() == "delete_client":
                     user_data.set_step(f"delete_client_{proforma_info[11]}")
                     message = await query.message.reply_text(f"удалить эту запись?",
                                                    reply_markup=yes_no_keyboard('ru'))
                     context.user_data['delete_messages'].append(message.message_id)
-
 
                 #     формируем кнопки
             else:
