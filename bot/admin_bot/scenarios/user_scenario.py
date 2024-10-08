@@ -32,16 +32,6 @@ def get_db_connection():
         return None
 
 
-# Функция для подключения к базе данных
-# def get_db_connection():
-#     return psycopg2.connect(
-#         host="postgres",
-#         database="mydatabase",
-#         user="myuser",
-#         password="mypassword",
-#         client_encoding="UTF8"
-#     )
-
 async def user_welcome_message(update: Update, first_name):
     return await update.message.reply_text(
             f"Welcome {first_name}! Choose your language / Выберите язык",

@@ -125,7 +125,12 @@ def reserved_month(current_date):
 
     cursor = conn.cursor()
     first_day_month = datetime(current_date.year, current_date.month, 1)
-    first_day_next_month = datetime(current_date.year, current_date.month + 1, 1)
+
+    if current_date.month == 12:
+        first_day_next_month = datetime(current_date.year + 1, 1, 1)
+
+    else:
+        first_day_next_month = datetime(current_date.year, current_date.month + 1, 1)
 
     try:
         # Выполнение SQL-запроса

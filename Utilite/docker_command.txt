@@ -48,3 +48,8 @@ docker exec -it docker_event_master-admin_bot-1 bash
 13.просмотр логов бота
 cat db_operations.log
 
+14. просмотр файлов логирования БД на сервере
+cat /var/lib/docker/volumes/dockereventmaster_postgres_data/_data/pg_log/postgresql-<дата>.log
+
+15. просмотр логов в реальном времени
+tail -f /var/lib/docker/volumes/dockereventmaster_postgres_data/_data/pg_log/postgresql-<дата>.log
