@@ -60,11 +60,12 @@ yarg==0.1.9
 python-telegram-bot==20.3
 python-dotenv
 
-
-
-
 #psycopg2~=2.9.9
 python-dotenv~=1.0.1
 chardet~=5.2.0
 pytz~=2024.2
 httpx~=0.24.1
+
+Flask==2.3.2
+stripe==2.60.0
+python-dotenv==0.19.2

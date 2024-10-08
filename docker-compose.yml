@@ -47,6 +47,21 @@ services:
       - "8001:8001"  # Настроить, если нужен доступ к admin_bot через внешний порт
     restart: always  # Добавляем параметр для авто-перезапуска контейнера
 
+  # Flask сервер для обработки Stripe платежей
+  flask_server:
+    build:
+      context: .
+      dockerfile: Dockerfile_flask  # Создай Dockerfile для Flask-сервера
+    env_file:  # Загружаем переменные из .env файла
+      - .env
+    networks:
+      - bot-network
+    ports:
+      - "5000:5000"  # Порт для Flask-сервера
+    depends_on:
+      - postgres  # Убедись, что сервер поднимается после PostgreSQL
+    restart: always  # Автоматический перезапуск
+
 networks:
   bot-network:
     driver: bridge

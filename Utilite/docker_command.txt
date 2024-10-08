@@ -53,3 +53,6 @@ cat /var/lib/docker/volumes/dockereventmaster_postgres_data/_data/pg_log/postgre
 
 15. просмотр логов в реальном времени
 tail -f /var/lib/docker/volumes/dockereventmaster_postgres_data/_data/pg_log/postgresql-<дата>.log
+
+16. перенос проекта с Гита на сервер (текущую директорию)
+git pull origin main
