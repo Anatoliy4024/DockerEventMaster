@@ -1,0 +1,15 @@
+# Используем Python-образ
+FROM python:3.9-slim
+
+# Устанавливаем рабочую директорию
+WORKDIR /app
+
+# Копируем необходимые файлы в контейнер
+COPY requirements.txt requirements.txt
+COPY . .
+
+# Устанавливаем зависимости
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Запускаем приложение
+CMD ["python", "payment_handler.py"]

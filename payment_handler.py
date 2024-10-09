@@ -32,11 +32,12 @@ def index():
     '''
 
 
+from flask import Flask, request, jsonify, redirect, url_for
+
 # Маршрут для создания платежной сессии
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
     try:
-        # Здесь ты можешь указать сумму и валюту (например, 20 евро = 2000 евроцентов)
         session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=[{
@@ -53,7 +54,8 @@ def create_checkout_session():
             success_url=success_url,
             cancel_url=cancel_url,
         )
-        return jsonify({'id': session.id})
+        # Вместо возвращения JSON, делаем перенаправление на страницу оплаты Stripe
+        return redirect(session.url, code=303)
     except Exception as e:
         return jsonify(error=str(e)), 403
 
