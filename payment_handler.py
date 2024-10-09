@@ -2,14 +2,35 @@ import os
 import stripe
 from flask import Flask, request, jsonify, redirect
 
+from dotenv import load_dotenv
+load_dotenv()
+
+print(os.getenv('STRIPE_SECRET_KEY'))
+
 # Инициализация Flask
 app = Flask(__name__)
 
 # Получаем ключи Stripe из переменных окружения
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
+
+print(f"Loaded Stripe API Key: {stripe.api_key}")
+
 publishable_key = os.getenv('STRIPE_PUBLISHABLE_KEY')
 success_url = os.getenv('SUCCESS_URL')
 cancel_url = os.getenv('CANCEL_URL')
+
+
+# Маршрут для корневого пути
+@app.route('/')
+def index():
+    return '''
+        <h1>Welcome to the Stripe Payment Gateway</h1>
+        <p>To initiate a payment, please click the button below:</p>
+        <form action="/create-checkout-session" method="POST">
+            <button type="submit">Create Checkout Session</button>
+        </form>
+    '''
+
 
 # Маршрут для создания платежной сессии
 @app.route('/create-checkout-session', methods=['POST'])

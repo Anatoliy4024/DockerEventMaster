@@ -1,6 +1,6 @@
 --- Таблица пользователей
 CREATE TABLE IF NOT EXISTS users (
-    user_id SERIAL PRIMARY KEY,   -- SERIAL используется для автоинкремента в PostgreSQL
+    user_id SERIAL PRIMARY KEY,
     username TEXT,
     status INTEGER,
     number_of_events INTEGER,

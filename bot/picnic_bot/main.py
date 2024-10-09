@@ -655,7 +655,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         month_offset = int(query.data.split('_')[2])
         user_data.set_month_offset(month_offset)
 
-        logging.info(f"Календарная клавиатура сгенерирована для month_offset={month_offset} !!!!!!!!!!!!!!!!!!!")
+        logging.info(f"Календарная клавиатура сгенерирована для month_offset={month_offset}")
 
         await show_calendar(query, month_offset, user_data.get_language())
 
