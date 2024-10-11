@@ -706,12 +706,12 @@ async def show_proforma(update: Update, context: ContextTypes.DEFAULT_TYPE):
             conn.close()
 
     # Получаем номер проформы (номер ордера с добавлением статуса "_3")
-        proforma_number = f"{user_data.get_user_id()}_{user_data.get_session_number()}_3"
+
     #
     # SELECT
     # order_id_0, user_id_1, session_number_2, user_name_3, selected_date_5, start_time_6, end_time_7, duration_8,
     # people_count_9, selected_style_10, preferences_11, city_12 calculated_cost_14
-
+    proforma_number = f"{last_order[1]}_{last_order[2]}_3"
     selected_date = last_order[5]
     start_time = last_order[6]
     end_time = last_order[7]
