@@ -18,7 +18,7 @@ from bot.picnic_bot.keyboards import (language_selection_keyboard, yes_no_keyboa
                                       generate_time_selection_keyboard, generate_person_selection_keyboard,
                                       generate_party_styles_keyboard)
 from bot.picnic_bot.message_handlers import (handle_message, handle_city_confirmation, update_order_data, handle_name,
-                                             show_payment_page, show_payment_page_handler, show_proforma,
+                                             show_payment_page_handler, show_proforma,
                                              check_client_is_exist)
 from bot.picnic_bot.calculations import calculate_total_cost
 
@@ -360,10 +360,16 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             user_status = get_user_status(user_data.get_user_id())
             if user_status != 1:
-                await query.message.reply_text(show_payment_page_handler(context))
-                await asyncio.sleep(3)
 
-            await show_proforma(update, context)
+                message_text,message_button = show_payment_page_handler(context)
+
+                await context.bot.send_message(chat_id=update.effective_chat.id, text=message_text,
+                                               reply_markup=message_button)
+
+            #     await query.message.reply_text(show_payment_page_handler(context))
+            #     await asyncio.sleep(3)
+            #
+            # await show_proforma(update, context)
 
         elif user_data.get_step() == 'time_confirmation':
             user_data.set_step('people_selection')
@@ -644,12 +650,18 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             (query.data, user_data.get_user_id(), session_number),
             user_data.get_user_id()
         )
-    # elif user_data.get_step() == 'city_confirmation':
-    #     await handle_city_confirmation(update, context)
-    #     await show_payment_page(update, context)
 
     elif user_data.get_step() == 'order_sent':
-        await show_payment_page(update, context)
+        # await show_payment_page(update, context)
+
+        message_text, message_button = show_payment_page_handler(context)
+
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=message_text,
+                                       reply_markup=message_button)
+
+        # await query.message.reply_text(show_payment_page_handler(context))
+        # await asyncio.sleep(3)
+        # await show_proforma(update, context)
 
     elif query.data.startswith('prev_month_') or query.data.startswith('next_month_'):
         month_offset = int(query.data.split('_')[2])

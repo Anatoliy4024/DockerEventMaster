@@ -1,6 +1,6 @@
 import os
 import stripe
-from flask import Flask, request, jsonify, redirect
+from flask import Flask, request, jsonify, redirect, url_for
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -32,8 +32,6 @@ def index():
     '''
 
 
-from flask import Flask, request, jsonify, redirect, url_for
-
 # Маршрут для создания платежной сессии
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
@@ -63,13 +61,15 @@ def create_checkout_session():
 @app.route('/payment-success')
 def payment_success():
     # Здесь происходит возврат в бота с сообщением об успешной оплате
-    return "Оплата прошла успешно! Можете вернуться в бот."
+    return redirect('https://t.me/PicnicsAlicanteBot?start=payment_success')
+   # return "Оплата прошла успешно! Можете вернуться в бот."
 
 # Маршрут для обработки отмены платежа
 @app.route('/payment-cancelled')
 def payment_cancelled():
     # Сообщение об отмене платежа
-    return "Платеж был отменен. Можете вернуться в бот."
+    return redirect('https://t.me/PicnicsAlicanteBot?start=payment_cancelled')
+    #return "Платеж был отменен. Можете вернуться в бот."
 
 # Вебхук для получения уведомлений от Stripe
 @app.route('/webhook', methods=['POST'])
