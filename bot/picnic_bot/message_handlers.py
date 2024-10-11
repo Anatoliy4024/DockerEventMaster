@@ -613,30 +613,29 @@ def generate_order_summary(user_data):
 def show_payment_page_handler(context: ContextTypes.DEFAULT_TYPE):
     user_data = context.user_data.get('user_data', UserData())
     payment_message_texts = {
-        'en': "Payment page for the reservation - 20 euros\n\n"
-              "The page is under development (technical testing). "
-              "Your proforma will be generated considering your prepayment...",
-        'ru': "Страница оплаты резерва - 20 евро\n\n"
-              "Страница в разработке (техническое тестирование). "
-              "Сейчас вам будет сформирована проформа с учетом вашей предоплаты...",
-        'es': "Página de pago de la reserva - 20 euros\n\n"
-              "La página está en desarrollo (prueba técnica). "
-              "Se generará su proforma considerando su prepago...",
-        'fr': "Page de paiement pour la réservation - 20 euros\n\n"
-              "La page est en cours de développement (test technique). "
-              "Votre proforma sera générée en tenant compte de votre prépaiement...",
-        'uk': "Сторінка оплати резерва - 20 євро\n\n"
-              "Сторінка в розробці (технічне тестування). "
-              "Зараз вам буде сформовано проформу з урахуванням вашої передоплати...",
-        'pl': "Strona płatności za rezerwację - 20 euro\n\n"
-              "Strona jest w fazie rozwoju (testy techniczne). "
-              "Twoja proforma zostanie wygenerowana z uwzględnieniem twojej przedpłaty...",
-        'de': "Zahlungsseite für die Reservierung - 20 Euro\n\n"
-              "Die Seite befindet sich in der Entwicklung (technischer Test). "
-              "Ihre Proforma wird unter Berücksichtigung Ihrer Vorauszahlung generiert...",
-        'it': "Pagina di pagamento per la prenotazione - 20 euro\n\n"
-              "La pagina è in fase di sviluppo (test tecnico). "
-              "La tua proforma sarà generata tenendo conto del tuo pagamento anticipato..."
+        'en': "You will be redirected to a secure payment page - Stripe payment platform.\n"
+              "Then return to the bot to see your proforma considering your prepayment.",
+
+        'ru': "Вы будете перенаправлены на безопасную страницу оплаты - платформу платежей Stripe.\n"
+              "Затем вернитесь в бот, чтобы увидеть вашу Проформу с учетом вашей предоплаты.",
+
+        'es': "Será redirigido a una página de pago segura - plataforma de pagos Stripe.\n"
+              "Luego regrese al bot para ver su proforma con el anticipo considerado.",
+
+        'fr': "Vous serez redirigé vers une page de paiement sécurisée - plateforme de paiement Stripe.\n"
+              "Ensuite, revenez dans le bot pour voir votre proforma tenant compte de votre prépaiement.",
+
+        'uk': "Вас буде перенаправлено на безпечну сторінку оплати - платформу платежів Stripe.\n"
+              "Потім поверніться в бот, щоб побачити свою Проформу з урахуванням вашої передоплати.",
+
+        'pl': "Zostaniesz przekierowany na bezpieczną stronę płatności - platformę płatności Stripe.\n"
+              "Następnie wróć do bota, aby zobaczyć swoją proformę z uwzględnieniem przedpłaty.",
+
+        'de': "Sie werden auf eine sichere Zahlungsseite weitergeleitet - Zahlungsplattform Stripe.\n"
+              "Kehren Sie dann in den Bot zurück, um Ihre Proforma mit Ihrer Vorauszahlung zu sehen.",
+
+        'it': "Verrai reindirizzato a una pagina di pagamento sicura - piattaforma di pagamento Stripe.\n"
+              "Torna quindi al bot per vedere la tua proforma tenendo conto del tuo pagamento anticipato."
     }
     language_code = user_data.get_language()
     payment_message = payment_message_texts.get(language_code, payment_message_texts['en'])
