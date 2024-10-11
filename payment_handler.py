@@ -46,20 +46,20 @@ def get_last_order_id():
 
     return order_id
 
-# Корневой маршрут для отображения страницы
-@app.route('/')
-def index():
-    return '''
-        <h1>Welcome to the Stripe Payment Gateway</h1>
-        <p>To initiate a payment, please click the button below:</p>
-        <form action="/create-checkout-session" method="POST">
-            <button type="submit">Create Checkout Session</button>
-        </form>
-    '''
+# # Корневой маршрут для отображения страницы
+# @app.route('/')
+# def index():
+#     return '''
+#         <h1>Welcome to the Stripe Payment Gateway</h1>
+#         <p>To initiate a payment, please click the button below:</p>
+#         <form action="/create-checkout-session" method="POST">
+#             <button type="submit">Create Checkout Session</button>
+#         </form>
+#     '''
 
-# Маршрут для создания платежной сессии
-@app.route('/create-checkout-session', methods=['POST'])
-def create_checkout_session():
+# Новый корневой маршрут для непосредственного создания платежной сессии
+@app.route('/', methods=['GET'])
+def index():
     try:
         # Получаем последний order_id из базы данных
         order_id = get_last_order_id()
@@ -91,6 +91,41 @@ def create_checkout_session():
         return redirect(session.url, code=303)
     except Exception as e:
         return jsonify(error=str(e)), 403
+
+# # Маршрут для создания платежной сессии
+# @app.route('/create-checkout-session', methods=['POST'])
+# def create_checkout_session():
+#     try:
+#         # Получаем последний order_id из базы данных
+#         order_id = get_last_order_id()
+#
+#         if order_id is None:
+#             return jsonify({"error": "Order ID not found"}), 400
+#
+#         # Создаем платежную сессию Stripe с передачей order_id в метаданных
+#         session = stripe.checkout.Session.create(
+#             payment_method_types=['card'],
+#             line_items=[{
+#                 'price_data': {
+#                     'currency': 'eur',
+#                     'product_data': {
+#                         'name': 'Оплата заказа',
+#                     },
+#                     'unit_amount': 2000,  # 20 евро
+#                 },
+#                 'quantity': 1,
+#             }],
+#             mode='payment',
+#             success_url=success_url,
+#             cancel_url=cancel_url,
+#             metadata={
+#                 'order_id': order_id  # Передаем order_id в метаданные
+#             }
+#         )
+#         # Перенаправляем пользователя на страницу оплаты Stripe
+#         return redirect(session.url, code=303)
+#     except Exception as e:
+#         return jsonify(error=str(e)), 403
 
 # Маршрут для обработки успешной оплаты
 @app.route('/payment-success')
