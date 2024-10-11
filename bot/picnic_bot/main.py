@@ -164,18 +164,47 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     logging.info(f"Получен start_query: {query_param}")
 
+    # Словари с сообщениями для успешной оплаты и отмены
+    payment_messages = {
+        'payment_success': {
+            'en': "Payment was successful!",
+            'ru': "Оплата прошла успешно!",
+            'es': "¡El pago fue exitoso!",
+            'fr': "Le paiement a été effectué avec succès !",
+            'uk': "Оплата пройшла успішно!",
+            'pl': "Płatność zakończyła się sukcesem!",
+            'de': "Die Zahlung war erfolgreich!",
+            'it': "Il pagamento è andato a buon fine!"
+        },
+        'payment_cancelled': {
+            'en': "Payment was cancelled. Returning to the previous step.",
+            'ru': "Платеж был отменен. Возвращаем вас на предыдущий шаг.",
+            'es': "El pago fue cancelado. Volviendo al paso anterior.",
+            'fr': "Le paiement a été annulé. Retour à l'étape précédente.",
+            'uk': "Платіж був скасований. Повертаємо вас на попередній крок.",
+            'pl': "Płatność została anulowana. Wracamy do poprzedniego kroku.",
+            'de': "Die Zahlung wurde abgebrochen. Rückkehr zum vorherigen Schritt.",
+            'it': "Il pagamento è stato annullato. Torna al passaggio precedente."
+        }
+    }
+
     # Проверка успешной оплаты
     if query_param == "payment_success":
-        await update.message.reply_text("Оплата прошла успешно! Переходим к следующему шагу.")
+        language_code = user_data.get_language()  # Получаем язык пользователя
+        success_message = payment_messages['payment_success'].get(language_code,
+                                                                  payment_messages['payment_success']['en'])
+        await update.message.reply_text(success_message)
         # Переход на следующий шаг
         await show_proforma(update, context)
         return
 
     # Проверка отмены оплаты
     elif query_param == "payment_cancelled":
-        await update.message.reply_text("Платеж был отменен. Возвращаем вас на предыдущий шаг.")
-        # Возврат на предыдущий шаг, например, на показ страницы оплаты
-        # await show_payment_page(update, context)
+        language_code = user_data.get_language()  # Получаем язык пользователя
+        cancelled_message = payment_messages['payment_cancelled'].get(language_code,
+                                                                      payment_messages['payment_cancelled']['en'])
+        await update.message.reply_text(cancelled_message)
+        # Возврат на предыдущий шаг
         return
 
     else:
