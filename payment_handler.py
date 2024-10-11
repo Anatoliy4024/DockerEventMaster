@@ -1,26 +1,52 @@
 import os
 import stripe
+import psycopg2
+import logging
 from flask import Flask, request, jsonify, redirect, url_for
-
 from dotenv import load_dotenv
-load_dotenv()
 
-print(os.getenv('STRIPE_SECRET_KEY'))
+from status_3 import update_order_status_to_paid  # Подключаем функцию обновления статуса
+
+# Загрузка переменных окружения
+load_dotenv()
 
 # Инициализация Flask
 app = Flask(__name__)
 
-# Получаем ключи Stripe из переменных окружения
+# Настройка Stripe с использованием ключей из переменных окружения
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
-
-print(f"Loaded Stripe API Key: {stripe.api_key}")
-
 publishable_key = os.getenv('STRIPE_PUBLISHABLE_KEY')
 success_url = os.getenv('SUCCESS_URL')
 cancel_url = os.getenv('CANCEL_URL')
 
+# Функция для получения последнего order_id из базы данных
+def get_last_order_id():
+    conn = psycopg2.connect(
+        host=os.getenv('DB_HOST'),
+        database=os.getenv('DB_NAME'),
+        user=os.getenv('DB_USER'),
+        password=os.getenv('DB_PASSWORD')
+    )
+    order_id = None
+    try:
+        cursor = conn.cursor()
+        query = "SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1"
+        cursor.execute(query)
+        result = cursor.fetchone()
 
-# Маршрут для корневого пути
+        if result:
+            order_id = result[0]
+        else:
+            logging.error("Order ID not found")
+    except psycopg2.Error as e:
+        logging.error(f"Error fetching order_id: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+
+    return order_id
+
+# Корневой маршрут для отображения страницы
 @app.route('/')
 def index():
     return '''
@@ -31,11 +57,17 @@ def index():
         </form>
     '''
 
-
 # Маршрут для создания платежной сессии
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
     try:
+        # Получаем последний order_id из базы данных
+        order_id = get_last_order_id()
+
+        if order_id is None:
+            return jsonify({"error": "Order ID not found"}), 400
+
+        # Создаем платежную сессию Stripe с передачей order_id в метаданных
         session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=[{
@@ -51,8 +83,11 @@ def create_checkout_session():
             mode='payment',
             success_url=success_url,
             cancel_url=cancel_url,
+            metadata={
+                'order_id': order_id  # Передаем order_id в метаданные
+            }
         )
-        # Вместо возвращения JSON, делаем перенаправление на страницу оплаты Stripe
+        # Перенаправляем пользователя на страницу оплаты Stripe
         return redirect(session.url, code=303)
     except Exception as e:
         return jsonify(error=str(e)), 403
@@ -60,20 +95,16 @@ def create_checkout_session():
 # Маршрут для обработки успешной оплаты
 @app.route('/payment-success')
 def payment_success():
-    # Здесь происходит возврат в бота с сообщением об успешной оплате
-
-    # Тут потрібно оновити статус замість у show_proforma
+    # Возвращаемся в бота после успешной оплаты
     return redirect('https://t.me/PicnicsAlicanteBot?start=payment_success')
-   # return "Оплата прошла успешно! Можете вернуться в бот."
 
 # Маршрут для обработки отмены платежа
 @app.route('/payment-cancelled')
 def payment_cancelled():
-    # Сообщение об отмене платежа
+    # Возвращаемся в бота после отмены платежа
     return redirect('https://t.me/PicnicsAlicanteBot?start=payment_cancelled')
-    #return "Платеж был отменен. Можете вернуться в бот."
 
-# Вебхук для получения уведомлений от Stripe
+# Вебхук для обработки уведомлений от Stripe
 @app.route('/webhook', methods=['POST'])
 def webhook():
     payload = request.get_data(as_text=True)
@@ -85,16 +116,19 @@ def webhook():
             payload, sig_header, endpoint_secret
         )
     except ValueError as e:
-        # Невалидные данные
         return jsonify({'error': str(e)}), 400
     except stripe.error.SignatureVerificationError as e:
-        # Неверная подпись
         return jsonify({'error': str(e)}), 400
 
-    # Обрабатываем событие
     if event['type'] == 'checkout.session.completed':
-        # Здесь можно добавить логику для успешной оплаты
-        print('Оплата прошла успешно!')
+        session = event['data']['object']
+
+        # Получаем order_id из метаданных платежной сессии
+        order_id = session['metadata']['order_id']
+        print(f"Оплата прошла успешно для order_id: {order_id}")
+
+        # Обновляем статус заказа на "оплачено"
+        update_order_status_to_paid(order_id)
 
     return jsonify({'status': 'success'}), 200
 
