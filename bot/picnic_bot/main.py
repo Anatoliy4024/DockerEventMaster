@@ -153,76 +153,102 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Установка начальных данных
     user_id = update.message.from_user.id if update.message else update.callback_query.from_user.id
     username = update.message.from_user.username if update.message else update.callback_query.from_user.username
-    user_data.set_user_id(user_id)
-    user_data.set_username(username)
-    user_data.set_step('start')
-    user_data.set_language('en')  # Здесь можно задать язык или получить его от пользователя
 
-    logging.info(f"Получен user_id: {user_id}, username: {username}, language: {user_data.get_language()}")
+    # Получаем параметр 'start' из данных команды
+    start_query = update.message.text if update.message else update.callback_query.data
 
-    logging.info("ЗАПИС КОРИСТУВАЧА")
-    # await handle_name(update, context)
-    check_client_is_exist(update, context)
+    logging.info(f"Получен start_query: {start_query}, update.message.text: {update.message.text}, update.callback_query.data: {update.callback_query}")
 
+    # /start payment_success
+    query_param = start_query.split()[-1]
 
-    # Создаем новую запись в таблице orders с новым session_number
-    conn = create_connection()
-    if conn is not None:
-        try:
-            # Проверка текущего максимального session_number для user_id
-            select_query = "SELECT MAX(session_number) FROM orders WHERE user_id = %s"
-            cursor = conn.cursor()
-            cursor.execute(select_query, (user_id,))
+    logging.info(f"Получен start_query: {query_param}")
 
-            # Получаем результат запроса
-            result = cursor.fetchone()
-            logging.info("(((((((((((((((((((((((((((((((((((((((((((((((")
-            logging.info(result)
+    # Проверка успешной оплаты
+    if query_param == "payment_success":
+        await update.message.reply_text("Оплата прошла успешно! Переходим к следующему шагу.")
+        # Переход на следующий шаг
+        await show_proforma(update, context)
+        return
 
-            # Проверка, что результат не None и session_number существует
-            if result and result[0] is not None:
-                current_session = result[0]
-                new_session_number = current_session + 1
-            else:
-                new_session_number = 1  # Если записей нет или session_number пустой
+    # Проверка отмены оплаты
+    elif query_param == "payment_cancelled":
+        await update.message.reply_text("Платеж был отменен. Возвращаем вас на предыдущий шаг.")
+        # Возврат на предыдущий шаг, например, на показ страницы оплаты
+        # await show_payment_page(update, context)
+        return
 
-            user_data.set_session_number(new_session_number)
-
-            # Принт для отслеживания в терминале
-            print(f"Принт: Новый session_number для user_id {user_id} = {new_session_number}")
-
-            # Создаем новую запись в таблице orders
-            insert_query = """
-                INSERT INTO orders (user_id, session_number, selected_date, start_time, end_time, duration, people_count,
-                selected_style, city, preferences, calculated_cost, status)
-                VALUES (%s, %s, null, null, null, null, null, null, null, null, null, 1)
-            """
-            cursor.execute(insert_query, (user_id, new_session_number))
-            conn.commit()
-
-            logging.info(
-                f"Создана новая запись в таблице orders для user_id: {user_id} с session_number: {new_session_number}")
-
-        except Exception as e:
-            logging.error(f"Ошибка базы данных: {e}")
-        finally:
-            conn.close()
-            logging.info("Соединение с базой данных закрыто")
     else:
-        logging.error("Не удалось создать соединение с базой данных")
+        user_data.set_user_id(user_id)
+        user_data.set_username(username)
 
-    # Отправляем ответ пользователю
-    if update.message:
-        await update.message.reply_text(
-            f"Welcome {username}! Choose your language / Выберите язык / Elige tu idioma",
-            reply_markup=language_selection_keyboard()
-        )
-    elif update.callback_query:
-        await update.callback_query.message.reply_text(
-            f"Welcome {username}! Choose your language / Выберите язык / Elige tu idioma",
-            reply_markup=language_selection_keyboard()
-        )
-    logging.info("Функция start завершена")
+        user_data.set_step('start')
+        user_data.set_language('en')  # Здесь можно задать язык или получить его от пользователя
+
+        logging.info(f"Получен user_id: {user_id}, username: {username}, language: {user_data.get_language()}")
+
+        logging.info("ЗАПИС КОРИСТУВАЧА")
+        # await handle_name(update, context)
+        check_client_is_exist(update, context)
+
+        # Создаем новую запись в таблице orders с новым session_number
+        conn = create_connection()
+        if conn is not None:
+            try:
+                # Проверка текущего максимального session_number для user_id
+                select_query = "SELECT MAX(session_number) FROM orders WHERE user_id = %s"
+                cursor = conn.cursor()
+                cursor.execute(select_query, (user_id,))
+
+                # Получаем результат запроса
+                result = cursor.fetchone()
+                logging.info("(((((((((((((((((((((((((((((((((((((((((((((((")
+                logging.info(result)
+
+                # Проверка, что результат не None и session_number существует
+                if result and result[0] is not None:
+                    current_session = result[0]
+                    new_session_number = current_session + 1
+                else:
+                    new_session_number = 1  # Если записей нет или session_number пустой
+
+                user_data.set_session_number(new_session_number)
+
+                # Принт для отслеживания в терминале
+                print(f"Принт: Новый session_number для user_id {user_id} = {new_session_number}")
+
+                # Создаем новую запись в таблице orders
+                insert_query = """
+                    INSERT INTO orders (user_id, session_number, selected_date, start_time, end_time, duration, people_count,
+                    selected_style, city, preferences, calculated_cost, status)
+                    VALUES (%s, %s, null, null, null, null, null, null, null, null, null, 1)
+                """
+                cursor.execute(insert_query, (user_id, new_session_number))
+                conn.commit()
+
+                logging.info(
+                    f"Создана новая запись в таблице orders для user_id: {user_id} с session_number: {new_session_number}")
+
+            except Exception as e:
+                logging.error(f"Ошибка базы данных: {e}")
+            finally:
+                conn.close()
+                logging.info("Соединение с базой данных закрыто")
+        else:
+            logging.error("Не удалось создать соединение с базой данных")
+
+        # Отправляем ответ пользователю
+        if update.message:
+            await update.message.reply_text(
+                f"Welcome {username}! Choose your language / Выберите язык / Elige tu idioma",
+                reply_markup=language_selection_keyboard()
+            )
+        elif update.callback_query:
+            await update.callback_query.message.reply_text(
+                f"Welcome {username}! Choose your language / Выберите язык / Elige tu idioma",
+                reply_markup=language_selection_keyboard()
+            )
+        logging.info("Функция start завершена")
 
 
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):

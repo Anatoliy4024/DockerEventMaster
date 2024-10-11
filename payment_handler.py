@@ -61,6 +61,8 @@ def create_checkout_session():
 @app.route('/payment-success')
 def payment_success():
     # Здесь происходит возврат в бота с сообщением об успешной оплате
+
+    # Тут потрібно оновити статус замість у show_proforma
     return redirect('https://t.me/PicnicsAlicanteBot?start=payment_success')
    # return "Оплата прошла успешно! Можете вернуться в бот."
 

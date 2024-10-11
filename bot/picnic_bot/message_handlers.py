@@ -676,6 +676,9 @@ async def show_proforma(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Получаем user_id из user_data
     user_id = user_data.get_user_id()
 
+    last_order = get_latest_order(user_id)
+
+
     # Обновляем статус пользователя в таблице orders до "зарезервировано"
     conn = create_connection()  # Изменено для подключения к PostgreSQL
     if conn is not None:
@@ -704,19 +707,30 @@ async def show_proforma(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Получаем номер проформы (номер ордера с добавлением статуса "_3")
         proforma_number = f"{user_data.get_user_id()}_{user_data.get_session_number()}_3"
+    #
+    # SELECT
+    # order_id_0, user_id_1, session_number_2, user_name_3, selected_date_5, start_time_6, end_time_7, duration_8,
+    # people_count_9, selected_style_10, preferences_11, city_12 calculated_cost_14
+
+    selected_date = last_order[5]
+    start_time = last_order[6]
+    end_time = last_order[7]
+    person_count = last_order[9]
+    calculated_cost = last_order[14]
+
 
     # Тексты проформы на разных языках
     proforma_texts = {
         'en': (
             f"PROFORMA № {proforma_number}\n"
             f"_______________________\n"
-            f"DATE: {user_data.get_selected_date()}\n"
-            f"TIME: {user_data.get_start_time()} - {user_data.get_end_time()}\n"
-            f"PEOPLE: {user_data.get_person_count()}\n"
+            f"DATE: {selected_date}\n"
+            f"TIME: {start_time} - {end_time}\n"
+            f"PEOPLE: {person_count}\n"
             f"PREPAYMENT: 20 euros\n"
             f"AMOUNT TO PAY (excluding reservation):\n"
             f"_______________________\n"
-            f"{user_data.get_calculated_cost() - 20} euros"
+            f"{calculated_cost - 20} euros"
         ),
         'ru': (
             f"ПРОФОРМА № {proforma_number}\n"
@@ -911,3 +925,32 @@ def get_translation(user_data, key):
     language_code = user_data.get_language()  # Получаем код языка пользователя
     return translations.get(language_code, translations['en'])  # Возвращаем перевод или английский по умолчанию
 
+def get_latest_order(user_id):
+    """
+    Получаем максимальный ордер по session_number со статусом 2
+    """
+    conn = create_connection()
+    cursor = conn.cursor()
+
+    try:
+        # Сначала пытаемся найти session_number со статусом 2 (2-заполнено для расчета)
+        cursor.execute("""
+            SELECT * 
+            FROM orders 
+            WHERE user_id = %s 
+            AND status = %s 
+            ORDER BY session_number DESC 
+            LIMIT 1
+        """, (user_id, ORDER_STATUS["2-заполнено для расчета"]))
+
+        result = cursor.fetchone()
+
+        if result:
+            return result
+
+        else:
+            raise ValueError("Нет подходящих записей для этого пользователя.")
+
+    finally:
+        cursor.close()
+        conn.close()
