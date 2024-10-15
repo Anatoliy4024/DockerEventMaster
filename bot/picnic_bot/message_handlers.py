@@ -614,30 +614,29 @@ def show_payment_page_handler(context: ContextTypes.DEFAULT_TYPE):
     user_data = context.user_data.get('user_data', UserData())
     payment_message_texts = {
         'en': "You will be redirected to a secure payment page - Stripe payment platform.\n"
-              "Then return to the bot and press /start to see your proforma considering your prepayment.",
+              "Then return to the bot to see your proforma considering your prepayment.",
 
         'ru': "Вы будете перенаправлены на безопасную страницу оплаты - платформу платежей Stripe.\n"
-              "Затем вернитесь в бот и нажмите /start, чтобы увидеть вашу Проформу с учетом вашей предоплаты.",
+              "Затем вернитесь в бот, чтобы увидеть вашу Проформу с учетом вашей предоплаты.",
 
         'es': "Será redirigido a una página de pago segura - plataforma de pagos Stripe.\n"
-              "Luego regrese al bot y presione /start para ver su proforma con el anticipo considerado.",
+              "Luego regrese al bot para ver su proforma con el anticipo considerado.",
 
         'fr': "Vous serez redirigé vers une page de paiement sécurisée - plateforme de paiement Stripe.\n"
-              "Ensuite, revenez dans le bot et appuyez sur /start pour voir votre proforma tenant compte de votre prépaiement.",
+              "Ensuite, revenez dans le bot pour voir votre proforma tenant compte de votre prépaiement.",
 
         'uk': "Вас буде перенаправлено на безпечну сторінку оплати - платформу платежів Stripe.\n"
-              "Потім поверніться в бот і натисніть /start, щоб побачити свою Проформу з урахуванням вашої передоплати.",
+              "Потім поверніться в бот, щоб побачити свою Проформу з урахуванням вашої передоплати.",
 
         'pl': "Zostaniesz przekierowany na bezpieczną stronę płatności - platformę płatności Stripe.\n"
-              "Następnie wróć do bota i naciśnij /start, aby zobaczyć swoją proformę z uwzględnieniem przedpłaty.",
+              "Następnie wróć do bota, aby zobaczyć swoją proformę z uwzględnieniem przedpłaty.",
 
         'de': "Sie werden auf eine sichere Zahlungsseite weitergeleitet - Zahlungsplattform Stripe.\n"
-              "Kehren Sie dann in den Bot zurück und drücken Sie /start, um Ihre Proforma mit Ihrer Vorauszahlung zu sehen.",
+              "Kehren Sie dann in den Bot zurück, um Ihre Proforma mit Ihrer Vorauszahlung zu sehen.",
 
         'it': "Verrai reindirizzato a una pagina di pagamento sicura - piattaforma di pagamento Stripe.\n"
-              "Torna quindi al bot e premi /start per vedere la tua proforma tenendo conto del tuo pagamento anticipato."
+              "Torna quindi al bot per vedere la tua proforma tenendo conto del tuo pagamento anticipato."
     }
-
     language_code = user_data.get_language()
     payment_message = payment_message_texts.get(language_code, payment_message_texts['en'])
 
