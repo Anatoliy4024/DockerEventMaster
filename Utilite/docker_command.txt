@@ -45,6 +45,10 @@ docker exec -it 9ee5312cbb04 bash
 docker exec -it docker_event_master-picnic_bot-1 bash
 docker exec -it docker_event_master-admin_bot-1 bash
 
+12.1. Для Сервера
+docker exec -it dockereventmaster_picnic_bot_1 bash
+
+
 13.просмотр логов бота
 cat db_operations.log
 

@@ -926,13 +926,13 @@ def get_translation(user_data, key):
 
 def get_latest_order(user_id):
     """
-    Получаем максимальный ордер по session_number со статусом 2
+    Получаем максимальный ордер по session_number со статусом 3
     """
     conn = create_connection()
     cursor = conn.cursor()
 
     try:
-        # Сначала пытаемся найти session_number со статусом 2 (2-заполнено для расчета)
+        # Сначала пытаемся найти session_number со статусом 3 ("3-зарезервировано - заказчик оплатил аванс")
         cursor.execute("""
             SELECT * 
             FROM orders 
@@ -940,7 +940,8 @@ def get_latest_order(user_id):
             AND status = %s 
             ORDER BY session_number DESC 
             LIMIT 1
-        """, (user_id, ORDER_STATUS["2-заполнено для расчета"]))
+        """, (user_id, ORDER_STATUS["3-зарезервировано - заказчик оплатил аванс"]))
+        # """, (user_id, ORDER_STATUS["2-заполнено для расчета"]))
 
         result = cursor.fetchone()
 
