@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, UTC
 
 import psycopg2
 import logging
@@ -90,8 +91,8 @@ async def send_message_to_admin_and_service(user_id, session_num):
         # Обновляем статус ордера
         logging.info(f"Updating order status for user_id: {user_id}, session_number: {session_num}")
         cursor.execute(
-            "UPDATE orders SET status = %s WHERE user_id = %s AND session_number = %s",
-            (ORDER_STATUS["4-Админ и Сервисная служба получили сообщение о новой ПРОФОРМЕ"], user_id, session_num)
+            "UPDATE orders SET status = %s, updated_at = %s WHERE user_id = %s AND session_number = %s",
+            (ORDER_STATUS["4-Админ и Сервисная служба получили сообщение о новой ПРОФОРМЕ"], user_id, session_num, datetime.now(UTC))
         )
         conn.commit()
 
