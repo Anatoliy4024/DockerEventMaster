@@ -92,7 +92,7 @@ async def send_message_to_admin_and_service(user_id, session_num):
         # Обновляем статус ордера
         logging.info(f"Updating order status for user_id: {user_id}, session_number: {session_num}")
         cursor.execute(
-            "UPDATE orders SET status = %s, created_5at = %s WHERE user_id = %s AND session_number = %s",
+            "UPDATE orders SET status = %s, updated_at = %s WHERE user_id = %s AND session_number = %s",
             (ORDER_STATUS["4-Админ и Сервисная служба получили сообщение о новой ПРОФОРМЕ"], datetime.now(pytz.UTC), user_id, session_num)
         )
         conn.commit()
