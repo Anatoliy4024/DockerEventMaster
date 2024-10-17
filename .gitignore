@@ -26,3 +26,5 @@ env/
 # Database files
 *.sqlite3
 *.db
+
+python-telegram-bot/
