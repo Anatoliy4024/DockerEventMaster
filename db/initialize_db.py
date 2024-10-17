@@ -13,7 +13,7 @@ def initialize_db():
         # Создание таблицы пользователей
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
-            user_id SERIAL PRIMARY KEY,
+            user_id BIGSERIAL PRIMARY KEY,
             username TEXT,
             status INTEGER,
             number_of_events INTEGER,
@@ -25,7 +25,7 @@ def initialize_db():
         # Создание таблицы заказов
         cursor.execute('''
         CREATE TABLE IF NOT EXISTS orders (
-            order_id SERIAL PRIMARY KEY,
+            order_id BIGSERIAL PRIMARY KEY,
             user_id INTEGER,
             session_number INTEGER,  -- Номер сессии
             user_name TEXT,  -- Имя пользователя
