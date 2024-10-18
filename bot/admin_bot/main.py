@@ -13,8 +13,7 @@ from bot.admin_bot.scenarios.user_scenario import user_welcome_message
 from bot.admin_bot.scenarios.admin_scenario import admin_welcome_message, handle_find_client_callback, \
     show_calendar_to_admin, handle_date_selection, generate_proforma_buttons_by_date, handle_proforma_button_click, \
     handle_find_client_callback, null_status, handle_delete_client_callback
-from bot.admin_bot.scenarios.service_scenario import service_welcome_message, handle_user_statistics, \
-    handle_back_to_main
+from bot.admin_bot.scenarios.service_scenario import service_welcome_message
 from bot.admin_bot.translations import language_selection_keyboard
 from bot.admin_bot.database_logger import log_message, log_query
 from psycopg2 import OperationalError
@@ -328,21 +327,6 @@ if __name__ == '__main__':
     # Обработчик для кнопок проформы
     application.add_handler(CallbackQueryHandler(handle_proforma_button_click, pattern=r'^\d+_\d+_\d+$'))
 
-    # Обработчик для главных кнопок
     application.add_handler(CallbackQueryHandler(button_callback))
 
-    # Добавляем обработчики для новой кнопки "Статистика пользователей"
-    application.add_handler(CallbackQueryHandler(handle_user_statistics, pattern='^user_stats$'))
-
-    # Добавляем обработчик для кнопки возврата в основное меню
-    application.add_handler(CallbackQueryHandler(handle_back_to_main, pattern='^back_to_main$'))
-
-    # Обработчики для подменю статистики пользователей
-    application.add_handler(CallbackQueryHandler(button_callback, pattern='^user_status_1$'))
-    application.add_handler(CallbackQueryHandler(button_callback, pattern='^user_status_2$'))
-    application.add_handler(CallbackQueryHandler(button_callback, pattern='^user_registration_failures$'))
-    application.add_handler(CallbackQueryHandler(button_callback, pattern='^user_repeat_actions$'))
-
     application.run_polling()
-
-
