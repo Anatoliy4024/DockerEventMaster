@@ -9,7 +9,7 @@ from bot.admin_bot.keyboards.admin_keyboards import service_menu_keyboard, user_
 async def service_welcome_message(update: Update):
     # Приветственное сообщение для Службы сервиса
     message = await update.message.reply_text(
-        "Привет! Твой id - ........ соответствует Службе сервиса.\n"
+        "Привет! Твоему id - соответствует Службе сервиса.\n"
         "Предоставляю доступ к технической информации"
     )
     # Отображаем меню с кнопками для Службы сервиса
