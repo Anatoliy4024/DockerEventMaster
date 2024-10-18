@@ -29,6 +29,17 @@ def service_menu_keyboard():
     ]
     return InlineKeyboardMarkup(keyboard)
 
+def user_statistics_menu():
+    keyboard = [
+        [InlineKeyboardButton("Пользователи со статусом 1", callback_data='user_status_1')],
+        [InlineKeyboardButton("Пользователи с неоплаченными заказами (статус 2)", callback_data='user_status_2')],
+        [InlineKeyboardButton("Пользователи со сбоями в регистрации", callback_data='user_registration_failures')],
+        [InlineKeyboardButton("Повторные действия пользователей", callback_data='user_repeat_actions')],
+        [InlineKeyboardButton("Вернуться в основное меню", callback_data='back_to_main')]
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
 def user_options_keyboard(language, user_id):
     # Стандартное сообщение на языке пользователя
     trans = translations.get(language, translations['en'])  # Используем 'en' как язык по умолчанию
