@@ -30,15 +30,6 @@ def get_db_connection():
         return None
 
 
-#Функция для подключения к базе данных
-# def get_db_connection():
-#     return psycopg2.connect(
-#         host=os.getenv('DATABASE_HOST', 'localhost'),
-#         dbname=os.getenv('DATABASE_NAME', 'mydatabase'),
-#         user=os.getenv('DATABASE_USER', 'myuser'),
-#         password=os.getenv('DATABASE_PASSWORD', 'mypassword')
-#     )
-
 async def admin_welcome_message(update: Update):
     # Приветственное сообщение для выбора языка
     message = await update.message.reply_text(
