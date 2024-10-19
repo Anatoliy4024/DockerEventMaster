@@ -101,19 +101,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Если пользователь не найден в базе данных
         await update.message.reply_text("Вы не зарегистрированы в системе.")
         return
-
     # Проверка статуса пользователя
     if status == 1:
         # Пользователь является админом
         message = await admin_welcome_message(update)
     elif status == 2:
         # Пользователь является сервисным сотрудником
-        message = await service_welcome_message(update, context)
+        message, options_message = await service_welcome_message(update, context)
     else:
         # Обычный пользователь
         message = await user_welcome_message(update, user.first_name)
 
-    # Сохраняем ID сообщения с кнопками
+    # Сохраняем ID сообщения с кнопками (message, а не options_message)
     if message:
         context.user_data['language_message_id'] = message.message_id
 
