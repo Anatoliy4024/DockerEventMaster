@@ -178,6 +178,14 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     reply_markup=irina_service_menu()
                 )
                 context.user_data['delete_messages'].append(options_message.message_id)
+
+            elif status == 2:
+                # Это сервисный сотрудник, переключаем на сервис-меню
+                options_message = await query.message.reply_text(
+                    "Выбери действие:",
+                    reply_markup=service_menu_keyboard()  # Меню для сервисного сотрудника
+                )
+                context.user_data['delete_messages'].append(options_message.message_id)
             else:
                 # Для других пользователей остается логика стандартного меню юзера
                 headers = {
@@ -227,6 +235,15 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 reply_markup=irina_service_menu()
             )
             context.user_data['delete_messages'] = [options_message.message_id]  # Сохраняем ID сообщения
+
+        # Если это сервисный сотрудник, переключаем на сервис-меню
+        elif status == 2:
+            options_message = await query.message.reply_text(
+                "Выбери действие:",
+                reply_markup=service_menu_keyboard()  # Меню для сервисного сотрудника
+            )
+            context.user_data['delete_messages'].append(options_message.message_id)
+
 
         else:
             # Логика для других пользователей
