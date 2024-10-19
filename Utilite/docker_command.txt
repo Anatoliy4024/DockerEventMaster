@@ -50,6 +50,15 @@ docker exec -it dockereventmaster_picnic_bot_1 bash
 docker exec -it dockereventmaster_admin_bot-1 bash
 docker exec -it localhost bash
 
+содержимое резервной базы данных
+cat /root/backup.sql
+
+Ты можешь создать тестовую базу данных и попробовать восстановить в неё данные, чтобы убедиться, что бэкап корректен. Например:
+Создай новую базу данных:
+docker exec -it 148ce929210e psql -U myuser -c "CREATE DATABASE testdb;
+Восстанови данные в тестовую базу:
+docker exec -i 148ce929210e psql -U myuser -d testdb < /root/backup.sql
+
 
 13.просмотр логов бота
 cat db_operations.log

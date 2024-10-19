@@ -108,7 +108,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message = await admin_welcome_message(update)
     elif status == 2:
         # Пользователь является сервисным сотрудником
-        message = await service_welcome_message(update)
+        message = await service_welcome_message(update, context)
     else:
         # Обычный пользователь
         message = await user_welcome_message(update, user.first_name)
