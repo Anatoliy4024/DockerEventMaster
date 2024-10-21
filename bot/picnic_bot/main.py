@@ -4,6 +4,7 @@ import logging
 import random
 import sqlite3
 import psycopg2
+import pytz
 from psycopg2 import OperationalError
 import time
 
@@ -627,8 +628,8 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             user_data.get_user_id()
         )
         update_order_data(
-            "UPDATE orders SET status = %s WHERE user_id = %s AND session_number = %s",
-            (ORDER_STATUS["2-заполнено для расчета"], user_data.get_user_id(), session_number),
+            "UPDATE orders SET status = %s, updated_at = %s WHERE user_id = %s AND session_number = %s",
+            (ORDER_STATUS["2-заполнено для расчета"], datetime.now(pytz.UTC), user_data.get_user_id(), session_number),
             user_data.get_user_id()
         )
         # Рассчитываем стоимость
