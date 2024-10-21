@@ -683,7 +683,7 @@ async def show_proforma(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if conn is not None:
         try:
             # Проверка текущего максимального session_number для user_id
-            select_query = "SELECT MAX(session_number) FROM orders WHERE user_id = %s"  # Замена ? на %s для PostgreSQL
+            select_query = "SELECT MAX(session_number) FROM orders WHERE user_id = %s"
             cursor = conn.cursor()
             cursor.execute(select_query, (user_id,))
             current_session = cursor.fetchone()[0]
