@@ -126,6 +126,21 @@ async def handle_date_selection(update: Update, context: ContextTypes.DEFAULT_TY
             message = await query.message.reply_text(f"Проформы для даты {selected_date}:", reply_markup=proforma_keyboard)
             context.user_data['delete_messages'].append(message.message_id)
 
+            # Обновляем статус клиента с 2 на 3
+            try:
+                conn = get_db_connection()
+                cursor = conn.cursor()
+                cursor.execute("UPDATE users SET status = 3 WHERE user_id = %s AND status = 2", (user_id,))
+                conn.commit()
+                cursor.close()
+                conn.close()
+
+                # Уведомляем админа об успешном внесении клиента
+                await query.message.reply_text("Вы удачно внесли нового клиента!")
+            except Exception as e:
+                logging.error(f"Ошибка обновления статуса клиента: {e}")
+                await query.message.reply_text(f"Произошла ошибка при обновлении статуса клиента: {e}")
+
         else:
             await query.message.reply_text("Ошибка: выбранная дата не найдена.")
 
