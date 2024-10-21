@@ -422,7 +422,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     cursor = conn.cursor()
 
                     # Логируем сам запрос и параметры
-                    update_query = "UPDATE users SET status = 3 WHERE user_id = %s AND status = 2"
+                    update_query = "UPDATE orders SET status = 3 WHERE user_id = %s AND status = 2"
                     logging.info(f"Выполняем запрос: {update_query}, с параметрами: {(user_data.get_user_id(),)}")
 
                     # Выполняем запрос
