@@ -417,19 +417,27 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             user_status = get_user_status(user_data.get_user_id())
             if user_status != 1:
                 try:
+                    logging.info(f"Начало обновления статуса для user_id: {user_data.get_user_id()}")
                     conn = create_connection()
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE users SET status = 3 WHERE user_id = %s AND status = 2",
-                                   (user_data.get_user_id(),))
+
+                    # Логируем сам запрос и параметры
+                    update_query = "UPDATE users SET status = 3 WHERE user_id = %s AND status = 2"
+                    logging.info(f"Выполняем запрос: {update_query}, с параметрами: {(user_data.get_user_id(),)}")
+
+                    # Выполняем запрос
+                    cursor.execute(update_query, (user_data.get_user_id(),))
                     conn.commit()
+
+                    # Логируем успешное выполнение запроса
+                    logging.info(f"Запрос выполнен успешно для user_id: {user_data.get_user_id()}")
+
                     cursor.close()
                     conn.close()
-                    # Сообщаем об успешном обновлении статуса
                     await update.message.reply_text("Вы удачно внесли нового клиента!")
                 except Exception as e:
                     logging.error(f"Ошибка обновления статуса клиента: {e}")
                     await update.message.reply_text(f"Произошла ошибка при обновлении статуса клиента: {e}")
-
                 # Переход на шаг оплаты (если это не админ, просто продолжаем сценарий)
 
                 message_text,message_button = show_payment_page_handler(context)
