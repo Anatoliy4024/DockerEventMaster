@@ -46,16 +46,6 @@ def get_last_order_id():
 
     return order_id
 
-# # Корневой маршрут для отображения страницы
-# @app.route('/')
-# def index():
-#     return '''
-#         <h1>Welcome to the Stripe Payment Gateway</h1>
-#         <p>To initiate a payment, please click the button below:</p>
-#         <form action="/create-checkout-session" method="POST">
-#             <button type="submit">Create Checkout Session</button>
-#         </form>
-#     '''
 
 # Новый корневой маршрут для непосредственного создания платежной сессии
 @app.route('/', methods=['GET','POST'])
