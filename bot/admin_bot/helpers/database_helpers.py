@@ -157,11 +157,5 @@ def get_user_statistics():
             'repeat_actions': 0
         }
 
-    # return {
-    #     'pending_orders': pending_orders,
-    #     'unpaid_orders': unpaid_orders,
-    #     'paid_reservations': paid_reservations,
-    #     'repeat_actions': repeat_actions
-    # }
 
 

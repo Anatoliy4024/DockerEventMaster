@@ -120,9 +120,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
 
-    logger.debug(f"Получено нажатие с callback_data: {query.data}")
-    await query.message.reply_text(f"Получен callback_data: {query.data}")
-
     await query.answer()
 
     if query.data == 'inactive_button':
@@ -147,10 +144,10 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Формируем сообщение для отправки пользователю
         message = (
-            f"Пользователи с незаконченным заказом: {stats['pending_orders']}\n"
-            f"Пользователи с неоплаченными заказами: {stats['unpaid_orders']}\n"
-            f"Пользователи с оплаченным резервом: {stats['paid_reservations']}\n"
-            f"Повторные действия пользователей: {stats['repeat_actions']}"
+            f"Users с незаполненными данными для расчета стоимости: {stats['pending_orders']}\n"
+            f"Users с незавершенным бронированием: {stats['unpaid_orders']}\n"
+            f"Users с оплаченным бронированием: {stats['paid_reservations']}\n"
+            f"Users с более чем 2 заказами: {stats['repeat_actions']}"
         )
 
         # Отправляем сообщение в чат
