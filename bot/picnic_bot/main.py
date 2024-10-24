@@ -1,4 +1,3 @@
-import asyncio
 import os
 import logging
 import random
@@ -8,10 +7,10 @@ import pytz
 from psycopg2 import OperationalError
 import time
 
-from datetime import datetime, timedelta
-from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaVideo
-from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, MessageHandler, ContextTypes, filters
-from bot.picnic_bot.abstract_functions import create_connection, execute_query, execute_query_with_retry
+from datetime import datetime
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram.ext import ContextTypes
+from bot.picnic_bot.abstract_functions import create_connection, execute_query_with_retry
 from bot.picnic_bot.constants import (UserData, TemporaryData, time_selection_headers, people_selection_headers,
                                       party_styles_headers, time_set_texts,ORDER_STATUS)
 from bot.picnic_bot.database_logger import log_message, log_query
@@ -25,8 +24,7 @@ from bot.picnic_bot.calculations import calculate_total_cost
 
 from dotenv import load_dotenv
 
-from payment_handler import get_last_order_id
-from status_3 import update_order_status_to_paid
+from bot.picnic_bot.status_3 import update_order_status_to_paid, get_last_order_id
 
 # Загрузка переменных из .env файла
 load_dotenv()
@@ -67,8 +65,8 @@ def get_user_status(user_id):
 
 
 # добавление обработчика ошибок
-from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, MessageHandler, filters, Application
-from telegram.error import TelegramError
+from telegram.ext import ApplicationBuilder, CallbackQueryHandler, CommandHandler, MessageHandler, filters
+
 
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Log the error and send a telegram message to notify the developer."""

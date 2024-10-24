@@ -1,11 +1,9 @@
 import os
 import stripe
-import psycopg2
-import logging
-from flask import Flask, request, jsonify, redirect, url_for
+from flask import Flask, request, jsonify, redirect
 from dotenv import load_dotenv
 
-from status_3 import update_order_status_to_paid  # Подключаем функцию обновления статуса
+from bot.picnic_bot.status_3 import update_order_status_to_paid, get_last_order_id  # Подключаем функцию обновления статуса
 
 # Загрузка переменных окружения
 load_dotenv()
@@ -19,32 +17,7 @@ publishable_key = os.getenv('STRIPE_PUBLISHABLE_KEY')
 success_url = os.getenv('SUCCESS_URL')
 cancel_url = os.getenv('CANCEL_URL')
 
-# Функция для получения последнего order_id из базы данных
-def get_last_order_id():
-    conn = psycopg2.connect(
-        host=os.getenv('DB_HOST'),
-        database=os.getenv('DB_NAME'),
-        user=os.getenv('DB_USER'),
-        password=os.getenv('DB_PASSWORD')
-    )
-    order_id = None
-    try:
-        cursor = conn.cursor()
-        query = "SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1"
-        cursor.execute(query)
-        result = cursor.fetchone()
 
-        if result:
-            order_id = result[0]
-        else:
-            logging.error("Order ID not found")
-    except psycopg2.Error as e:
-        logging.error(f"Error fetching order_id: {e}")
-    finally:
-        cursor.close()
-        conn.close()
-
-    return order_id
 
 
 # Новый корневой маршрут для непосредственного создания платежной сессии

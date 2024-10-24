@@ -48,3 +48,31 @@ def update_order_status_to_paid(order_id):
             conn.close()
     else:
         logging.error("Не удалось подключиться к базе данных.")
+
+
+# Функция для получения последнего order_id из базы данных
+def get_last_order_id():
+    conn = psycopg2.connect(
+        host=os.getenv('DB_HOST'),
+        database=os.getenv('DB_NAME'),
+        user=os.getenv('DB_USER'),
+        password=os.getenv('DB_PASSWORD')
+    )
+    order_id = None
+    try:
+        cursor = conn.cursor()
+        query = "SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1"
+        cursor.execute(query)
+        result = cursor.fetchone()
+
+        if result:
+            order_id = result[0]
+        else:
+            logging.error("Order ID not found")
+    except psycopg2.Error as e:
+        logging.error(f"Error fetching order_id: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+
+    return order_id
