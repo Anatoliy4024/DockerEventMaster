@@ -1,7 +1,7 @@
 
 import asyncio
 import os
-import psycopg2  # Используем psycopg2 вместо sqlite3 для PostgreSQL
+import psycopg2
 import logging
 from telegram import Update
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, CallbackQueryHandler, MessageHandler, filters
@@ -13,7 +13,7 @@ from bot.admin_bot.scenarios.user_scenario import user_welcome_message
 from bot.admin_bot.scenarios.admin_scenario import admin_welcome_message, handle_find_client_callback, \
     show_calendar_to_admin, handle_date_selection, generate_proforma_buttons_by_date, handle_proforma_button_click, \
     handle_find_client_callback, null_status, handle_delete_client_callback
-from bot.admin_bot.scenarios.service_scenario import service_welcome_message, show_statistics_menu, handle_back_to_main
+from bot.admin_bot.scenarios.service_scenario import service_welcome_message
 from bot.admin_bot.translations import language_selection_keyboard
 from bot.admin_bot.database_logger import log_message, log_query
 from psycopg2 import OperationalError
@@ -334,19 +334,6 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.message.reply_text("Произошла ошибка при попытке получить информацию о пользователе.")
 
 
-# Основной блок для запуска бота
-# if __name__ == '__main__':
-#     application = ApplicationBuilder().token(BOT_TOKEN).build()
-#
-#     application.add_handler(CommandHandler('start', start))
-#     application.add_handler(CallbackQueryHandler(handle_date_selection, pattern=r'^date_\d{4}-\d{2}-\d{2}$'))
-#     # Обработчик для кнопок проформы
-#     application.add_handler(CallbackQueryHandler(handle_proforma_button_click, pattern=r'^\d+_\d+_\d+$'))
-#
-#     application.add_handler(CallbackQueryHandler(button_callback))
-#
-#     application.run_polling()
-
 
 if __name__ == '__main__':
     application = ApplicationBuilder().token(BOT_TOKEN).build()
@@ -363,11 +350,6 @@ if __name__ == '__main__':
     # Основной обработчик кнопок (включая меню сервиса)
     application.add_handler(CallbackQueryHandler(button_callback))
 
-    # Обработчик для перехода на подменю статистики пользователей
-    application.add_handler(CallbackQueryHandler(show_statistics_menu, pattern='^user_stats$'))
-
-    # Обработчик для кнопки возврата в основное меню
-    application.add_handler(CallbackQueryHandler(handle_back_to_main, pattern='^back_to_main$'))
 
     # Запуск polling
     application.run_polling()

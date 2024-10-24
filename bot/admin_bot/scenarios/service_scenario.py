@@ -27,27 +27,3 @@ async def service_welcome_message(update: Update, context):
     context.user_data['delete_messages'] = [options_message.message_id]
     return message, options_message
 
-
-async def show_statistics_menu(update: Update, context):
-    query = update.callback_query
-    await query.answer()
-
-    # Переход на подменю статистики
-    options_message = await query.message.reply_text(
-        "Выберите интересующую статистику:",
-        reply_markup=user_statistics_menu()
-    )
-
-    # Сохраняем ID нового сообщения
-    context.user_data['delete_messages'].append(options_message.message_id)
-
-# Обработчик для кнопки "Вернуться в основное меню"
-async def handle_back_to_main(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-
-    # Возвращаемся к главному меню сервиса
-    await query.edit_message_text(
-        text="Выбери действие:",
-        reply_markup=service_menu_keyboard()
-    )
