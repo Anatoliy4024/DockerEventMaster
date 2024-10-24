@@ -25,7 +25,7 @@ def irina_service_menu():
 def service_menu_keyboard():
     keyboard = [
         [InlineKeyboardButton("Статистика пользователей", callback_data='user_stats')],
-        [InlineKeyboardButton("Статистика системы", callback_data='system_stats')]
+        [InlineKeyboardButton("Статистика сервера", callback_data='system_stats')]
     ]
     return InlineKeyboardMarkup(keyboard)
 

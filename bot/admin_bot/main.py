@@ -6,6 +6,7 @@ import logging
 from telegram import Update
 from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, CallbackQueryHandler, MessageHandler, filters
 from bot.admin_bot.constants import UserData, ORDER_STATUS
+from bot.admin_bot.helpers.system_helpers import get_system_statistics
 from bot.admin_bot.scenarios.user_scenario import send_proforma_to_user, get_full_proforma
 from bot.admin_bot.helpers.database_helpers import get_latest_session_number
 from bot.admin_bot.keyboards.admin_keyboards import user_options_keyboard, irina_service_menu, service_menu_keyboard
@@ -18,6 +19,7 @@ from bot.admin_bot.translations import language_selection_keyboard
 from bot.admin_bot.database_logger import log_message, log_query
 from psycopg2 import OperationalError
 from dotenv import load_dotenv
+import psutil  # библиотека для состояния сервера
 
 ORDER_STATUS_REVERSE = {v: k for k, v in ORDER_STATUS.items()}
 BOT_TOKEN = os.getenv('TELEGRAM_TOKEN_ADMIN')
@@ -149,8 +151,20 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"Users с оплаченным бронированием: {stats['paid_reservations']}\n"
             f"Users с более чем 2 заказами: {stats['repeat_actions']}"
         )
-
         # Отправляем сообщение в чат
+        await query.message.reply_text(message)
+
+    # Обработка кнопки "Статистика сервера"
+    if query.data == 'system_stats':
+        stats = get_system_statistics()  # Функция для сбора статистики сервера
+        message = (
+            f"Статистика сервера:\n"
+            f"Загрузка процессора: {stats['cpu_usage']}%\n"
+            f"Использование памяти: {stats['memory_usage']}%\n"
+            f"Использование диска: {stats['disk_usage']}%\n"
+            f"Отправлено данных: {stats['sent_bytes']} байт\n"
+            f"Получено данных: {stats['recv_bytes']} байт"
+        )
         await query.message.reply_text(message)
 
 

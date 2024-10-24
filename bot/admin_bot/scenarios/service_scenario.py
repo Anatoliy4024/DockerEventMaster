@@ -28,14 +28,5 @@ async def service_welcome_message(update: Update, context):
     context.user_data['delete_messages'] = [options_message.message_id]
     return message, options_message
 
-async def handle_service_menu_callback(update, context):
-    query = update.callback_query
-    if query.data == 'user_stats':
-        stats = get_user_statistics()  # вызов функции для получения статистики
-        message = (
-            f"Пользователи с незаконченным заказом: {stats['pending_orders']}\n"
-            f"Пользователи с неоплаченными заказами: {stats['unpaid_orders']}\n"
-            f"Пользователи с оплаченным резервом: {stats['paid_reservations']}\n"
-            f"Повторные действия пользователей: {stats['repeat_actions']}"
-        )
-        await query.message.edit_text(message)
+
+
