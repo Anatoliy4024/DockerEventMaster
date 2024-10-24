@@ -119,6 +119,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
+
+    logger.debug(f"Получено нажатие с callback_data: {query.data}")
+    await query.message.reply_text(f"Получен callback_data: {query.data}")
+
     await query.answer()
 
     if query.data == 'inactive_button':
