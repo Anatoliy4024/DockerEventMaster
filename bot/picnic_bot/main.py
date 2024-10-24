@@ -24,6 +24,10 @@ from bot.picnic_bot.message_handlers import (handle_message, handle_city_confirm
 from bot.picnic_bot.calculations import calculate_total_cost
 
 from dotenv import load_dotenv
+
+from payment_handler import get_last_order_id
+from status_3 import update_order_status_to_paid
+
 # Загрузка переменных из .env файла
 load_dotenv()
 
@@ -416,39 +420,29 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             user_status = get_user_status(user_data.get_user_id())
             if user_status != 1:
-                try:
-                    logging.info(f"Начало обновления статуса для user_id: {user_data.get_user_id()}")
-                    conn = create_connection()
-                    cursor = conn.cursor()
 
-                    # Логируем сам запрос и параметры
-                    update_query = "UPDATE orders SET status = 3 WHERE user_id = %s AND status = 2"
-                    logging.info(f"Выполняем запрос: {update_query}, с параметрами: {(user_data.get_user_id(),)}")
-
-                    # Выполняем запрос
-                    cursor.execute(update_query, (user_data.get_user_id(),))
-                    conn.commit()
-
-                    # Логируем успешное выполнение запроса
-                    logging.info(f"Запрос выполнен успешно для user_id: {user_data.get_user_id()}")
-
-                    cursor.close()
-                    conn.close()
-                    await update.message.reply_text("Вы удачно внесли нового клиента!")
-                except Exception as e:
-                    logging.error(f"Ошибка обновления статуса клиента: {e}")
-                    await update.message.reply_text(f"Произошла ошибка при обновлении статуса клиента: {e}")
                 # Переход на шаг оплаты (если это не админ, просто продолжаем сценарий)
 
                 message_text,message_button = show_payment_page_handler(context)
 
                 await context.bot.send_message(chat_id=update.effective_chat.id, text=message_text,
                                                reply_markup=message_button)
+            else:
 
-            #     await query.message.reply_text(show_payment_page_handler(context))
-            #     await asyncio.sleep(3)
-            #
-            # await show_proforma(update, context)
+                # Получаем последний order_id из базы данных
+                order_id = get_last_order_id()
+
+                if order_id is None:
+                    await context.bot.send_message(chat_id=update.effective_chat.id, text="Order ID not found",)
+
+                update_order_status_to_paid(order_id)
+
+                # Переход на следующий шаг
+                await show_proforma(update, context)
+
+
+
+
 
         elif user_data.get_step() == 'time_confirmation':
             user_data.set_step('people_selection')
