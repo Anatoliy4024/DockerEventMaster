@@ -1,13 +1,15 @@
 import psycopg2
 import logging
 
-from IPython.core import logger
-
 from bot.admin_bot.constants import ORDER_STATUS
 from bot.admin_bot.translations import translations
 import os  # Для работы с переменными окружения
 from psycopg2 import OperationalError
 from dotenv import load_dotenv
+
+
+# Включаем логирование и указываем файл для логов
+logger = logging.getLogger(__name__)
 
 # Загружаем переменные окружения из .env файла
 load_dotenv()
@@ -25,16 +27,6 @@ def get_db_connection():
     except OperationalError as e:
         print(f"Ошибка при подключении к базе данных: {e}")
         return None
-
-
-# def get_db_connection():
-#     return psycopg2.connect(
-#         host=os.getenv('DATABASE_HOST', 'localhost'),
-#         dbname=os.getenv('DATABASE_NAME', 'mydatabase'),
-#         user=os.getenv('DATABASE_USER', 'myuser'),
-#         password=os.getenv('DATABASE_PASSWORD', 'mypassword')
-#     )
-#
 
 def get_full_proforma(user_id, session_number):
     """
@@ -113,30 +105,57 @@ def get_latest_session_number(user_id):
         cursor.close()
         conn.close()
 
-import psycopg2
 
 def get_user_statistics():
-    conn = get_db_connection()  # подключение к базе данных
-    cursor = conn.cursor()
+    try:
+        # Подключение к базе данных
+        logger.debug("Попытка подключения к базе данных...")
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
-    # Пользователи с незаконченным заказом (статус 1)
-    cursor.execute("SELECT COUNT(*) FROM orders WHERE status = 1")
-    pending_orders = cursor.fetchone()[0]
+        # Пользователи с незаконченным заказом (статус 1)
+        logger.debug("Выполняю запрос: SELECT COUNT(*) FROM orders WHERE status = 1")
+        cursor.execute("SELECT COUNT(*) FROM orders WHERE status = 1")
+        pending_orders = cursor.fetchone()[0]
 
-    # Пользователи с неоплаченными заказами (статус 2)
-    cursor.execute("SELECT COUNT(*) FROM orders WHERE status = 2")
-    unpaid_orders = cursor.fetchone()[0]
+        # Пользователи с неоплаченными заказами (статус 2)
+        logger.debug("Выполняю запрос: SELECT COUNT(*) FROM orders WHERE status = 2")
+        cursor.execute("SELECT COUNT(*) FROM orders WHERE status = 2")
+        unpaid_orders = cursor.fetchone()[0]
 
-    # Пользователи с оплаченным резервом (статус 3 и выше)
-    cursor.execute("SELECT COUNT(*) FROM orders WHERE status >= 3")
-    paid_reservations = cursor.fetchone()[0]
+        # Пользователи с оплаченным резервом (статус 3 и выше)
+        logger.debug("Выполняю запрос: SELECT COUNT(*) FROM orders WHERE status >= 3")
+        cursor.execute("SELECT COUNT(*) FROM orders WHERE status >= 3")
+        paid_reservations = cursor.fetchone()[0]
 
-    # Повторные действия пользователей (статус 2 и выше в таблице users)
-    cursor.execute("SELECT COUNT(*) FROM users WHERE status >= 2")
-    repeat_actions = cursor.fetchone()[0]
+        # Повторные действия пользователей (статус 2 и выше в таблице users)
+        logger.debug("Выполняю запрос: SELECT COUNT(*) FROM users WHERE status >= 2")
+        cursor.execute("SELECT COUNT(*) FROM users WHERE status >= 2")
+        repeat_actions = cursor.fetchone()[0]
 
-    cursor.close()
-    conn.close()
+        # Закрытие курсора и соединения
+        cursor.close()
+        conn.close()
+
+        # Возвращаем результаты
+        return {
+            'pending_orders': pending_orders,
+            'unpaid_orders': unpaid_orders,
+            'paid_reservations': paid_reservations,
+            'repeat_actions': repeat_actions
+        }
+
+    except Exception as e:
+        # Логируем любую ошибку, которая может произойти
+        logger.error(f"Ошибка при выполнении функции get_user_statistics: {str(e)}")
+
+        # Если произошла ошибка, возвращаем нули, чтобы не нарушать работу бота
+        return {
+            'pending_orders': 0,
+            'unpaid_orders': 0,
+            'paid_reservations': 0,
+            'repeat_actions': 0
+        }
 
     # return {
     #     'pending_orders': pending_orders,
@@ -145,9 +164,4 @@ def get_user_statistics():
     #     'repeat_actions': repeat_actions
     # }
 
-    return {
-        'pending_orders': 3,
-        'unpaid_orders': 5,
-        'paid_reservations': 4,
-        'repeat_actions': 2
-    }
+
