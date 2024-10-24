@@ -109,3 +109,35 @@ def get_latest_session_number(user_id):
     finally:
         cursor.close()
         conn.close()
+
+import psycopg2
+
+def get_user_statistics():
+    conn = get_db_connection()  # подключение к базе данных
+    cursor = conn.cursor()
+
+    # Пользователи с незаконченным заказом (статус 1)
+    cursor.execute("SELECT COUNT(*) FROM orders WHERE status = 1")
+    pending_orders = cursor.fetchone()[0]
+
+    # Пользователи с неоплаченными заказами (статус 2)
+    cursor.execute("SELECT COUNT(*) FROM orders WHERE status = 2")
+    unpaid_orders = cursor.fetchone()[0]
+
+    # Пользователи с оплаченным резервом (статус 3 и выше)
+    cursor.execute("SELECT COUNT(*) FROM orders WHERE status >= 3")
+    paid_reservations = cursor.fetchone()[0]
+
+    # Повторные действия пользователей (статус 2 и выше в таблице users)
+    cursor.execute("SELECT COUNT(*) FROM users WHERE status >= 2")
+    repeat_actions = cursor.fetchone()[0]
+
+    cursor.close()
+    conn.close()
+
+    return {
+        'pending_orders': pending_orders,
+        'unpaid_orders': unpaid_orders,
+        'paid_reservations': paid_reservations,
+        'repeat_actions': repeat_actions
+    }

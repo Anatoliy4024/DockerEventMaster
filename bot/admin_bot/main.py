@@ -135,6 +135,23 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Вы не зарегистрированы в системе.")
         return
 
+    # Обработка нажатия кнопки "Статистика пользователей"
+    if query.data == 'user_stats':
+        from helpers.database_helpers import get_user_statistics  # Импорт функции получения статистики
+        stats = get_user_statistics()  # Вызов функции для получения статистики
+
+        # Формируем сообщение для отправки пользователю
+        message = (
+            f"Пользователи с незаконченным заказом: {stats['pending_orders']}\n"
+            f"Пользователи с неоплаченными заказами: {stats['unpaid_orders']}\n"
+            f"Пользователи с оплаченным резервом: {stats['paid_reservations']}\n"
+            f"Повторные действия пользователей: {stats['repeat_actions']}"
+        )
+
+        # Отправляем сообщение в чат
+        await query.message.reply_text(message)
+
+
     # Обработка нажатий на календарь
     if query.data.startswith('prev_month_'):
         month_offset = int(query.data.split('_')[2])  # Извлекаем смещение месяца
