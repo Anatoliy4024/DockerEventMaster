@@ -1,4 +1,4 @@
-# Используем Python-образ
+RUN pip install --no-cache-dir -r requirements.txtRUN pip install --no-cache-dir -r requirements.txtRUN pip install --no-cache-dir -r requirements.txt# Используем Python-образ
 FROM python:3.9-slim
 
 # Устанавливаем рабочую директорию
@@ -9,7 +9,7 @@ COPY requirements.txt requirements.txt
 COPY . .
 
 # Устанавливаем зависимости
-RUN pip install --no-cache-dir -r requirements.txt gunicorn
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Запускаем приложение
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "payment_handler:app"]

@@ -58,7 +58,7 @@ def get_last_order_id():
 #     '''
 
 # Новый корневой маршрут для непосредственного создания платежной сессии
-@app.route('/', methods=['GET'])
+@app.route('/', methods=['GET','POST'])
 def index():
     try:
         # Получаем последний order_id из базы данных
@@ -140,7 +140,7 @@ def payment_cancelled():
     return redirect('https://t.me/PicnicsAlicanteBot?start=payment_cancelled')
 
 # Вебхук для обработки уведомлений от Stripe
-@app.route('/webhook', methods=['POST'])
+@app.route('/webhook', methods=['POST','GET'])
 def webhook():
     payload = request.get_data(as_text=True)
     sig_header = request.headers.get('Stripe-Signature')
