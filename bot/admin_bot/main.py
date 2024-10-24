@@ -141,7 +141,8 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Обработка нажатия кнопки "Статистика пользователей"
     if query.data == 'user_stats':
-        from helpers.database_helpers import get_user_statistics  # Импорт функции получения статистики
+        from bot.admin_bot.helpers.database_helpers import get_user_statistics
+
         stats = get_user_statistics()  # Вызов функции для получения статистики
 
         # Формируем сообщение для отправки пользователю
