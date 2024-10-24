@@ -1,5 +1,8 @@
 import psycopg2
 import logging
+
+from IPython.core import logger
+
 from bot.admin_bot.constants import ORDER_STATUS
 from bot.admin_bot.translations import translations
 import os  # Для работы с переменными окружения
@@ -135,9 +138,16 @@ def get_user_statistics():
     cursor.close()
     conn.close()
 
+    # return {
+    #     'pending_orders': pending_orders,
+    #     'unpaid_orders': unpaid_orders,
+    #     'paid_reservations': paid_reservations,
+    #     'repeat_actions': repeat_actions
+    # }
+
     return {
-        'pending_orders': pending_orders,
-        'unpaid_orders': unpaid_orders,
-        'paid_reservations': paid_reservations,
-        'repeat_actions': repeat_actions
+        'pending_orders': 3,
+        'unpaid_orders': 5,
+        'paid_reservations': 4,
+        'repeat_actions': 2
     }
