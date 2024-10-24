@@ -3,7 +3,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from bot.admin_bot.keyboards.admin_keyboards import service_menu_keyboard, user_statistics_menu
+from bot.admin_bot.keyboards.admin_keyboards import service_menu_keyboard
 
 
 async def service_welcome_message(update: Update, context):
