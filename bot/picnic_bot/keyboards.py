@@ -177,61 +177,6 @@ def generate_time_selection_keyboard(language, stage='start', selected_date=None
 
 
 
-# def generate_time_selection_keyboard(language, stage='start', start_time=None):
-#     start_time_dt = datetime.strptime('08:00', '%H:%M')
-#     end_time_dt = datetime.strptime('22:00', '%H:%M')
-#
-#     time_buttons = []
-#     current_time = start_time_dt
-#
-#     while current_time <= end_time_dt:
-#         time_str = current_time.strftime('%H:%M')
-#         if stage == 'end' and start_time:
-#             start_time_dt = datetime.strptime(start_time, '%H:%M')
-#             if current_time < start_time_dt + timedelta(hours=2):
-#                 time_buttons.append(InlineKeyboardButton(f"🔻 {time_str}", callback_data='none'))
-#             else:
-#                 time_buttons.append(InlineKeyboardButton(f" {time_str}", callback_data=f'time_{time_str}'))
-#         else:
-#             if current_time >= datetime.strptime('20:30', '%H:%M'):
-#                 time_buttons.append(InlineKeyboardButton(f"🔻 {time_str}", callback_data='none'))
-#             else:
-#                 time_buttons.append(InlineKeyboardButton(f" {time_str}", callback_data=f'time_{time_str}'))
-#         current_time += timedelta(minutes=30)
-#
-#     num_buttons_per_row = 3
-#     rows = [time_buttons[i:i + num_buttons_per_row] for i in range(0, len(time_buttons), num_buttons_per_row)]
-#
-#     time_selection_headers = {
-#         'start': {
-#             'en': 'Planning to start around...',
-#             'ru': 'Планирую начать в...',
-#             'es': 'Planeo comenzar alrededor de...',
-#             'fr': 'Je prévois de commencer vers...',
-#             'uk': 'Планую почати о...',
-#             'pl': 'Planuję rozpocząć około...',
-#             'de': 'Ich plane zu beginnen um...',
-#             'it': 'Prevedo di iniziare intorno alle...'
-#         },
-#         'end': {
-#             'en': 'Planning to end around...',
-#             'ru': 'Планирую окончание около...',
-#             'es': 'Planeo terminar alrededor de...',
-#             'fr': 'Je prévois de terminer vers...',
-#             'uk': 'Планую закінчити приблизно о...',
-#             'pl': 'Planuję zakończyć około...',
-#             'de': 'Ich plane zu beenden um...',
-#             'it': 'Prevedo di finire intorno alle...'
-#         }
-#     }
-#     selection_text = time_selection_headers[stage].get(language, "Select start and end time (minimum duration 2 hours)")
-#
-#     keyboard = [
-#         [InlineKeyboardButton(selection_text, callback_data='none')]
-#     ] + rows
-#
-#     return InlineKeyboardMarkup(keyboard)
-
 def language_selection_keyboard():
     keyboard = [
         [

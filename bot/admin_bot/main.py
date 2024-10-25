@@ -277,7 +277,6 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             context.user_data['delete_messages'].append(options_message.message_id)
 
-
         else:
             # Логика для других пользователей
             headers = {

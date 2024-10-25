@@ -160,7 +160,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Получаем параметр 'start' из данных команды
     start_query = update.message.text if update.message else update.callback_query.data
 
-    logging.info(f"Получен start_query: {start_query}, update.message.text: {update.message.text}, update.callback_query.data: {update.callback_query}")
+    # logging.info(f"Получен start_query: {start_query}, update.message.text: {update.message.text}, update.callback_query.data: {update.callback_query}")
 
     # /start payment_success
     query_param = start_query.split()[-1]
