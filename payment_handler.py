@@ -24,8 +24,12 @@ cancel_url = os.getenv('CANCEL_URL')
 @app.route('/', methods=['GET','POST'])
 def index():
     try:
+        user_id = request.args.get("c")
+        if not user_id:
+            return jsonify(error="no user_id"), 400
+
         # Получаем последний order_id из базы данных
-        order_id = get_last_order_id()
+        order_id = get_last_order_id(int(user_id))
 
         if order_id is None:
             return jsonify({"error": "Order ID not found"}), 400

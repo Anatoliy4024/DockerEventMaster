@@ -51,7 +51,7 @@ def update_order_status_to_paid(order_id):
 
 
 # Функция для получения последнего order_id из базы данных
-def get_last_order_id():
+def get_last_order_id(user_id):
     conn = psycopg2.connect(
         host=os.getenv('DB_HOST'),
         database=os.getenv('DB_NAME'),
@@ -61,8 +61,9 @@ def get_last_order_id():
     order_id = None
     try:
         cursor = conn.cursor()
-        query = "SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1"
-        cursor.execute(query)
+        # query = "SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1"
+        query = "SELECT order_id FROM orders WHERE user_id = %s ORDER BY order_id DESC LIMIT 1"
+        cursor.execute(query,(user_id,))
         result = cursor.fetchone()
 
         if result:

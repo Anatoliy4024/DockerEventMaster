@@ -428,7 +428,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             else:
 
                 # Получаем последний order_id из базы данных
-                order_id = get_last_order_id()
+                order_id = get_last_order_id(user_data.get_user_id())
 
                 if order_id is None:
                     await context.bot.send_message(chat_id=update.effective_chat.id, text="Order ID not found",)
