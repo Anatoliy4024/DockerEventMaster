@@ -13,10 +13,10 @@ def reserved_time_intervals(selected_date):
     # Создаем подключение к базе данных PostgreSQL
     try:
         conn = psycopg2.connect(
-            host=os.getenv('DATABASE_HOST', 'localhost'),  # Используем переменные окружения
-            database=os.getenv('DATABASE_NAME', 'event_db'),
-            user=os.getenv('DATABASE_USER', 'myuser'),
-            password=os.getenv('DATABASE_PASSWORD', 'mypassword')
+            host=os.getenv('DB_HOST', 'localhost'),  # Используем переменные окружения
+            database=os.getenv('DB_NAME', 'event_db'),
+            user=os.getenv('DB_USER', 'myuser'),
+            password=os.getenv('DB_PASSWORD', 'mypassword')
         )
         logging.info("Соединение с базой данных успешно установлено.")
     except Exception as e:
