@@ -1,8 +1,11 @@
 import os
+from datetime import timedelta
+
 import stripe
 from flask import Flask, request, jsonify, redirect
 from dotenv import load_dotenv
 
+from bot.picnic_bot.data_reserve import get_reserved_times_for_date, check_time_reserved
 from bot.picnic_bot.status_3 import update_order_status_to_paid, get_last_order_id  # Подключаем функцию обновления статуса
 
 # Загрузка переменных окружения
@@ -29,10 +32,31 @@ def index():
             return jsonify(error="no user_id"), 400
 
         # Получаем последний order_id из базы данных
-        order_id = get_last_order_id(int(user_id))
+        order = get_last_order_id(int(user_id))
 
-        if order_id is None:
+        if order is None:
             return jsonify({"error": "Order ID not found"}), 400
+
+        selected_date = order[1]
+        start_time = order[2]
+        end_time = order[3]
+
+        # Проверка доступности времени перед оплатой
+        reserved_intervals = get_reserved_times_for_date(selected_date)
+
+        start = timedelta(hours=start_time.hour, minutes=start_time.minute) - timedelta(hours=4, minutes=30)
+        end = timedelta(hours=end_time.hour, minutes=end_time.minute) + timedelta(hours=5, minutes=30)
+
+        while start < end:
+            hours = int(start.total_seconds() // 3600)
+            minutes = int((start.total_seconds() % 3600) // 60)
+            start_time_str = (f"{hours:02d}:{minutes:02d}")
+            if check_time_reserved(start_time_str, reserved_intervals):
+                return redirect('https://t.me/PicnicsAlicanteBot?start=expired_date')
+
+            start += timedelta(minutes=30)
+
+
 
         # Создаем платежную сессию Stripe с передачей order_id в метаданных
         session = stripe.checkout.Session.create(
@@ -51,7 +75,7 @@ def index():
             success_url=success_url,
             cancel_url=cancel_url,
             metadata={
-                'order_id': order_id  # Передаем order_id в метаданные
+                'order_id': order[0]  # Передаем order_id в метаданные
             }
         )
         # Перенаправляем пользователя на страницу оплаты Stripe

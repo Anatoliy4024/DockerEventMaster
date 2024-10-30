@@ -62,13 +62,11 @@ def get_last_order_id(user_id):
     try:
         cursor = conn.cursor()
         # query = "SELECT order_id FROM orders ORDER BY order_id DESC LIMIT 1"
-        query = "SELECT order_id FROM orders WHERE user_id = %s ORDER BY order_id DESC LIMIT 1"
+        query = "SELECT order_id, selected_date, start_time, end_time FROM orders WHERE user_id = %s ORDER BY order_id DESC LIMIT 1"
         cursor.execute(query,(user_id,))
         result = cursor.fetchone()
 
-        if result:
-            order_id = result[0]
-        else:
+        if not result:
             logging.error("Order ID not found")
     except psycopg2.Error as e:
         logging.error(f"Error fetching order_id: {e}")
@@ -76,4 +74,4 @@ def get_last_order_id(user_id):
         cursor.close()
         conn.close()
 
-    return order_id
+    return result

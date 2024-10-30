@@ -210,6 +210,21 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Возврат на предыдущий шаг
         return
 
+    elif query_param == "expired_date":
+        language_code = user_data.get_language()  # Получаем язык пользователя
+        occupied_message_texts = {
+            'en': "The selected date and time are already booked by another customer. Please choose another date.",
+            'ru': "Выбранная дата и время уже оплачены другим заказчиком. Пожалуйста, выберите другую дату.",
+            'uk': "Вибрана дата і час вже оплачено іншим клієнтом. Будь ласка, виберіть іншу дату."
+            # Добавьте другие языки по необходимости
+        }
+        occupied_message = occupied_message_texts.get(language_code, occupied_message_texts['en'])
+
+        # Сообщение о занятости времени и кнопка для выбора новой даты
+        await context.bot.send_message(chat_id=user_data.get_user_id(), text=occupied_message)
+
+        return
+
     else:
         user_data.set_user_id(user_id)
         user_data.set_username(username)
@@ -428,7 +443,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             else:
 
                 # Получаем последний order_id из базы данных
-                order_id = get_last_order_id(user_data.get_user_id())
+                order_id = get_last_order_id(user_data.get_user_id())[0]
 
                 if order_id is None:
                     await context.bot.send_message(chat_id=update.effective_chat.id, text="Order ID not found",)

@@ -612,6 +612,8 @@ def generate_order_summary(user_data):
 
 def show_payment_page_handler(context: ContextTypes.DEFAULT_TYPE):
     user_data = context.user_data.get('user_data', UserData())
+
+
     payment_message_texts = {
         'en': "You will be redirected to a secure payment page - Stripe payment platform.\n"
               "Then return to the bot to see your proforma considering your prepayment.",
