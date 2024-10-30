@@ -130,7 +130,6 @@ def generate_time_selection_keyboard(language, stage='start', selected_date=None
                 else:
                     time_buttons.append(InlineKeyboardButton(f" {time_str}", callback_data=f'time_{time_str}'))
         else:
-            # if check_time_reserved(time_str, next_time, reserved_intervals):
             if check_time_reserved(current_time.strftime('%H:%M'), reserved_intervals):
                 time_buttons.append(InlineKeyboardButton(f"🔻 {time_str}", callback_data='none'))
             else:
