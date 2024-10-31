@@ -5,13 +5,14 @@ CREATE TABLE IF NOT EXISTS users (
     status INTEGER,
     number_of_events INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    email TEXT
 );
 
 -- Таблица заказов
 CREATE TABLE IF NOT EXISTS orders (
     order_id SERIAL PRIMARY KEY,  -- SERIAL используется для автоинкремента
-    user_id INTEGER,
+    user_id BIGINT,
     session_number INTEGER,  -- Номер сессии
     user_name TEXT,  -- Имя пользователя
     language TEXT,  -- Язык

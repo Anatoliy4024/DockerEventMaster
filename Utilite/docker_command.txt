@@ -71,3 +71,7 @@ tail -f /var/lib/docker/volumes/dockereventmaster_postgres_data/_data/pg_log/pos
 
 16. перенос проекта с Гита на сервер (текущую директорию)
 git pull origin main
+
+17.
+
+psql -U myuser -d picnicsalicante

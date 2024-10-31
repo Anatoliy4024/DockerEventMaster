@@ -213,9 +213,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query_param == "expired_date":
         language_code = user_data.get_language()  # Получаем язык пользователя
         occupied_message_texts = {
-            'en': "The selected date and time are already booked by another customer. Please choose another date.",
-            'ru': "Выбранная дата и время уже оплачены другим заказчиком. Пожалуйста, выберите другую дату.",
-            'uk': "Вибрана дата і час вже оплачено іншим клієнтом. Будь ласка, виберіть іншу дату."
+            'en': "The selected date and time are already booked by another customer. Please choose another date — press /start.",
+    'ru': "Выбранная дата и время уже оплачены другим заказчиком. Пожалуйста, выберите другую дату — нажмите /start.",
+    'uk': "Вибрана дата і час вже оплачено іншим клієнтом. Будь ласка, виберіть іншу дату — натисніть /start.",
+    'es': "La fecha y hora seleccionadas ya han sido reservadas por otro cliente. Por favor, elija otra fecha — presione /start.",
+    'fr': "La date et l'heure sélectionnées ont déjà été réservées par un autre client. Veuillez choisir une autre date — appuyez sur /start.",
+    'pl': "Wybrana data i godzina są już zarezerwowane przez innego klienta. Proszę wybrać inną datę — naciśnij /start.",
+    'de': "Das ausgewählte Datum und die Uhrzeit sind bereits von einem anderen Kunden gebucht. Bitte wählen Sie ein anderes Datum — drücken Sie /start.",
+    'it': "La data e l'orario selezionati sono già stati prenotati da un altro cliente. Si prega di scegliere un'altra data — premere /start."
             # Добавьте другие языки по необходимости
         }
         occupied_message = occupied_message_texts.get(language_code, occupied_message_texts['en'])
