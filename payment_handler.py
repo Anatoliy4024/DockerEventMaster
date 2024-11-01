@@ -146,7 +146,7 @@
 # это предыдущая версия без выкачки mail в таблицу users БД
 import os
 from datetime import timedelta
-
+import logging
 import stripe
 from flask import Flask, request, jsonify, redirect
 from dotenv import load_dotenv
@@ -156,6 +156,9 @@ from bot.picnic_bot.status_3 import update_order_status_to_paid, get_last_order_
 
 # Загрузка переменных окружения
 load_dotenv()
+
+# Настройка логирования
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Инициализация Flask
 app = Flask(__name__)
@@ -186,6 +189,7 @@ def index():
         selected_date = order[1]
         start_time = order[2]
         end_time = order[3]
+        logging.info(f"Функция get_reserved_times_for_date вызвана для даты: {selected_date},{start_time},{end_time}")
 
         # Проверка доступности времени перед оплатой
         reserved_intervals = get_reserved_times_for_date(selected_date)
@@ -197,6 +201,10 @@ def index():
             hours = int(start.total_seconds() // 3600)
             minutes = int((start.total_seconds() % 3600) // 60)
             start_time_str = (f"{hours:02d}:{minutes:02d}")
+
+            logging.info(
+                f"LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLФункция get_reserved_times_for_date вызвана для даты: {start_time_str},{reserved_intervals},{check_time_reserved(start_time_str, reserved_intervals)}")
+
             if check_time_reserved(start_time_str, reserved_intervals):
                 return redirect('https://t.me/PicnicsAlicanteBot?start=expired_date')
 
