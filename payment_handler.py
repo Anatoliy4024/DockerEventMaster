@@ -147,6 +147,8 @@
 import os
 from datetime import timedelta, datetime
 import logging
+
+import psycopg2
 import stripe
 from flask import Flask, request, jsonify, redirect
 from dotenv import load_dotenv
@@ -169,7 +171,14 @@ publishable_key = os.getenv('STRIPE_PUBLISHABLE_KEY')
 success_url = os.getenv('SUCCESS_URL')
 cancel_url = os.getenv('CANCEL_URL')
 
-
+# Функция для подключения к базе данных
+def get_db_connection():
+    return psycopg2.connect(
+        host=os.getenv('DB_HOST'),
+        database=os.getenv('DB_NAME'),
+        user=os.getenv('DB_USER'),
+        password=os.getenv('DB_PASSWORD')
+    )
 
 
 # Новый корневой маршрут для непосредственного создания платежной сессии
@@ -189,35 +198,11 @@ def index():
         selected_date = order[1]
         start_time = order[2]
         end_time = order[3]
-        logging.info(f"Функция get_reserved_times_for_date вызвана для даты: {selected_date},{start_time},{end_time}")
 
         # Проверка доступности времени перед оплатой
         reserved_intervals = get_reserved_times_for_date(selected_date)
 
-        # start_time_dt = datetime.strptime('08:00', '%H:%M')
-        # end_time_dt = datetime.strptime('22:00', '%H:%M')
-        #
-        # time_buttons = []
-        # current_time = start_time_dt
-        #
-        # while current_time <= end_time_dt:
-        #     time_str = current_time.strftime('%H:%M')
-        #
-        #     if check_time_reserved(current_time.strftime('%H:%M'), reserved_intervals):
-        #         time_buttons.append(time_str)
-        #
-        #     else:
-        #         if current_time >= datetime.strptime('20:30', '%H:%M'):
-        #             time_buttons.append(time_str)
-        #
-        #         else:
-        #             time_buttons.append(time_str)
-        #
-        #     current_time += timedelta(minutes=30)
-
-        # start = timedelta(hours=start_time.hour, minutes=start_time.minute) - timedelta(hours=4, minutes=30)
         start = timedelta(hours=start_time.hour, minutes=start_time.minute)
-        # end = timedelta(hours=end_time.hour, minutes=end_time.minute) + timedelta(hours=5, minutes=30)
         end = timedelta(hours=end_time.hour, minutes=end_time.minute)
 
         while start < end:
@@ -225,15 +210,10 @@ def index():
             minutes = int((start.total_seconds() % 3600) // 60)
             start_time_str = (f"{hours:02d}:{minutes:02d}")
 
-            logging.info(
-                f"LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLФункция get_reserved_times_for_date вызвана для даты: {start_time_str},{reserved_intervals},{check_time_reserved(start_time_str, reserved_intervals)}")
-
             if check_time_reserved(start_time_str, reserved_intervals):
                 return redirect('https://t.me/PicnicsAlicanteBot?start=expired_date')
 
             start += timedelta(minutes=30)
-
-
 
         # Создаем платежную сессию Stripe с передачей order_id в метаданных
         session = stripe.checkout.Session.create(
@@ -287,15 +267,45 @@ def webhook():
     except stripe.error.SignatureVerificationError as e:
         return jsonify({'error': str(e)}), 400
 
+    # if event['type'] == 'checkout.session.completed':
+    #     session = event['data']['object']
+    #
+    #     # Получаем order_id из метаданных платежной сессии
+    #     order_id = session['metadata']['order_id']
+    #     print(f"Оплата прошла успешно для order_id: {order_id}")
+    #
+    #     # Обновляем статус заказа на "оплачено"
+    #     update_order_status_to_paid(order_id)
+
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
 
-        # Получаем order_id из метаданных платежной сессии
+        # Извлекаем order_id и user_id из метаданных
         order_id = session['metadata']['order_id']
-        print(f"Оплата прошла успешно для order_id: {order_id}")
+        user_id = session['metadata']['user_id']
+        customer_email = session['customer_details']['email']  # Получаем email пользователя
 
-        # Обновляем статус заказа на "оплачено"
-        update_order_status_to_paid(order_id)
+        # Обновляем статус заказа и email пользователя в базе данных
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+
+            # Обновляем статус заказа на "оплачено"
+            update_order_status_to_paid(order_id)
+
+            # Обновляем email в таблице users
+            cursor.execute("""
+                UPDATE users
+                SET email = %s, updated_at = NOW()
+                WHERE user_id = %s
+            """, (customer_email, user_id))
+
+            conn.commit()
+            cursor.close()
+            conn.close()
+        except Exception as e:
+            print(f"Ошибка базы данных: {e}")
+            return jsonify({'error': 'Не удалось обновить базу данных'}), 500
 
     return jsonify({'status': 'success'}), 200
 
