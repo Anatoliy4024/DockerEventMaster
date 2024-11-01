@@ -232,7 +232,8 @@ def index():
             success_url=success_url,
             cancel_url=cancel_url,
             metadata={
-                'order_id': order[0]  # Передаем order_id в метаданные
+                'order_id': order[0],
+                'user_id': user_id  # Передаем user_id в метаданных для связи
             }
         )
         # Перенаправляем пользователя на страницу оплаты Stripe
