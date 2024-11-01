@@ -19,7 +19,7 @@ from bot.picnic_bot.keyboards import (language_selection_keyboard, yes_no_keyboa
                                       generate_party_styles_keyboard)
 from bot.picnic_bot.message_handlers import (handle_message, handle_city_confirmation, update_order_data, handle_name,
                                              show_payment_page_handler, show_proforma,
-                                             check_client_is_exist)
+                                             check_client_is_exist, reset_user_data)
 from bot.picnic_bot.calculations import calculate_total_cost
 
 from dotenv import load_dotenv
@@ -151,6 +151,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Инициализация данных пользователя
     user_data = context.user_data.get('user_data', UserData())
+    reset_user_data(user_data)
     context.user_data['user_data'] = user_data
 
     # Установка начальных данных

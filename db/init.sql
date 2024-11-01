@@ -1,6 +1,6 @@
 --- Таблица пользователей
 CREATE TABLE IF NOT EXISTS users (
-    user_id SERIAL PRIMARY KEY,
+    user_id BIGSERIAL PRIMARY KEY,
     username TEXT,
     status INTEGER,
     number_of_events INTEGER,
