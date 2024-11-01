@@ -145,7 +145,7 @@
 
 # это предыдущая версия без выкачки mail в таблицу users БД
 import os
-from datetime import timedelta
+from datetime import timedelta, datetime
 import logging
 import stripe
 from flask import Flask, request, jsonify, redirect
@@ -194,8 +194,31 @@ def index():
         # Проверка доступности времени перед оплатой
         reserved_intervals = get_reserved_times_for_date(selected_date)
 
-        start = timedelta(hours=start_time.hour, minutes=start_time.minute) - timedelta(hours=4, minutes=30)
-        end = timedelta(hours=end_time.hour, minutes=end_time.minute) + timedelta(hours=5, minutes=30)
+        # start_time_dt = datetime.strptime('08:00', '%H:%M')
+        # end_time_dt = datetime.strptime('22:00', '%H:%M')
+        #
+        # time_buttons = []
+        # current_time = start_time_dt
+        #
+        # while current_time <= end_time_dt:
+        #     time_str = current_time.strftime('%H:%M')
+        #
+        #     if check_time_reserved(current_time.strftime('%H:%M'), reserved_intervals):
+        #         time_buttons.append(time_str)
+        #
+        #     else:
+        #         if current_time >= datetime.strptime('20:30', '%H:%M'):
+        #             time_buttons.append(time_str)
+        #
+        #         else:
+        #             time_buttons.append(time_str)
+        #
+        #     current_time += timedelta(minutes=30)
+
+        # start = timedelta(hours=start_time.hour, minutes=start_time.minute) - timedelta(hours=4, minutes=30)
+        start = timedelta(hours=start_time.hour, minutes=start_time.minute)
+        # end = timedelta(hours=end_time.hour, minutes=end_time.minute) + timedelta(hours=5, minutes=30)
+        end = timedelta(hours=end_time.hour, minutes=end_time.minute)
 
         while start < end:
             hours = int(start.total_seconds() // 3600)
