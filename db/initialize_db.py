@@ -19,7 +19,9 @@ def initialize_db():
             status INTEGER,
             number_of_events INTEGER,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            registration_email TEXT,
+            registration_password TEXT
         )
         ''')
 

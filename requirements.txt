@@ -1,3 +1,12 @@
+
+blinker
+Flask==2.1.0
+gunicorn==22.0.0
+
+
+
+
+
 anyio==4.4.0
 asttokens==2.4.1
 attrs==24.2.0
@@ -14,7 +23,7 @@ defusedxml==0.7.1
 docopt==0.6.2
 executing==2.1.0
 fastjsonschema==2.20.0
-Flask==2.1.0
+
 fpdf==1.7.2
 h11==0.14.0
 httpcore==0.17.3

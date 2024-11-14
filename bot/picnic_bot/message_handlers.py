@@ -658,7 +658,7 @@ def show_payment_page_handler(context: ContextTypes.DEFAULT_TYPE):
     button_text = button_texts.get(language_code, button_texts['en'])  # Используем английский текст по умолчанию
 
     # stripe_link = os.getenv('BASE_URL')
-    stripe_link = os.getenv('BASE_URL') + f"?c={user_data.get_user_id()}"
+    stripe_link = os.getenv('BASE_URL') + f"/create-payment?c={user_data.get_user_id()}"
 
     # Создание кнопки
     button = InlineKeyboardButton(button_text, url=stripe_link)

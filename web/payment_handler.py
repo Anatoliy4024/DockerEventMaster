@@ -12,7 +12,7 @@
 # load_dotenv()
 #
 # # Инициализация Flask и Stripe
-# app = Flask(__name__)
+# myapp = Flask(__name__)
 # stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
 # publishable_key = os.getenv('STRIPE_PUBLISHABLE_KEY')
 # success_url = os.getenv('SUCCESS_URL')
@@ -30,7 +30,7 @@
 #
 #
 # # Маршрут для создания платежной сессии
-# @app.route('/', methods=['GET', 'POST'])
+# @myapp.route('/', methods=['GET', 'POST'])
 # def index():
 #     try:
 #         user_id = request.args.get("c")
@@ -88,7 +88,7 @@
 #
 #
 # # Webhook для обработки событий от Stripe
-# @app.route('/webhook', methods=['POST'])
+# @myapp.route('/webhook', methods=['POST'])
 # def webhook():
 #     payload = request.get_data(as_text=True)
 #     sig_header = request.headers.get('Stripe-Signature')
@@ -135,7 +135,7 @@
 #
 #
 # if __name__ == '__main__':
-#     app.run(host='0.0.0.0', port=5000)
+#     myapp.run(host='0.0.0.0', port=5000)
 #
 
 
@@ -145,6 +145,7 @@
 
 # это предыдущая версия без выкачки mail в таблицу users БД
 import os
+import sys
 from datetime import timedelta, datetime
 import logging
 
@@ -152,6 +153,11 @@ import psycopg2
 import stripe
 from flask import Flask, request, jsonify, redirect
 from dotenv import load_dotenv
+
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(project_root)
+
+
 
 from bot.picnic_bot.data_reserve import get_reserved_times_for_date, check_time_reserved
 from bot.picnic_bot.status_3 import update_order_status_to_paid, get_last_order_id  # Подключаем функцию обновления статуса

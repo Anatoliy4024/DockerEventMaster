@@ -6,7 +6,9 @@ CREATE TABLE IF NOT EXISTS users (
     number_of_events INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    email TEXT
+    email TEXT,
+    registration_email TEXT,
+    registration_password TEXT
 );
 
 -- Таблица заказов

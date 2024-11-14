@@ -1,15 +1,20 @@
-# Используем Python-образ
+## Используем Python-образ
 FROM python:3.9-slim
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
 
 # Копируем необходимые файлы в контейнер
-COPY requirements.txt requirements.txt
-COPY . .
+COPY ../requirements.txt requirements.txt
+COPY ./web /app/web
+COPY ./bot /app/bot
 
 # Устанавливаем зависимости
 RUN pip install --no-cache-dir -r requirements.txt gunicorn
 
 # Запускаем приложение
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "payment_handler:app"]
+#CMD ["gunicorn", "--bind", "0.0.0.0:5000", "web.payment_handler:myapp"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "web.run:app"]
+
+
+

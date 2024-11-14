@@ -51,7 +51,7 @@ services:
   flask_server:
     build:
       context: .
-      dockerfile: Dockerfile_flask  # Создай Dockerfile для Flask-сервера
+      dockerfile: web/Dockerfile_flask  # Создай Dockerfile для Flask-сервера
     env_file:  # Загружаем переменные из .env файла
       - .env
     networks:
