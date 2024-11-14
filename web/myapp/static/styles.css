@@ -1,0 +1,89 @@
+/* app/static/styles.css */
+/* Стили для страницы с логотипом и флагами */
+
+body {
+    background-color: #f5f5dc;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.logo {
+    max-width: 350px;
+    height: auto;
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+
+/* Настройки для контейнера флагов */
+/* Флаги в одну строку */
+.flags {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: nowrap; /* Отключаем перенос, чтобы флаги отображались в одну строку */
+    max-width: none; /* Убираем ограничение по ширине */
+}
+
+/* Настройки для флагов */
+.flag {
+    width: 30px; /* Вернем прежний размер флагов */
+    height: auto;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px; /* Расстояние между полями */
+    margin-top: 10px; /* Отступ сверху, чтобы форма не прижималась к тексту */
+}
+
+form label {
+    align-self: flex-start; /* Выравнивание текста меток по левому краю */
+}
+
+form input, form button {
+    width: 100%; /* Занимают всю ширину родителя */
+    max-width: 300px; /* Ограничение максимальной ширины */
+    padding: 8px;
+    font-size: 16px;
+}
+
+form button {
+    cursor: pointer;
+}
+
+/* Адаптивные стили для мобильных устройств */
+@media (max-width: 600px) {
+    .container {
+        padding: 10px;
+    }
+
+    .logo {
+        max-width: 80%;
+    }
+
+    form input, form button {
+        max-width: 100%;
+    }
+
+    .flags {
+        gap: 5px;
+    }
+
+    .flag {
+        width: 25px;
+    }
+}
