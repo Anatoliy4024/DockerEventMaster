@@ -5,6 +5,8 @@ import logging
 
 from dotenv import load_dotenv
 from flask import Blueprint, request, render_template, flash, redirect, jsonify, url_for
+from werkzeug.security import check_password_hash, generate_password_hash
+
 from web.myapp.email_utils import send_email
 from web.utils.db import create_connection  # Подключаем базу данных
 from web.myapp.translations import translations, field_labels  # Импортируем оба словаря
@@ -196,6 +198,44 @@ def select_language():
         time=current_time
     )
 
+#
+# @main.route('/register', methods=['POST'])
+# def register():
+#     """Обработчик регистрации."""
+#     email = request.form.get('email')
+#     password = request.form.get('password')
+#     lang = request.args.get('lang', 'en')
+#
+#     # Подключение к базе данных
+#     conn = create_connection()
+#     cursor = conn.cursor()
+#
+#     # Проверка, существует ли пользователь
+#     cursor.execute("SELECT registration_password FROM users WHERE registration_email = %s", (email,))
+#     user = cursor.fetchone()
+#
+#     if user:
+#         # Если пользователь найден, проверим пароль
+#         if user[0] == password:
+#             flash(translations[lang]['registration_successful'], "success")
+#             return redirect(url_for('main.booking_page', lang=lang))  # Переход на страницу бронирования при успешной регистрации
+#         else:
+#             # Если пароль неверный, отправляем email с правильным паролем
+#             subject = "Welcome to PicnicsAlicante"
+#             message = f"Hello,\n\nThank you for registering with PicnicsAlicante! Here are your login details:\n\nEmail: {email}\nPassword: {user[0]}\n\nIf you did not request this, please ignore this message.\n\nBest regards,\nThe PicnicsAlicante Team"
+#             send_email(email, subject, message)
+#             flash(translations[lang]['incorrect_password'], "warning")
+#             return redirect(url_for('main.error_page', lang=lang))  # Переход на страницу ошибки при неверном пароле
+#     else:
+#         # Если пользователя нет, регистрируем его
+#         cursor.execute("INSERT INTO users (registration_email, registration_password) VALUES (%s, %s)", (email, password))
+#         conn.commit()
+#         flash(translations[lang]['registration_successful'], "success")
+#         return redirect(url_for('main.booking_page', lang=lang))  # Переход на страницу бронирования при первой регистрации
+#
+#     # Закрываем соединение с базой данных
+#     cursor.close()
+#     conn.close()
 
 @main.route('/register', methods=['POST'])
 def register():
@@ -204,36 +244,44 @@ def register():
     password = request.form.get('password')
     lang = request.args.get('lang', 'en')
 
+    # Проверка языка
+    if lang not in translations:
+        lang = 'en'
+
     # Подключение к базе данных
     conn = create_connection()
     cursor = conn.cursor()
 
-    # Проверка, существует ли пользователь
-    cursor.execute("SELECT registration_password FROM users WHERE registration_email = %s", (email,))
-    user = cursor.fetchone()
+    try:
+        # Проверка, существует ли пользователь
+        cursor.execute("SELECT registration_password FROM users WHERE registration_email = %s", (email,))
+        user = cursor.fetchone()
 
-    if user:
-        # Если пользователь найден, проверим пароль
-        if user[0] == password:
-            flash(translations[lang]['registration_successful'], "success")
-            return redirect(url_for('main.booking_page', lang=lang))  # Переход на страницу бронирования при успешной регистрации
+        if user:
+            # Если пользователь найден, проверим пароль
+            if check_password_hash(user[0], password):
+                flash(translations[lang]['registration_successful'], "success")
+                return redirect(url_for('main.booking_page', lang=lang))
+            else:
+                flash(translations[lang]['incorrect_password'], "warning")
+                return redirect(url_for('main.error_page', lang=lang))
         else:
-            # Если пароль неверный, отправляем email с правильным паролем
-            subject = "Welcome to PicnicsAlicante"
-            message = f"Hello,\n\nThank you for registering with PicnicsAlicante! Here are your login details:\n\nEmail: {email}\nPassword: {user[0]}\n\nIf you did not request this, please ignore this message.\n\nBest regards,\nThe PicnicsAlicante Team"
-            send_email(email, subject, message)
-            flash(translations[lang]['incorrect_password'], "warning")
-            return redirect(url_for('main.error_page', lang=lang))  # Переход на страницу ошибки при неверном пароле
-    else:
-        # Если пользователя нет, регистрируем его
-        cursor.execute("INSERT INTO users (registration_email, registration_password) VALUES (%s, %s)", (email, password))
-        conn.commit()
-        flash(translations[lang]['registration_successful'], "success")
-        return redirect(url_for('main.booking_page', lang=lang))  # Переход на страницу бронирования при первой регистрации
+            # Если пользователя нет, регистрируем его
+            hashed_password = generate_password_hash(password)
+            cursor.execute("INSERT INTO users (registration_email, registration_password) VALUES (%s, %s)", (email, hashed_password))
+            conn.commit()
+            flash(translations[lang]['registration_successful'], "success")
+            return redirect(url_for('main.booking_page', lang=lang))
+    except Exception as e:
+        # Обработка ошибок базы данных
+        print(f"Database error: {e}")
+        flash(translations[lang].get('database_error', 'Database error occurred'), "danger")
+        return redirect(url_for('main.index', lang=lang))
+    finally:
+        # Закрытие соединения с базой
+        cursor.close()
+        conn.close()
 
-    # Закрываем соединение с базой данных
-    cursor.close()
-    conn.close()
 
 @main.route('/booking_page')
 def booking_page():
