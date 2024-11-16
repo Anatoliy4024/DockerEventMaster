@@ -17,6 +17,8 @@ sys.path.append(project_root)
 from bot.picnic_bot.data_reserve import get_reserved_times_for_date, check_time_reserved
 from bot.picnic_bot.status_3 import update_order_status_to_paid, get_last_order_id  # Подключаем функцию обновления статуса
 
+from datetime import datetime
+
 # Загрузка переменных окружения
 load_dotenv()
 
@@ -172,12 +174,28 @@ def index():
  lang = request.args.get('lang', 'en')
  return render_template('index.html', translations=translations[lang], labels=field_labels[lang], lang=lang)
 
+# @main.route('/select_language')
+# def select_language():
+#  """Маршрут для выбора языка с отображением сообщения."""
+#  lang = request.args.get('lang', 'en')
+#  message = translations[lang]['language_selected']
+#  return render_template('index.html', message=message, translations=translations[lang], labels=field_labels[lang], lang=lang)
+
 @main.route('/select_language')
 def select_language():
- """Маршрут для выбора языка с отображением сообщения."""
- lang = request.args.get('lang', 'en')
- message = translations[lang]['language_selected']
- return render_template('index.html', message=message, translations=translations[lang], labels=field_labels[lang], lang=lang)
+    """Маршрут для выбора языка с отображением сообщения."""
+    lang = request.args.get('lang', 'en')
+    message = translations[lang]['language_selected']
+    current_time = int(datetime.now().timestamp())  # Получаем текущую временную метку
+    return render_template(
+        'index.html',
+        message=message,
+        translations=translations[lang],
+        labels=field_labels[lang],
+        lang=lang,
+        time=current_time
+    )
+
 
 @main.route('/register', methods=['POST'])
 def register():

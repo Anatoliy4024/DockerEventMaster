@@ -87,3 +87,19 @@ form button {
         width: 25px;
     }
 }
+
+.forgot-password {
+    margin-top: 10px; /* Отступ сверху */
+    font-size: 14px;
+    color: #007bff;
+}
+
+.forgot-password a {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+}
+
+.forgot-password a:hover {
+    text-decoration: underline;
+}

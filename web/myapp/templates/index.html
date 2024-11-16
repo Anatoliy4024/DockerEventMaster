@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PicnicsAlicante</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v={{ time }}">
+
+
 </head>
 <body>
     <div class="container">
@@ -58,6 +60,11 @@
 
             <!-- Используем перевод для кнопки -->
             <button type="submit">{{ translations['register'] }}</button>
+
+             <!-- Ссылка "Забыли пароль?" -->
+            <p class="forgot-password">
+                <a href="{{ url_for('auth.forgot_password') }}">{{ translations['forgot_password'] }}</a>
+            </p>
         </form>
         {% endif %}
     </div>
