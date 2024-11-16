@@ -1,0 +1,80 @@
+
+
+
+1.контейнеры остановлены:
+docker-compose down
+
+
+2.запустить сборку и запуск всех сервисов:
+docker-compose up --build
+
+
+3.проверка логов контейнеров:
+docker-compose logs
+
+
+4.проверка(имена), что контейнеры работают:
+docker ps
+
+
+5.подключение к базе данных PostgreSQL:
+docker exec -it localhost psql -U myuser -d mydatabase
+
+docker exec -it dockerpicnicweb_db_1 psql -U postgres
+
+
+6.лист таблиц БД
+ \db
+
+7.лист зависимостей в БД
+ \dt
+
+8.отобразить содержимое таблицы
+SELECT * FROM users;
+SELECT * FROM orders;
+
+9.вывод логов по контейнеру пикник-бота
+docker logs docker_event_master-picnic_bot-1
+
+10.просмотр логов конкретного контейнера:
+docker logs <container_id>            docker logs 7324ba9f642f это  docker_event_master-picnic_bot
+
+11.просмотр логов в реальном времени:
+docker logs -f <container_id>
+
+12.Войти внутрь контейнера
+docker exec -it <container_id_or_name> /bin/bash
+docker exec -it 9ee5312cbb04 bash
+docker exec -it docker_event_master-picnic_bot-1 bash
+docker exec -it docker_event_master-admin_bot-1 bash
+
+12.1. Для Сервера
+docker exec -it dockereventmaster_picnic_bot_1 bash
+docker exec -it dockereventmaster_admin_bot_1 bash
+docker exec -it localhost bash
+
+содержимое резервной базы данных
+cat /root/backup.sql
+
+Ты можешь создать тестовую базу данных и попробовать восстановить в неё данные, чтобы убедиться, что бэкап корректен. Например:
+Создай новую базу данных:
+docker exec -it 148ce929210e psql -U myuser -c "CREATE DATABASE testdb;
+Восстанови данные в тестовую базу:
+docker exec -i 148ce929210e psql -U myuser -d testdb < /root/backup.sql
+
+
+13.просмотр логов бота
+cat db_operations.log
+
+14. просмотр файлов логирования БД на сервере
+cat /var/lib/docker/volumes/dockereventmaster_postgres_data/_data/pg_log/postgresql-<дата>.log
+
+15. просмотр логов в реальном времени
+tail -f /var/lib/docker/volumes/dockereventmaster_postgres_data/_data/pg_log/postgresql-<дата>.log
+
+16. перенос проекта с Гита на сервер (текущую директорию)
+git pull origin main
+
+17.
+
+psql -U myuser -d picnicsalicante
