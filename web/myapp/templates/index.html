@@ -61,12 +61,54 @@
             <!-- Используем перевод для кнопки -->
             <button type="submit">{{ translations['register'] }}</button>
 
-             <!-- Ссылка "Забыли пароль?" -->
+            <!-- Ссылка "Забыли пароль?" -->
             <p class="forgot-password">
                 <a href="{{ url_for('auth.forgot_password') }}">{{ translations['forgot_password'] }}</a>
             </p>
         </form>
+
+        <!-- Контейнер для сообщений -->
+        <div id="flash-message" style="margin-top: 10px; font-size: 18px; font-weight: bold; color: red; display: none;"></div>
+
         {% endif %}
     </div>
+
+    <script>
+        // Получаем сообщение от Flask (если есть)
+        const flashMessage = {{ get_flashed_messages(with_categories=true) | tojson }};
+
+        // Контейнер для вывода сообщений
+        const flashContainer = document.getElementById("flash-message");
+
+        // Если есть сообщение, показываем его
+        if (flashMessage.length > 0) {
+            flashMessage.forEach(([category, message]) => {
+                flashContainer.style.color = category === "success" ? "green" : "red";
+                flashContainer.innerHTML = message;
+                flashContainer.style.display = "block";
+            });
+
+            // Убираем сообщение через 2 секунды
+            setTimeout(() => {
+                flashContainer.style.display = "none";
+                flashContainer.innerHTML = "";
+            }, 2000);
+
+            // Если сообщение успешно, перенаправляем на основную страницу
+            if (flashMessage.some(([category, _]) => category === "success")) {
+                setTimeout(() => {
+                    window.location.href = "{{ url_for('main.booking_page', lang=lang) }}";
+                }, 2000);
+            }
+
+            // Если ошибка, очищаем поля формы
+            if (flashMessage.some(([category, _]) => category === "danger")) {
+                setTimeout(() => {
+                    document.getElementById("email").value = "";
+                    document.getElementById("password").value = "";
+                }, 2000);
+            }
+        }
+    </script>
 </body>
 </html>

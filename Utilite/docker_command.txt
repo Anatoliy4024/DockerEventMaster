@@ -1,6 +1,5 @@
 
 
-
 1.контейнеры остановлены:
 docker-compose down
 
