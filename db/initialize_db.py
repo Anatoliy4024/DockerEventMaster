@@ -21,7 +21,7 @@ def initialize_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             registration_email TEXT,
-            registration_password TEXT
+            registration_passw TEXT
         )
         ''')
 

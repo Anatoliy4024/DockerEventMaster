@@ -21,7 +21,7 @@ def initialize_db():
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             registration_email TEXT,
-            registration_password TEXT
+            registration_passw TEXT
         )
         ''')
 
@@ -48,6 +48,8 @@ def initialize_db():
             CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES users(user_id) ON DELETE CASCADE
         )
         ''')
+        # ALTER TABLE users
+        # ADD COLUMN reset_token VARCHAR(255) DEFAULT '';
 
         # Применение изменений
         conn.commit()

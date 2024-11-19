@@ -32,7 +32,7 @@ def insert_user(email, password):
     """Добавляет нового пользователя."""
     conn = create_connection()
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO users (email, registration_password) VALUES (%s, %s);", (email, password))
+    cursor.execute("INSERT INTO users (email, registration_passw) VALUES (%s, %s);", (email, password))
     conn.commit()
     cursor.close()
     conn.close()

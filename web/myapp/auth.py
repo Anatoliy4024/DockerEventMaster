@@ -33,7 +33,7 @@ def register():
 
         # Добавляем нового пользователя в базу данных
         cursor.execute(
-            "INSERT INTO users (registration_email, registration_password) VALUES (%s, %s)",
+            "INSERT INTO users (registration_email, registration_passw) VALUES (%s, %s)",
             (email, hashed_password)
         )
         conn.commit()
@@ -110,7 +110,7 @@ def reset_password():
             hashed_password = generate_password_hash(new_password)
             cursor.execute("""
                 UPDATE users
-                SET registration_password = %s, reset_token = NULL, updated_at = NOW()
+                SET registration_passw = %s, reset_token = NULL, updated_at = NOW()
                 WHERE reset_token = %s
             """, (hashed_password, token))
             conn.commit()

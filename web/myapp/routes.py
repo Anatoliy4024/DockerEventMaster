@@ -194,7 +194,7 @@ def register():
     cursor = conn.cursor()
 
     # Проверка, существует ли пользователь
-    cursor.execute("SELECT registration_password FROM users WHERE registration_email = %s", (email,))
+    cursor.execute("SELECT registration_passw FROM users WHERE registration_email = %s", (email,))
     user = cursor.fetchone()
 
     if user:
@@ -205,7 +205,7 @@ def register():
         return redirect(url_for('main.index', lang=lang))  # Возврат на страницу входа
     else:
         hashed_password = generate_password_hash(password)  # Хэширование пароля
-        cursor.execute("INSERT INTO users (registration_email, registration_password) VALUES (%s, %s)", (email, hashed_password))
+        cursor.execute("INSERT INTO users (registration_email, registration_passw) VALUES (%s, %s)", (email, hashed_password))
         conn.commit()
         flash(translations[lang]['registration_successful'], "success")
         return redirect(url_for('main.index', lang=lang))  # Возврат на страницу входа

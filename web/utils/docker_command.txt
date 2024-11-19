@@ -75,6 +75,54 @@ tail -f /var/lib/docker/volumes/dockereventmaster_postgres_data/_data/pg_log/pos
 16. перенос проекта с Гита на сервер (текущую директорию)
 git pull origin main
 
-17.
-
+17. вход в БД
 psql -U myuser -d picnicsalicante
+
+
+server {
+    listen 80;
+    server_name picnicsalicante.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /static/ {
+        alias /DockerEventMaster/web/myapp/static/;
+    }
+
+    error_log /var/log/nginx/flask_app_error.log;
+    access_log /var/log/nginx/flask_app_access.log;
+}
+
+старая версия конфига nginx
+server {
+    server_name picnicsalicante.com;
+
+    # Перенаправление с корневого домена на поддомен web
+    return 301 http://web.picnicsalicante.com$request_uri;
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/picnicsalicante.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/picnicsalicante.com/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+server {
+    if ($host = picnicsalicante.com) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    listen 80;
+    server_name picnicsalicante.com;
+    return 404; # managed by Certbot
+
+
+}
+
