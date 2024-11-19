@@ -180,41 +180,87 @@ def select_language():
         lang=lang,
         time=current_time
     )
-
-
-@main.route('/ver1.0/register', methods=['POST'])
+@main.route('/register', methods=['GET', 'POST'])
 def register():
-    """Обработчик регистрации."""
-    email = request.form.get('email')
-    password = request.form.get('password')
-    lang = request.args.get('lang', 'en')
+    """Регистрация пользователя через email и пароль."""
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        lang = request.args.get('lang', 'en')  # Получаем выбранный язык
 
-    # Подключение к базе данных
-    conn = create_connection()
-    cursor = conn.cursor()
+        conn = create_connection()
+        cursor = conn.cursor()
+        try:
+            # Проверяем, есть ли уже такой email в базе данных
+            cursor.execute("SELECT user_id, registration_passw FROM users WHERE registration_email = %s", (email,))
+            user = cursor.fetchone()
 
-    # Проверка, существует ли пользователь
-    cursor.execute("SELECT registration_passw FROM users WHERE registration_email = %s", (email,))
-    user = cursor.fetchone()
+            if user:
+                user_id, hashed_password = user
+                # Проверяем правильность пароля
+                if check_password_hash(hashed_password, password):
+                    # Обновляем номер сессии для существующего пользователя
+                    cursor.execute("SELECT MAX(session_number) FROM orders WHERE user_id = %s", (user_id,))
+                    result = cursor.fetchone()
 
-    if user:
-        if check_password_hash(user[0], password):
-            flash(translations[lang]['login_successful'], "success")
-        else:
-            flash(translations[lang]['incorrect_password'], "danger")
-        return redirect(url_for('main.index', lang=lang))  # Возврат на страницу входа
-    else:
-        hashed_password = generate_password_hash(password)  # Хэширование пароля
-        cursor.execute("INSERT INTO users (registration_email, registration_passw) VALUES (%s, %s)", (email, hashed_password))
-        conn.commit()
-        flash(translations[lang]['registration_successful'], "success")
-        return redirect(url_for('main.index', lang=lang))  # Возврат на страницу входа
+                    if result and result[0] is not None:
+                        current_session = result[0]
+                        new_session_number = current_session + 1
+                    else:
+                        new_session_number = 1
 
-    # Закрываем соединение с базой данных
-    cursor.close()
-    conn.close()
+                    # Создаем новую запись в таблице orders
+                    cursor.execute("""
+                        INSERT INTO orders (user_id, session_number, language, status, selected_date, start_time, end_time,
+                                            duration, people_count, selected_style, city, preferences, calculated_cost, 
+                                            created_at, updated_at)
+                        VALUES (%s, %s, %s, %s, null, null, null, null, null, null, null, null, null, NOW(), NOW())
+                    """, (user_id, new_session_number, lang, 1))  # status = 1 (pending)
 
+                    conn.commit()
+                    flash('Добро пожаловать! Вы успешно вошли.', 'success')
+                    return redirect(url_for('main.booking_page', lang=lang))
 
+                else:
+                    # Неверный пароль
+                    flash('Неверный пароль. Попробуйте снова.', 'danger')
+                    return redirect(url_for('main.index', lang=lang))
+
+            # Если пользователя нет, создаем нового
+            hashed_password = generate_password_hash(password)
+
+            # Добавляем нового пользователя в таблицу users
+            cursor.execute(
+                "INSERT INTO users (registration_email, registration_passw) VALUES (%s, %s) RETURNING user_id",
+                (email, hashed_password)
+            )
+            user_id = cursor.fetchone()[0]  # Получаем ID нового пользователя
+
+            # Для нового пользователя устанавливаем session_number = 1
+            new_session_number = 1
+
+            # Создаем новую запись в таблице orders
+            cursor.execute("""
+                INSERT INTO orders (user_id, session_number, language, status, selected_date, start_time, end_time,
+                                    duration, people_count, selected_style, city, preferences, calculated_cost, 
+                                    created_at, updated_at)
+                VALUES (%s, %s, %s, %s, null, null, null, null, null, null, null, null, null, NOW(), NOW())
+            """, (user_id, new_session_number, lang, 1))  # status = 1 (pending)
+
+            conn.commit()
+            flash('Регистрация прошла успешно. Добро пожаловать!', 'success')
+            return redirect(url_for('main.booking_page', lang=lang))
+
+        except Exception as e:
+            conn.rollback()  # Отмена транзакции при ошибке
+            flash(f'Ошибка: {e}', 'danger')
+            return redirect(url_for('main.index', lang=lang))
+
+        finally:
+            cursor.close()
+            conn.close()
+
+    return render_template('register.html')
 
 @main.route('/ver1.0/booking_page')
 def booking_page():

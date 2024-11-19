@@ -24,6 +24,9 @@ def initialize_db():
             registration_passw TEXT
         )
         ''')
+        # ALTER TABLE users RENAME COLUMN registration_password TO registration_passw;
+
+
 
         # Создание таблицы заказов
         cursor.execute('''

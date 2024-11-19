@@ -10,6 +10,7 @@ from web.utils.db import create_connection
 
 auth = Blueprint('auth', __name__)
 
+
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     """Регистрация пользователя через email и пароль."""
@@ -17,38 +18,66 @@ def register():
         email = request.form.get('email')
         password = request.form.get('password')
 
-        # Проверяем, есть ли уже такой email в базе данных
         conn = create_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT user_id FROM users WHERE registration_email = %s", (email,))
-        user = cursor.fetchone()
+        try:
+            # Проверяем, есть ли уже такой email в базе данных
+            cursor.execute("SELECT user_id FROM users WHERE registration_email = %s", (email,))
+            user = cursor.fetchone()
 
-        if user:
-            # Если email уже существует, показываем сообщение об ошибке
-            flash('Этот email уже зарегистрирован. Попробуйте войти.', 'danger')
-            cursor.close()
-            conn.close()
+            if user:
+                flash('Этот email уже зарегистрирован. Попробуйте войти.', 'danger')
+                return redirect(url_for('auth.register'))
+
+            # Хэшируем пароль
+            hashed_password = generate_password_hash(password)
+
+            # Добавляем нового пользователя в базу данных
+            cursor.execute(
+                "INSERT INTO users (registration_email, registration_passw) VALUES (%s, %s) RETURNING user_id",
+                (email, hashed_password)
+            )
+            new_user_id = cursor.fetchone()[0]  # Получаем ID нового пользователя
+
+            # Добавляем запись в таблицу orders
+            cursor.execute("""
+                INSERT INTO orders (
+                    user_id, session_number, language, status,
+                    selected_date, start_time, end_time, duration,
+                    people_count, selected_style, city, preferences,
+                    calculated_cost, created_at, updated_at
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+            """, (
+                new_user_id,  # user_id
+                1,  # session_number (по умолчанию 1)
+                None,  # language
+                'pending',  # status (по умолчанию "ожидает заполнения")
+                None,  # selected_date
+                None,  # start_time
+                None,  # end_time
+                None,  # duration
+                None,  # people_count
+                None,  # selected_style
+                None,  # city
+                None,  # preferences
+                None  # calculated_cost
+            ))
+
+            conn.commit()
+            flash('Регистрация прошла успешно. Теперь вы можете войти.', 'success')
             return redirect(url_for('auth.register'))
 
-        # Хэшируем пароль
-        hashed_password = generate_password_hash(password)
+        except Exception as e:
+            conn.rollback()  # Отмена транзакции при ошибке
+            flash(f'Ошибка: {e}', 'danger')
+            return redirect(url_for('auth.register'))
 
-        # Добавляем нового пользователя в базу данных
-        cursor.execute(
-            "INSERT INTO users (registration_email, registration_passw) VALUES (%s, %s)",
-            (email, hashed_password)
-        )
-        conn.commit()
-
-        # Закрываем соединение с базой данных
-        cursor.close()
-        conn.close()
-
-        # Сообщение об успешной регистрации
-        flash('Регистрация прошла успешно. Теперь вы можете войти.', 'success')
-        return redirect(url_for('auth.register'))
+        finally:
+            cursor.close()
+            conn.close()
 
     return render_template('register.html')
+
 
 @auth.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
