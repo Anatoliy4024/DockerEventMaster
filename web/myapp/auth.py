@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash
 
 from web.myapp.email_utils import send_email
 from web.utils.db import create_connection
-from web.myapp.routes import register
+
 
 auth = Blueprint('auth', __name__)
 
@@ -123,7 +123,7 @@ def reset_password():
         cursor.close()
         conn.close()
         # return redirect(url_for('auth.login'))  # Предполагается, что есть маршрут для входа
-        return redirect(url_for('register'))
+        return redirect(url_for('main.register'))
 
     return render_template('reset_password.html', token=token)
 
