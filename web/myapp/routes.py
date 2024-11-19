@@ -160,13 +160,13 @@ def webhook():
 
     return jsonify({'status': 'success'}), 200
 
-@main.route('/')
+@main.route('/ver1.0/')
 def index():
  """Главная страница с выбором языка и флагами."""
  lang = request.args.get('lang', 'en')
  return render_template('index.html', translations=translations[lang], labels=field_labels[lang], lang=lang)
 
-@main.route('/select_language')
+@main.route('/ver1.0/select_language')
 def select_language():
     """Маршрут для выбора языка с отображением сообщения."""
     lang = request.args.get('lang', 'en')
@@ -182,7 +182,7 @@ def select_language():
     )
 
 
-@main.route('/register', methods=['POST'])
+@main.route('/ver1.0/register', methods=['POST'])
 def register():
     """Обработчик регистрации."""
     email = request.form.get('email')
@@ -216,13 +216,13 @@ def register():
 
 
 
-@main.route('/booking_page')
+@main.route('/ver1.0/booking_page')
 def booking_page():
     """Страница для бронирования."""
     lang = request.args.get('lang', 'en')
     return render_template('booking.html', lang=lang)
 
-@main.route('/error_page')
+@main.route('/ver1.0/error_page')
 def error_page():
     """Страница ошибки с неверным паролем."""
     lang = request.args.get('lang', 'en')
