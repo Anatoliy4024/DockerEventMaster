@@ -123,7 +123,7 @@ def reset_password():
         cursor.close()
         conn.close()
         # return redirect(url_for('auth.login'))  # Предполагается, что есть маршрут для входа
-        return redirect(url_for('main.register'))
+        return redirect(url_for('main.index'))
 
     return render_template('reset_password.html', token=token)
 
