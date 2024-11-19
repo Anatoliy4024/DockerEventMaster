@@ -1,3 +1,4 @@
+import os
 import uuid
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash
@@ -74,7 +75,7 @@ def forgot_password():
             conn.commit()
 
             # Отправка письма с ссылкой для сброса пароля
-            reset_link = f"http://localhost:5000/auth/reset-password?token={token}"
+            reset_link = os.getenv('BASE_URL') + f"/auth/reset-password?token={token}"
             send_email(
                 to_address=email,
                 subject="Сброс пароля",
