@@ -16,6 +16,8 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center; /* Центрирует элементы по вертикали */
+    height: 100vh; /* Высота контейнера занимает весь экран */
 }
 
 .logo {
@@ -112,4 +114,19 @@ form button {
 
 #flash-message.error {
     color: red;
+}
+
+h1 {
+    margin-bottom: 280px; /* Увеличиваем отступ между заголовком и формой */
+    text-align: center; /* Центрируем заголовок */
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px; /* Расстояние между элементами формы */
+    width: 100%; /* Ширина формы на 100% родительского контейнера */
+    max-width: 400px; /* Ограничиваем ширину формы */
 }

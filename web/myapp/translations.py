@@ -15,9 +15,12 @@ translations = {
         'database_error': 'A database error occurred. Please try again later.',
         'forgot_password_title': 'Password Recovery',
         'enter_email_label': 'Enter your email:',
+        'enter_new_password_label': 'Enter your new password:',
         'send_button': 'Send',
         'email_not_registered': 'This email is not registered in the system.',
-        'email_sent': 'An email has been sent to your inbox to reset your password.'
+        'email_sent': 'An email has been sent to your inbox to reset your password.',
+        'password_updated': 'Password updated successfully. You can now log in.',
+        'invalid_or_expired_token': 'Invalid or expired token.'
     },
     'sp': {
         'language_selected': 'Has seleccionado el idioma:',
@@ -31,9 +34,12 @@ translations = {
         'database_error': 'Se produjo un error en la base de datos. Inténtalo de nuevo más tarde.',
         'forgot_password_title': 'Recuperación de contraseña',
         'enter_email_label': 'Introduce tu correo electrónico:',
+        'enter_new_password_label': 'Introduce tu nueva contraseña:',
         'send_button': 'Enviar',
         'email_not_registered': 'Este correo electrónico no está registrado en el sistema.',
-        'email_sent': 'Se ha enviado un correo a tu bandeja de entrada para restablecer tu contraseña.'
+        'email_sent': 'Se ha enviado un correo a tu bandeja de entrada para restablecer tu contraseña.',
+        'password_updated': 'La contraseña se actualizó correctamente. Ahora puedes iniciar sesión.',
+        'invalid_or_expired_token': 'Token no válido o caducado.'
     },
     'fr': {
         'language_selected': 'Vous avez sélectionné la langue :',
@@ -47,9 +53,12 @@ translations = {
         'database_error': "Une erreur de base de données s'est produite. Veuillez réessayer plus tard.",
         'forgot_password_title': 'Récupération de mot de passe',
         'enter_email_label': 'Entrez votre email :',
+        'enter_new_password_label': 'Entrez votre nouveau mot de passe:',
         'send_button': 'Envoyer',
         'email_not_registered': "Cet email n'est pas enregistré dans le système.",
-        'email_sent': 'Un email a été envoyé à votre boîte de réception pour réinitialiser votre mot de passe.'
+        'email_sent': 'Un email a été envoyé à votre boîte de réception pour réinitialiser votre mot de passe.',
+        'password_updated': 'Mot de passe mis à jour avec succès. Vous pouvez maintenant vous connecter.',
+        'invalid_or_expired_token': 'Jeton invalide ou expiré.'
     },
     'de': {
         'language_selected': 'Sie haben die Sprache gewählt:',
@@ -63,9 +72,12 @@ translations = {
         'database_error': 'Es ist ein Datenbankfehler aufgetreten. Bitte versuchen Sie es später noch einmal.',
         'forgot_password_title': 'Passwort-Wiederherstellung',
         'enter_email_label': 'Geben Sie Ihre E-Mail-Adresse ein:',
+        'enter_new_password_label': 'Geben Sie Ihr neues Passwort ein:',
         'send_button': 'Senden',
         'email_not_registered': 'Diese E-Mail ist im System nicht registriert.',
-        'email_sent': 'Eine E-Mail wurde an Ihr Postfach gesendet, um Ihr Passwort zurückzusetzen.'
+        'email_sent': 'Eine E-Mail wurde an Ihr Postfach gesendet, um Ihr Passwort zurückzusetzen.',
+        'password_updated': 'Passwort erfolgreich aktualisiert. Sie können sich jetzt anmelden.',
+        'invalid_or_expired_token': 'Ungültiges oder abgelaufenes Token.'
     },
     'it': {
         'language_selected': 'Hai selezionato la lingua:',
@@ -79,9 +91,12 @@ translations = {
         'database_error': "Si è verificato un errore del database. Riprova più tardi.",
         'forgot_password_title': 'Recupero della password',
         'enter_email_label': 'Inserisci la tua email:',
+        'enter_new_password_label': 'Inserisci la tua nuova password:',
         'send_button': 'Invia',
         'email_not_registered': "Questa email non è registrata nel sistema.",
-        'email_sent': 'È stata inviata un\'email alla tua casella di posta per reimpostare la tua password.'
+        'email_sent': 'È stata inviata un\'email alla tua casella di posta per reimpostare la tua password.',
+        'password_updated': 'Password aggiornata con successo. Ora puoi accedere.',
+        'invalid_or_expired_token': 'Token non valido o scaduto.'
     },
     'pl': {
         'language_selected': 'Wybrano język:',
@@ -95,9 +110,12 @@ translations = {
         'database_error': 'Wystąpił błąd bazy danych. Spróbuj ponownie później.',
         'forgot_password_title': 'Odzyskiwanie hasła',
         'enter_email_label': 'Wprowadź swój e-mail:',
+        'enter_new_password_label': 'Wprowadź swoje nowe hasło:',
         'send_button': 'Wyślij',
         'email_not_registered': 'Ten e-mail nie jest zarejestrowany w systemie.',
-        'email_sent': 'Na twoją skrzynkę odbiorczą została wysłana wiadomość e-mail w celu zresetowania hasła.'
+        'email_sent': 'Na twoją skrzynkę odbiorczą została wysłana wiadomość e-mail w celu zresetowania hasła.',
+        'password_updated': 'Hasło zostało pomyślnie zaktualizowane. Możesz się teraz zalogować.',
+        'invalid_or_expired_token': 'Nieprawidłowy lub wygasły token.'
     },
     'ua': {
         'language_selected': 'Ви обрали мову:',
@@ -111,9 +129,12 @@ translations = {
         'database_error': 'Сталася помилка бази даних. Будь ласка, спробуйте пізніше.',
         'forgot_password_title': 'Відновлення пароля',
         'enter_email_label': 'Введіть вашу електронну адресу:',
+        'enter_new_password_label': 'Введіть новий пароль:',
         'send_button': 'Надіслати',
         'email_not_registered': 'Ця електронна адреса не зареєстрована в системі.',
-        'email_sent': 'На вашу електронну пошту було відправлено лист для скидання пароля.'
+        'email_sent': 'На вашу електронну пошту було відправлено лист для скидання пароля.',
+        'password_updated': 'Пароль успішно оновлено. Тепер ви можете увійти.',
+        'invalid_or_expired_token': 'Недійсний або застарілий токен.'
     },
     'ru': {
         'language_selected': 'Вы выбрали язык:',
@@ -127,9 +148,12 @@ translations = {
         'database_error': 'Произошла ошибка базы данных. Попробуйте позже.',
         'forgot_password_title': 'Восстановление пароля',
         'enter_email_label': 'Введите ваш email:',
+        'enter_new_password_label': 'Введите новый пароль:',
         'send_button': 'Отправить',
         'email_not_registered': 'Этот email не зарегистрирован в системе.',
-        'email_sent': 'На вашу почту отправлено письмо для сброса пароля.'
+        'email_sent': 'На вашу почту отправлено письмо для сброса пароля.',
+        'password_updated': 'Пароль успешно обновлен. Теперь вы можете войти.',
+        'invalid_or_expired_token': 'Неверный или устаревший токен.'
     }
 }
 

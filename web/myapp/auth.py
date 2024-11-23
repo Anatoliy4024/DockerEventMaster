@@ -112,7 +112,7 @@ def forgot_password():
             conn.commit()
 
             # Отправка письма с ссылкой для сброса пароля
-            reset_link = os.getenv('BASE_URL') + f"/auth/reset-password?token={token}"
+            reset_link = os.getenv('BASE_URL') + f"/auth/reset-password?token={token}&lang={lang}"
             send_email(
                 to_address=email,
                 subject=translations[lang]['forgot_password_title'],  # Используем перевод для темы письма
@@ -129,10 +129,14 @@ def forgot_password():
 
     return render_template('forgot_password.html', translations=translations[lang], lang=lang)
 
+
 @auth.route('/reset-password', methods=['GET', 'POST'])
 def reset_password():
     """Сброс пароля через уникальную ссылку."""
     token = request.args.get('token')
+    lang = request.args.get('lang', 'en')  # Устанавливаем язык по умолчанию 'en'
+    if lang not in translations:  # Проверяем, что указанный язык существует в словаре translations
+        lang = 'en'
 
     if request.method == 'POST':
         new_password = request.form.get('password')
@@ -153,15 +157,13 @@ def reset_password():
                 WHERE reset_token = %s
             """, (hashed_password, token))
             conn.commit()
-            flash('Пароль успешно обновлен. Теперь вы можете войти.', 'success')
+            flash(translations[lang]['password_updated'], 'success')  # Используем перевод
         else:
-            flash('Неверный или устаревший токен.', 'danger')
+            flash(translations[lang]['invalid_or_expired_token'], 'danger')  # Используем перевод
 
         cursor.close()
         conn.close()
-        # return redirect(url_for('auth.login'))  # Предполагается, что есть маршрут для входа
-        return redirect(url_for('main.index'))
+        return redirect(url_for('main.index', lang=lang))  # Передаем язык в редиректе
 
-    return render_template('reset_password.html', token=token)
-
+    return render_template('reset_password.html', token=token, lang=lang, translations=translations[lang])
 
