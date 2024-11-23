@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     email TEXT,
     registration_email TEXT,
-    registration_passw TEXT
+    registration_passw TEXT,
+    reset_token VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS orders (

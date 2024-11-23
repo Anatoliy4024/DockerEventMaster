@@ -6,6 +6,8 @@ from werkzeug.security import generate_password_hash
 
 from web.myapp.email_utils import send_email
 from web.utils.db import create_connection
+from web.myapp.translations import translations
+
 
 
 auth = Blueprint('auth', __name__)
@@ -14,6 +16,8 @@ auth = Blueprint('auth', __name__)
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     """Регистрация пользователя через email и пароль."""
+    lang = request.args.get('lang', 'en')  # Определяем язык, по умолчанию 'en'
+
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
@@ -26,8 +30,8 @@ def register():
             user = cursor.fetchone()
 
             if user:
-                flash('Этот email уже зарегистрирован. Попробуйте войти.', 'danger')
-                return redirect(url_for('auth.register'))
+                flash(translations[lang]['email_not_registered'], 'danger')  # Используем перевод
+                return redirect(url_for('auth.register', lang=lang))  # Передаем язык в редиректе
 
             # Хэшируем пароль
             hashed_password = generate_password_hash(password)
@@ -50,7 +54,7 @@ def register():
             """, (
                 new_user_id,  # user_id
                 1,  # session_number (по умолчанию 1)
-                None,  # language
+                lang,  # language
                 'pending',  # status (по умолчанию "ожидает заполнения")
                 None,  # selected_date
                 None,  # start_time
@@ -64,24 +68,27 @@ def register():
             ))
 
             conn.commit()
-            flash('Регистрация прошла успешно. Теперь вы можете войти.', 'success')
-            return redirect(url_for('auth.register'))
+            flash(translations[lang]['registration_successful'], 'success')  # Используем перевод
+            return redirect(url_for('auth.register', lang=lang))  # Передаем язык
 
         except Exception as e:
             conn.rollback()  # Отмена транзакции при ошибке
-            flash(f'Ошибка: {e}', 'danger')
-            return redirect(url_for('auth.register'))
+            flash(translations[lang]['database_error'], 'danger')  # Используем перевод
+            return redirect(url_for('auth.register', lang=lang))
 
         finally:
             cursor.close()
             conn.close()
 
-    return render_template('register.html')
-
+    return render_template('register.html', translations=translations[lang], lang=lang)
 
 @auth.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
     """Обработка запроса на сброс пароля."""
+    lang = request.args.get('lang', 'en')  # Получаем язык, по умолчанию 'en'
+    if lang not in translations:  # Проверяем, что язык существует в словаре
+        lang = 'en'
+
     if request.method == 'POST':
         email = request.form.get('email')
 
@@ -108,18 +115,19 @@ def forgot_password():
             reset_link = os.getenv('BASE_URL') + f"/auth/reset-password?token={token}"
             send_email(
                 to_address=email,
-                subject="Сброс пароля",
-                body=f"Для сброса пароля перейдите по ссылке: {reset_link}"
+                subject=translations[lang]['forgot_password_title'],  # Используем перевод для темы письма
+                body=f"{translations[lang]['email_sent']}\n{reset_link}"  # Используем перевод для текста письма
             )
-            flash('На вашу почту отправлено письмо для сброса пароля.', 'success')
+            flash(translations[lang]['email_sent'], 'success')  # Используем переводы
         else:
-            flash('Этот email не зарегистрирован в системе.', 'danger')
+            flash(translations[lang]['email_not_registered'], 'danger')
 
         cursor.close()
         conn.close()
-        return redirect(url_for('auth.forgot_password'))
+        # Редирект с передачей языка
+        return redirect(url_for('auth.forgot_password', lang=lang))
 
-    return render_template('forgot_password.html')
+    return render_template('forgot_password.html', translations=translations[lang], lang=lang)
 
 @auth.route('/reset-password', methods=['GET', 'POST'])
 def reset_password():

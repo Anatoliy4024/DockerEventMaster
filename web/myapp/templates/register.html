@@ -1,20 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Регистрация</title>
+    <title>{{ translations['registration'] }}</title>
 </head>
 <body>
-    <h1>Регистрация</h1>
+    <h1>{{ translations['registration'] }}</h1>
     <form method="POST">
-        <label for="email">Email:</label>
+        <label for="email">{{ translations['email'] }}</label>
         <input type="email" name="email" id="email" required>
         <br>
-        <label for="password">Пароль:</label>
+        <label for="password">{{ translations['password'] }}</label>
         <input type="password" name="password" id="password" required>
         <br>
-        <button type="submit">Зарегистрироваться</button>
+        <button type="submit">{{ translations['register'] }}</button>
     </form>
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}

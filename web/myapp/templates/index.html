@@ -65,7 +65,7 @@
 
             <!-- Ссылка "Забыли пароль?" -->
             <p class="forgot-password">
-                <a href="{{ url_for('auth.forgot_password') }}">{{ translations['forgot_password'] }}</a>
+                <a href="{{ url_for('auth.forgot_password', lang=lang) }}">{{ translations['forgot_password'] }}</a>
             </p>
         </form>
 
