@@ -183,6 +183,13 @@ def select_language():
 @main.route('/register', methods=['GET', 'POST'])
 def register():
     """Регистрация пользователя через email и пароль."""
+    lang = request.args.get('lang', 'en')  # Получаем выбранный язык или устанавливаем 'en' по умолчанию
+
+    # Проверка, что lang есть в translations и field_labels
+    if lang not in translations or lang not in field_labels:
+        flash(f"Invalid language selected: {lang}", "danger")
+        return redirect(url_for('main.index', lang='en'))
+
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
@@ -218,12 +225,12 @@ def register():
                     """, (user_id, new_session_number, lang, 1))  # status = 1 (pending)
 
                     conn.commit()
-                    flash('Добро пожаловать! Вы успешно вошли.', 'success')
+                    flash(translations[lang]['login_successful'], 'success')  # Используем перевод для сообщения
                     return redirect(url_for('main.booking_page', lang=lang))
 
                 else:
                     # Неверный пароль
-                    flash('Неверный пароль. Попробуйте снова.', 'danger')
+                    flash(translations[lang]['incorrect_password'], 'danger')  # Используем перевод для сообщения
                     return redirect(url_for('main.index', lang=lang))
 
             # Если пользователя нет, создаем нового
@@ -248,19 +255,21 @@ def register():
             """, (user_id, new_session_number, lang, 1))  # status = 1 (pending)
 
             conn.commit()
-            flash('Регистрация прошла успешно. Добро пожаловать!', 'success')
-            return redirect(url_for('main.booking_page', lang=lang))
+            flash(translations[lang]['registration_successful'], 'success')
+            return redirect(url_for('main.index', lang=lang))
 
         except Exception as e:
             conn.rollback()  # Отмена транзакции при ошибке
-            flash(f'Ошибка: {e}', 'danger')
-            return redirect(url_for('main.index', lang=lang))
+            flash(f"{translations[lang]['database_error']} ({e})", 'danger')  # Перевод + текст ошибки
+            return redirect(url_for('main.index', lang=lang, translations=translations[lang]))
+
 
         finally:
             cursor.close()
             conn.close()
 
-    return render_template('register.html')
+    return render_template('register.html', lang=lang, translations=translations[lang], labels=field_labels[lang])
+
 
 @main.route('/ver1.0/booking_page')
 def booking_page():

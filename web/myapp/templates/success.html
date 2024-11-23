@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success</title>
+</head>
+<body>
+    <div class="container">
+        <p>{{ translations['registration_successful'] }}</p>
+    </div>
+    <script>
+        // Перенаправляем через 2 секунды
+        setTimeout(() => {
+            window.location.href = "{{ url_for('main.booking_page', lang=lang) }}";
+        }, 2000);
+    </script>
+</body>
+</html>

@@ -104,3 +104,12 @@ form button {
     text-decoration: underline;
 }
 
+#flash-message {
+    color: green;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+#flash-message.error {
+    color: red;
+}
