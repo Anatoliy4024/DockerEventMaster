@@ -18,8 +18,26 @@
             <a href="{{ url_for('main.select_language', lang='sp') }}">
                 <img src="{{ url_for('static', filename='images/flags/sp.svg') }}" alt="ES" class="flag">
             </a>
-            <!-- Остальные флаги -->
+            <a href="{{ url_for('main.select_language', lang='fr') }}">
+                <img src="{{ url_for('static', filename='images/flags/fr.svg') }}" alt="FR" class="flag">
+            </a>
+            <a href="{{ url_for('main.select_language', lang='ua') }}">
+                <img src="{{ url_for('static', filename='images/flags/uk.svg') }}" alt="UA" class="flag">
+            </a>
+            <a href="{{ url_for('main.select_language', lang='de') }}">
+                <img src="{{ url_for('static', filename='images/flags/de.svg') }}" alt="DE" class="flag">
+            </a>
+            <a href="{{ url_for('main.select_language', lang='it') }}">
+                <img src="{{ url_for('static', filename='images/flags/it.svg') }}" alt="IT" class="flag">
+            </a>
+            <a href="{{ url_for('main.select_language', lang='pl') }}">
+                <img src="{{ url_for('static', filename='images/flags/pl.svg') }}" alt="PL" class="flag">
+            </a>
+            <a href="{{ url_for('main.select_language', lang='ru') }}">
+                <img src="{{ url_for('static', filename='images/flags/ru.svg') }}" alt="RU" class="flag">
+            </a>
         </div>
+
 
         <!-- Форма регистрации -->
         <form method="POST" action="{{ url_for('main.register', lang=lang) }}">

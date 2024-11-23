@@ -138,10 +138,10 @@ translations = {
 field_labels = {
     'en': {'email': "Email:", 'password': "Password:"},
     'sp': {'email': "Correo electrónico:", 'password': "Contraseña:"},
+    'ua': {'email': "Електронна пошта:", 'password': "Пароль:"},
     'fr': {'email': "E-mail:", 'password': "Mot de passe:"},
     'de': {'email': "E-Mail:", 'password': "Passwort:"},
     'it': {'email': "E-mail:", 'password': "Password:"},
     'pl': {'email': "Email:", 'password': "Hasło:"},
-    'ua': {'email': "Електронна пошта:", 'password': "Пароль:"},
     'ru': {'email': "Электронная почта:", 'password': "Пароль:"}
 }
