@@ -7,18 +7,24 @@ body {
     font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
-    align-items: center;
-    height: 100vh;
+    align-items: flex-start; /* Центрирует контент ближе к верху */
+    height: 100vh; /* Отступ от верха окна */
+
     text-align: center;
 }
 
 .container {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center; /* Центрирует элементы по вертикали */
-    height: 100vh; /* Высота контейнера занимает весь экран */
+    align-items: center; /* Центрирует по горизонтали */
+    justify-content: center; /* Центрирует по вертикали */
+    text-align: center; /* Центрирует текст */
+    max-width: 600px; /* Ограничивает ширину */
+    height: calc(100vh - 20px); /* Устанавливает высоту чуть меньше окна браузера */
+    margin: 0 auto;
+    overflow: hidden; /* Убирает скроллинг, если что-то выходит за границы */
 }
+
 
 .logo {
     max-width: 350px;
@@ -48,8 +54,10 @@ form {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px; /* Расстояние между полями */
-    margin-top: 10px; /* Отступ сверху, чтобы форма не прижималась к тексту */
+    justify-content: center;
+    gap: 15px; /* Расстояние между элементами формы */
+    width: 100%; /* Ширина формы на 100% родительского контейнера */
+    max-width: 400px; /* Ограничиваем ширину формы */
 }
 
 form label {
@@ -68,9 +76,9 @@ form button {
 }
 
 /* Адаптивные стили для мобильных устройств */
-@media (max-width: 600px) {
+@media (max-width: 700px) {
     .container {
-        padding: 10px;
+        height: 90vh; /* Ограничьте высоту на небольших экранах */
     }
 
     .logo {
@@ -89,6 +97,7 @@ form button {
         width: 25px;
     }
 }
+
 
 .forgot-password {
     margin-top: 10px; /* Отступ сверху */
@@ -117,16 +126,13 @@ form button {
 }
 
 h1 {
-    margin-bottom: 280px; /* Увеличиваем отступ между заголовком и формой */
-    text-align: center; /* Центрируем заголовок */
+    margin-top: 10px; /* Уменьшает верхний отступ */
+    margin-bottom: 20px; /* Отступ до формы */
 }
 
 form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 15px; /* Расстояние между элементами формы */
-    width: 100%; /* Ширина формы на 100% родительского контейнера */
-    max-width: 400px; /* Ограничиваем ширину формы */
+    margin-top: 0; /* Убираем лишние отступы */
+    padding: 0;
 }
+
+
