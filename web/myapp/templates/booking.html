@@ -1,10 +1,14 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="{{ lang }}">
 <head>
     <meta charset="UTF-8">
-    <title>Booking Page</title>
+    <title>{{ translations['booking_event'] }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='booking.css') }}">
 </head>
 <body>
-    <h1>Это главная страница для бронирования</h1>
+    <div class="booking-container">
+        <h1>{{ translations['booking_event'] }}</h1>
+        <p>{{ translations['booking_description'] }}</p>
+    </div>
 </body>
 </html>

@@ -271,11 +271,26 @@ def register():
     return render_template('register.html', lang=lang, translations=translations[lang], labels=field_labels[lang])
 
 
-@main.route('/ver1.0/booking_page')
+# @main.route('/ver1.0/booking_page')
+# def booking_page():
+#     """Страница для бронирования."""
+#     lang = request.args.get('lang', 'en')
+#     return render_template('booking.html', lang=lang)
+
+@main.route('/ver1.0/booking_page', methods=['GET'])
 def booking_page():
-    """Страница для бронирования."""
-    lang = request.args.get('lang', 'en')
-    return render_template('booking.html', lang=lang)
+    lang = request.args.get('lang', 'en')  # Получаем выбранный язык или устанавливаем 'en' по умолчанию
+
+    # Проверка, что lang есть в translations и field_labels
+    if lang not in translations or lang not in field_labels:
+        flash(f"Invalid language selected: {lang}", "danger")
+        return redirect(url_for('main.index', lang='en'))
+
+    return render_template(
+        'booking.html',
+        lang=lang,
+        translations=translations[lang]  # Передаем переводы для выбранного языка
+    )
 
 @main.route('/ver1.0/error_page')
 def error_page():

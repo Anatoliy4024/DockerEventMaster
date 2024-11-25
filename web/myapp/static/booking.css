@@ -1,0 +1,24 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5dc;
+    font-family: Arial, sans-serif;
+}
+
+.booking-container {
+    margin-top: 20px; /* Отступ сверху */
+    text-align: center;
+}
+
+h1 {
+    font-size: 2rem; /* Уменьшили размер */
+    font-weight: bold;
+    margin-bottom: 10px; /* Отступ снизу */
+}
+
+p {
+    font-size: 1.2rem;
+    font-weight: bold; /* Жирный текст */
+    color: green;
+    margin: 0; /* Убираем отступы */
+}

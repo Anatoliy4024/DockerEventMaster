@@ -1,7 +1,5 @@
 # translations.py
 
-# translations.py
-
 translations = {
     'en': {
         'language_selected': 'You selected the language:',
@@ -20,7 +18,9 @@ translations = {
         'email_not_registered': 'This email is not registered in the system.',
         'email_sent': 'An email has been sent to your inbox to reset your password.',
         'password_updated': 'Password updated successfully. You can now log in.',
-        'invalid_or_expired_token': 'Invalid or expired token.'
+        'invalid_or_expired_token': 'Invalid or expired token.',
+        'booking_event': 'BOOKING YOUR EVENT',
+        'booking_description': 'To book your event, fill out the form and review it before booking.'
     },
     'sp': {
         'language_selected': 'Has seleccionado el idioma:',
@@ -39,7 +39,9 @@ translations = {
         'email_not_registered': 'Este correo electrónico no está registrado en el sistema.',
         'email_sent': 'Se ha enviado un correo a tu bandeja de entrada para restablecer tu contraseña.',
         'password_updated': 'La contraseña se actualizó correctamente. Ahora puedes iniciar sesión.',
-        'invalid_or_expired_token': 'Token no válido o caducado.'
+        'invalid_or_expired_token': 'Token no válido o caducado.',
+        'booking_event': 'RESERVA DE SU EVENTO',
+        'booking_description': 'Para reservar su evento, complete el formulario y revíselo antes de reservar.'
     },
     'fr': {
         'language_selected': 'Vous avez sélectionné la langue :',
@@ -58,7 +60,9 @@ translations = {
         'email_not_registered': "Cet email n'est pas enregistré dans le système.",
         'email_sent': 'Un email a été envoyé à votre boîte de réception pour réinitialiser votre mot de passe.',
         'password_updated': 'Mot de passe mis à jour avec succès. Vous pouvez maintenant vous connecter.',
-        'invalid_or_expired_token': 'Jeton invalide ou expiré.'
+        'invalid_or_expired_token': 'Jeton invalide ou expiré.',
+        'booking_event': "RÉSERVATION DE VOTRE ÉVÉNEMENT",
+        'booking_description': "Pour réserver votre événement, remplissez le formulaire et vérifiez-le avant de réserver."
     },
     'de': {
         'language_selected': 'Sie haben die Sprache gewählt:',
@@ -77,7 +81,9 @@ translations = {
         'email_not_registered': 'Diese E-Mail ist im System nicht registriert.',
         'email_sent': 'Eine E-Mail wurde an Ihr Postfach gesendet, um Ihr Passwort zurückzusetzen.',
         'password_updated': 'Passwort erfolgreich aktualisiert. Sie können sich jetzt anmelden.',
-        'invalid_or_expired_token': 'Ungültiges oder abgelaufenes Token.'
+        'invalid_or_expired_token': 'Ungültiges oder abgelaufenes Token.',
+        'booking_event': 'BUCHUNG IHRES EVENTS',
+        'booking_description': 'Um Ihr Event zu buchen, füllen Sie das Formular aus und überprüfen Sie es vor der Buchung.'
     },
     'it': {
         'language_selected': 'Hai selezionato la lingua:',
@@ -96,7 +102,9 @@ translations = {
         'email_not_registered': "Questa email non è registrata nel sistema.",
         'email_sent': 'È stata inviata un\'email alla tua casella di posta per reimpostare la tua password.',
         'password_updated': 'Password aggiornata con successo. Ora puoi accedere.',
-        'invalid_or_expired_token': 'Token non valido o scaduto.'
+        'invalid_or_expired_token': 'Token non valido o scaduto.',
+        'booking_event': 'PRENOTAZIONE DEL TUO EVENTO',
+        'booking_description': 'Per prenotare il tuo evento, compila il modulo e controllalo prima di prenotare.'
     },
     'pl': {
         'language_selected': 'Wybrano język:',
@@ -115,7 +123,9 @@ translations = {
         'email_not_registered': 'Ten e-mail nie jest zarejestrowany w systemie.',
         'email_sent': 'Na twoją skrzynkę odbiorczą została wysłana wiadomość e-mail w celu zresetowania hasła.',
         'password_updated': 'Hasło zostało pomyślnie zaktualizowane. Możesz się teraz zalogować.',
-        'invalid_or_expired_token': 'Nieprawidłowy lub wygasły token.'
+        'invalid_or_expired_token': 'Nieprawidłowy lub wygasły token.',
+        'booking_event': 'REZERWACJA TWOJEGO WYDARZENIA',
+        'booking_description': 'Aby zarezerwować swoje wydarzenie, wypełnij formularz i sprawdź go przed rezerwacją.'
     },
     'ua': {
         'language_selected': 'Ви обрали мову:',
@@ -134,7 +144,9 @@ translations = {
         'email_not_registered': 'Ця електронна адреса не зареєстрована в системі.',
         'email_sent': 'На вашу електронну пошту було відправлено лист для скидання пароля.',
         'password_updated': 'Пароль успішно оновлено. Тепер ви можете увійти.',
-        'invalid_or_expired_token': 'Недійсний або застарілий токен.'
+        'invalid_or_expired_token': 'Недійсний або застарілий токен.',
+        'booking_event': 'БРОНЮВАННЯ ВАШОГО ЗАХОДУ',
+        'booking_description': 'Щоб забронювати захід, заповніть форму та перевірте її перед бронюванням.'
     },
     'ru': {
         'language_selected': 'Вы выбрали язык:',
@@ -153,7 +165,9 @@ translations = {
         'email_not_registered': 'Этот email не зарегистрирован в системе.',
         'email_sent': 'На вашу почту отправлено письмо для сброса пароля.',
         'password_updated': 'Пароль успешно обновлен. Теперь вы можете войти.',
-        'invalid_or_expired_token': 'Неверный или устаревший токен.'
+        'invalid_or_expired_token': 'Неверный или устаревший токен.',
+        'booking_event': 'БРОНИРОВАНИЕ ВАШЕГО СОБЫТИЯ',
+        'booking_description': 'Чтобы забронировать событие, заполните форму и проверьте её перед бронированием.'
     }
 }
 
