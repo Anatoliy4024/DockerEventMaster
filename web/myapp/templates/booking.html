@@ -11,18 +11,4 @@
         <p>{{ translations['booking_description'] }}</p>
     </div>
 </body>
-
-<form method="POST" action="{{ url_for('booking_page') }}">
-    <label for="event_name">Название события:</label>
-    <input type="text" id="event_name" name="event_name">
-
-    <label for="event_date">Дата события:</label>
-    <input type="date" id="event_date" name="event_date">
-
-    <label for="event_time">Время события:</label>
-    <input type="time" id="event_time" name="event_time">
-
-    <button type="submit">Бронировать</button>
-</form>
-
 </html>
