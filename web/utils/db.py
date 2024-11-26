@@ -1,4 +1,5 @@
 # db.py
+# db.py
 
 import psycopg2
 import os
@@ -34,5 +35,32 @@ def insert_user(email, password):
     cursor = conn.cursor()
     cursor.execute("INSERT INTO users (email, registration_password) VALUES (%s, %s);", (email, password))
     conn.commit()
+    cursor.close()
+    conn.close()
+
+def insert_order(vars_tuple):
+    """Добавление нового ордера в БД"""
+    conn = create_connection()
+    cursor = conn.cursor()
+    # insert_query = """
+    #                     INSERT INTO orders (user_id, session_number, selected_date, start_time, end_time, duration, people_count,
+    #                     selected_style, city, preferences, calculated_cost, status)
+    #                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 2)
+    #                 """
+    # cursor.execute(insert_query, vars_tuple)
+    # conn.commit()
+
+    update_query = """
+                      UPDATE orders SET user_name = %s, selected_date = %s, start_time = %s, end_time = %s, duration = %s, people_count = %s,
+                      selected_style = %s, city = %s, preferences = %s, calculated_cost = %s, status = 2
+                      WHERE user_id = %s AND session_number = %s
+                   """
+    # cursor.execute(update_query, (
+    #     ORDER_STATUS["3-зарезервировано - заказчик оплатил аванс"], user_id, current_session))
+
+    cursor.execute(update_query, vars_tuple)
+
+    conn.commit()
+
     cursor.close()
     conn.close()

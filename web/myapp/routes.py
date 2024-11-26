@@ -5,10 +5,13 @@ import logging
 
 from dotenv import load_dotenv
 from flask import Blueprint, request, render_template, flash, redirect, jsonify, url_for
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from web.myapp.email_utils import send_email
-from web.utils.db import create_connection  # Подключаем базу данных
+from web.myapp.forms import RegistrationForm
+from web.utils.calculations import get_duration, calculate_total_cost
+from web.utils.db import create_connection, insert_order  # Подключаем базу данных
 from web.myapp.translations import translations, field_labels  # Импортируем оба словаря
 
 import stripe
@@ -27,8 +30,17 @@ from datetime import datetime
 load_dotenv()
 
 # Настройка логирования
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+# Включаем логирование и указываем файл для логов
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.DEBUG,  # Установите уровень на DEBUG для детальной информации
+    filename='db_operations.log',  # Укажите имя файла для логов
+    filemode='w'  # 'w' - перезаписывать файл при каждом запуске, 'a' - добавлять к существующему файлу
+)
+
+logger = logging.getLogger(__name__)
 
 # Настройка Stripe с использованием ключей из переменных окружения
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
@@ -226,7 +238,7 @@ def register():
 
                     conn.commit()
                     flash(translations[lang]['login_successful'], 'success')  # Используем перевод для сообщения
-                    return redirect(url_for('main.booking_page', lang=lang))
+                    return redirect(url_for('main.booking_page', lang=lang, user_id=user_id))
 
                 else:
                     # Неверный пароль
@@ -255,7 +267,7 @@ def register():
             """, (user_id, new_session_number, lang, 1))  # status = 1 (pending)
 
             conn.commit()
-            flash(translations[lang]['registration_successful'], 'success')
+            flash((translations[lang]['registration_successful'], 'success', user_id))
             return redirect(url_for('main.index', lang=lang))
 
         except Exception as e:
@@ -270,15 +282,8 @@ def register():
 
     return render_template('register.html', lang=lang, translations=translations[lang], labels=field_labels[lang])
 
-
-# @main.route('/ver1.0/booking_page')
-# def booking_page():
-#     """Страница для бронирования."""
-#     lang = request.args.get('lang', 'en')
-#     return render_template('booking.html', lang=lang)
-
-@main.route('/ver1.0/booking_page', methods=['GET'])
-def booking_page():
+@main.route('/ver1.0/booking_page/<int:user_id>', methods=['GET'])
+def booking_page(user_id):
     lang = request.args.get('lang', 'en')  # Получаем выбранный язык или устанавливаем 'en' по умолчанию
 
     # Проверка, что lang есть в translations и field_labels
@@ -286,11 +291,74 @@ def booking_page():
         flash(f"Invalid language selected: {lang}", "danger")
         return redirect(url_for('main.index', lang='en'))
 
+    # return render_template(
+    #     'booking.html',
+    #     lang=lang,
+    #     translations=translations[lang]  # Передаем переводы для выбранного языка
+    # )
     return render_template(
-        'booking.html',
+        'booking111.html',
         lang=lang,
-        translations=translations[lang]  # Передаем переводы для выбранного языка
+        user_id=user_id,
+        form=RegistrationForm()
     )
+
+@main.route('/ver1.0/receive-booking/<int:user_id>', methods=['POST'])
+def receive_booking(user_id):
+    lang = request.args.get('lang', 'en')  # Получаем выбранный язык или устанавливаем 'en' по умолчанию
+
+    # Проверка, что lang есть в translations и field_labels
+    if lang not in translations or lang not in field_labels:
+        flash(f"Invalid language selected: {lang}", "danger")
+        return redirect(url_for('main.index', lang='en'))
+
+    form = RegistrationForm()
+
+    logging.info(f"Получен form.validate_on_submit(): {form.validate_on_submit()}")
+
+    if form.validate_on_submit():
+        # user_id = form.user_id.data
+        username = form.username.data
+        selected_date = form.selected_date.data
+        start_time = form.start_time.data
+        end_time = form.end_time.data
+        people_count = form.people_count.data
+        selected_style = form.selected_style.data
+        preferences = form.preferences.data
+        city = form.city.data
+
+        logging.info(f"user_id: {user_id}")
+
+        duration = get_duration(start_time, end_time)
+        total_cost = calculate_total_cost(duration, people_count)
+        conn = create_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SELECT MAX(session_number) FROM orders WHERE user_id = %s", (user_id,))
+            result = cursor.fetchone()
+            if result and result[0] is not None:
+                session_number = result[0]
+            else:
+                session_number = 1
+        except Exception as e:
+            conn.rollback()  # Отмена транзакции при ошибке
+            flash(f"{translations[lang]['database_error']} ({e})", 'danger')  # Перевод + текст ошибки
+            return redirect(url_for('main.index', lang=lang, translations=translations[lang]))
+
+        finally:
+            cursor.close()
+            conn.close()
+
+        logging.info(f"session_number: {session_number}")
+
+        order = (username, selected_date, start_time, end_time, duration, people_count,
+                selected_style, city, preferences, total_cost, user_id, session_number)
+        insert_order(order)
+
+        logging.info(f"IIIIIIIIIIIIIIIIIIIIIIIIIIII")
+
+        return redirect(url_for('form_page'))
+    return render_template('booking111.html', form=form)
 
 @main.route('/ver1.0/error_page')
 def error_page():

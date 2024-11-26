@@ -59,30 +59,58 @@
     </div>
 
     <script>
-        // Получаем flash-сообщения
-        const flashMessage = {{ get_flashed_messages(with_categories=true) | tojson }};
-        const flashContainer = document.getElementById("flash-message");
+<!--        // Получаем flash-сообщения-->
+<!--        const flashMessage = {{ get_flashed_messages(with_categories=true) | tojson }};-->
+<!--        const flashContainer = document.getElementById("flash-message");-->
 
-        if (flashMessage.length > 0) {
-            flashMessage.forEach(([category, message]) => {
-                flashContainer.style.color = category === "success" ? "green" : "red";
-                flashContainer.innerHTML = message;
-                flashContainer.style.display = "block";
-            });
+<!--        if (flashMessage.length > 0) {-->
+<!--            flashMessage.forEach(([category, message, user_id]) => {-->
+<!--                flashContainer.style.color = category === "success" ? "green" : "red";-->
+<!--                flashContainer.innerHTML = message;-->
+<!--                flashContainer.style.display = "block";-->
+<!--            });-->
 
-            // Убираем сообщение через 2 секунды
-            setTimeout(() => {
-                flashContainer.style.display = "none";
-                flashContainer.innerHTML = "";
-            }, 2000);
+<!--            // Убираем сообщение через 2 секунды-->
+<!--            setTimeout(() => {-->
+<!--                flashContainer.style.display = "none";-->
+<!--                flashContainer.innerHTML = "";-->
+<!--            }, 2000);-->
 
-            // Если сообщение успешно, перенаправляем на страницу бронирования
-            if (flashMessage.some(([category, _]) => category === "success")) {
-                setTimeout(() => {
-                    window.location.href = "{{ url_for('main.booking_page', lang=lang) }}";
-                }, 2000);
-            }
-        }
+<!--            // Если сообщение успешно, перенаправляем на страницу бронирования-->
+<!--            if (flashMessage.some(([category, _]) => category === "success")) {-->
+<!--                setTimeout(() => {-->
+<!--                    window.location.href = "{{ url_for('main.booking_page', lang=lang, user_id={{user_id}}) }}";-->
+<!--                }, 2000);-->
+<!--            }-->
+<!--        }-->
+
+           const flashMessages = {{ get_flashed_messages(with_categories=true) | tojson }};
+           const flashContainer = document.getElementById("flash-message");
+
+           if (flashMessages.length > 0) {
+               flashMessages.forEach(([message, category, userId]) => {
+                   flashContainer.style.color = category === "success" ? "green" : "red";
+                   flashContainer.innerHTML = message;
+                   flashContainer.style.display = "block";
+
+        // Создаем URL с user_id и lang
+        const lang = "{{ lang }}";  // Язык из шаблона
+        const url = /booking_page/${userId}/?lang=${lang};
+
+        // Перенаправляем через 2 секунды
+        setTimeout(() => {
+            window.location.href = url;
+        }, 2000);
+    });
+
+    // Убираем сообщение через 2 секунды
+    setTimeout(() => {
+        flashContainer.style.display = "none";
+        flashContainer.innerHTML = "";
+    }, 2000);
+}
     </script>
+
+
 </body>
 </html>

@@ -46,6 +46,8 @@ docker logs -f <container_id>
 docker exec -it <container_id_or_name> /bin/bash
 docker exec -it 9ee5312cbb04 bash
 docker exec -it docker_event_master-picnic_bot-1 bash
+
+docker exec -it docker_event_master-flask_server-1 bash
 docker exec -it docker_event_master-admin_bot-1 bash
 
 12.1. Для Сервера

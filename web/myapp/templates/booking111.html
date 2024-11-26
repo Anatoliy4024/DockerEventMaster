@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Date and Time Input</title>
+</head>
+<body>
+    <h1>Enter Event Details</h1>
+    <form method="POST" action="/ver1.0/receive-booking/{{user_id}}">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.username.label }}<br>
+            {{ form.username(size=30) }}<br>
+            {% for error in form.username.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.selected_date.label }}<br>
+            {{ form.selected_date(size=30, placeholder="YYYY-MM-DD") }}<br>
+            {% for error in form.selected_date.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.start_time.label }}<br>
+            {{ form.start_time(size=30, placeholder="HH:MM:SS") }}<br>
+            {% for error in form.start_time.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.end_time.label }}<br>
+            {{ form.end_time(size=30, placeholder="HH:MM:SS") }}<br>
+            {% for error in form.end_time.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.people_count.label }}<br>
+            {{ form.people_count(size=30) }}<br>
+            {% for error in form.people_count.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.preferences.label }}<br>
+            {{ form.preferences(size=30) }}<br>
+            {% for error in form.preferences.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.city.label }}<br>
+            {{ form.city(size=30) }}<br>
+            {% for error in form.city.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.submit() }}
+        </p>
+    </form>
+</body>
+</html>
