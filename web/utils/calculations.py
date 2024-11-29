@@ -3,8 +3,11 @@ from datetime import datetime
 
 def get_duration(start_time, end_time):
     if start_time and end_time:
-        start_time = datetime.strptime(start_time, '%H:%M')
-        end_time = datetime.strptime(end_time, '%H:%M')
+        date = datetime.now()
+        start_time = datetime.combine(date.date(), start_time)
+        end_time = datetime.combine(date.date(), end_time)
+        # start_time = datetime.strptime(start_time, '%H:%M')
+        # end_time = datetime.strptime(end_time, '%H:%M')
         duration_minutes = (end_time - start_time).seconds // 60
         duration_hours = (duration_minutes // 60) + (1 if duration_minutes % 60 != 0 else 0)
         return duration_hours

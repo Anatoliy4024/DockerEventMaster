@@ -29,27 +29,11 @@ from datetime import datetime
 # Загрузка переменных окружения
 load_dotenv()
 
-# Настройка логирования
-# logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-# Включаем логирование и указываем файл для логов
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.DEBUG,  # Установите уровень на DEBUG для детальной информации
-    filename='db_operations.log',  # Укажите имя файла для логов
-    filemode='w'  # 'w' - перезаписывать файл при каждом запуске, 'a' - добавлять к существующему файлу
-)
-
-logger = logging.getLogger(__name__)
-
 # Настройка Stripe с использованием ключей из переменных окружения
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
 publishable_key = os.getenv('STRIPE_PUBLISHABLE_KEY')
 success_url = os.getenv('SUCCESS_URL')
 cancel_url = os.getenv('CANCEL_URL')
-
-
-
 
 main = Blueprint('main', __name__)
 
@@ -178,7 +162,7 @@ def index():
  lang = request.args.get('lang', 'en')
  return render_template('index.html', translations=translations[lang], labels=field_labels[lang], lang=lang)
 
-@main.route('/ver1.0/select_language')
+@main.route('/ver1.0/select-language')
 def select_language():
     """Маршрут для выбора языка с отображением сообщения."""
     lang = request.args.get('lang', 'en')
@@ -242,7 +226,7 @@ def register():
 
                 else:
                     # Неверный пароль
-                    flash(translations[lang]['incorrect_password'], 'danger')  # Используем перевод для сообщения
+                    flash((translations[lang]['incorrect_password'], 'danger'))  # Используем перевод для сообщения
                     return redirect(url_for('main.index', lang=lang))
 
             # Если пользователя нет, создаем нового
@@ -267,6 +251,7 @@ def register():
             """, (user_id, new_session_number, lang, 1))  # status = 1 (pending)
 
             conn.commit()
+
             flash((translations[lang]['registration_successful'], 'success', user_id))
             return redirect(url_for('main.index', lang=lang))
 
@@ -282,7 +267,7 @@ def register():
 
     return render_template('register.html', lang=lang, translations=translations[lang], labels=field_labels[lang])
 
-@main.route('/ver1.0/booking_page/<int:user_id>', methods=['GET'])
+@main.route('/ver1.0/booking-page/<int:user_id>', methods=['GET'])
 def booking_page(user_id):
     lang = request.args.get('lang', 'en')  # Получаем выбранный язык или устанавливаем 'en' по умолчанию
 
@@ -291,11 +276,6 @@ def booking_page(user_id):
         flash(f"Invalid language selected: {lang}", "danger")
         return redirect(url_for('main.index', lang='en'))
 
-    # return render_template(
-    #     'booking.html',
-    #     lang=lang,
-    #     translations=translations[lang]  # Передаем переводы для выбранного языка
-    # )
     return render_template(
         'booking111.html',
         lang=lang,
@@ -315,6 +295,7 @@ def receive_booking(user_id):
     form = RegistrationForm()
 
     logging.info(f"Получен form.validate_on_submit(): {form.validate_on_submit()}")
+    logging.info(f"user_id: {user_id}")
 
     if form.validate_on_submit():
         # user_id = form.user_id.data
@@ -355,10 +336,28 @@ def receive_booking(user_id):
                 selected_style, city, preferences, total_cost, user_id, session_number)
         insert_order(order)
 
-        logging.info(f"IIIIIIIIIIIIIIIIIIIIIIIIIIII")
-
-        return redirect(url_for('form_page'))
+        return redirect(url_for('main.generate_booking_summary', lang=lang, user_id=user_id))
+    else:
+        if form.errors:  # Optional: Flash errors for feedback
+            for field, error_list in form.errors.items():
+                for error in error_list:
+                    logging.info(f"field {field},error{error}")
     return render_template('booking111.html', form=form)
+
+@main.route('/ver1.0/booking-summary/<int:user_id>', methods=['GET'])
+def generate_booking_summary(user_id):
+    lang = request.args.get('lang', 'en')  # Получаем выбранный язык или устанавливаем 'en' по умолчанию
+
+    # Проверка, что lang есть в translations и field_labels
+    if lang not in translations or lang not in field_labels:
+        flash(f"Invalid language selected: {lang}", "danger")
+        return redirect(url_for('main.index', lang='en'))
+
+    return render_template(
+        'booking.html',
+        lang=lang,
+        user_id=user_id,
+    )
 
 @main.route('/ver1.0/error_page')
 def error_page():

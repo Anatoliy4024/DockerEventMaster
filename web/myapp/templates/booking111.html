@@ -45,6 +45,13 @@
             {% endfor %}
         </p>
         <p>
+            {{ form.selected_style.label }}<br>
+            {{ form.selected_style(size=30) }}<br>
+            {% for error in form.selected_style.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+        </p>
+        <p>
             {{ form.preferences.label }}<br>
             {{ form.preferences(size=30) }}<br>
             {% for error in form.preferences.errors %}
