@@ -268,20 +268,41 @@ def register():
     return render_template('register.html', lang=lang, translations=translations[lang], labels=field_labels[lang])
 
 @main.route('/ver1.0/booking-page/<int:user_id>', methods=['GET'])
-def booking_page(user_id):
-    lang = request.args.get('lang', 'en')  # Получаем выбранный язык или устанавливаем 'en' по умолчанию
+# def booking_page(user_id):
+#     lang = request.args.get('lang', 'en')  # Получаем выбранный язык или устанавливаем 'en' по умолчанию
+#
+#     # Проверка, что lang есть в translations и field_labels
+#     if lang not in translations or lang not in field_labels:
+#         flash(f"Invalid language selected: {lang}", "danger")
+#         return redirect(url_for('main.index', lang='en'))
+#
+#     return render_template(
+#         'booking.html',
+#         lang=lang,
+#         user_id=user_id,
+#         form=RegistrationForm()
+#     )
 
-    # Проверка, что lang есть в translations и field_labels
-    if lang not in translations or lang not in field_labels:
-        flash(f"Invalid language selected: {lang}", "danger")
-        return redirect(url_for('main.index', lang='en'))
+@main.route('/ver1.0/booking-page/<int:user_id>', methods=['GET'])
+def booking_page(user_id):
+    # Получение языка из параметров запроса
+    lang = request.args.get('lang', 'en')
+
+    # Проверка, что язык есть в словаре переводов
+    if lang not in translations:
+        lang = 'en'  # Устанавливаем язык по умолчанию, если выбранный язык не поддерживается
+
+    # Передача перевода в шаблон
+    current_translations = translations[lang]
 
     return render_template(
-        'booking111.html',
+        'booking.html',
         lang=lang,
+        translations=current_translations,  # Передаём переводы
         user_id=user_id,
-        form=RegistrationForm()
+        form=RegistrationForm()  # Передаём форму
     )
+
 
 @main.route('/ver1.0/receive-booking/<int:user_id>', methods=['POST'])
 def receive_booking(user_id):
@@ -342,7 +363,7 @@ def receive_booking(user_id):
             for field, error_list in form.errors.items():
                 for error in error_list:
                     logging.info(f"field {field},error{error}")
-    return render_template('booking111.html', form=form)
+    return render_template('booking.html', form=form)
 
 @main.route('/ver1.0/booking-summary/<int:user_id>', methods=['GET'])
 def generate_booking_summary(user_id):

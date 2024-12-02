@@ -1,24 +1,82 @@
+/* Общий стиль страницы */
 body {
     margin: 0;
     padding: 0;
-    background-color: #f5f5dc;
+    background-color: #f5f5dc; /* Базовый фон */
     font-family: Arial, sans-serif;
 }
 
+/* Центровка контейнера */
 .booking-container {
-    margin-top: 20px; /* Отступ сверху */
-    text-align: center;
+    margin-top: 20px;
+    max-width: 600px; /* Ограничение ширины контейнера */
+    margin-left: auto;
+    margin-right: auto;
+    padding: 20px;
+    background-color: #f5f5dc;
 }
 
+/* Стили заголовков */
 h1 {
-    font-size: 2rem; /* Уменьшили размер */
+    font-size: 2rem;
     font-weight: bold;
-    margin-bottom: 10px; /* Отступ снизу */
+    text-align: center;
+    margin-bottom: 10px;
 }
 
 p {
     font-size: 1.2rem;
-    font-weight: bold; /* Жирный текст */
     color: green;
-    margin: 0; /* Убираем отступы */
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Стили формы */
+form {
+    display: flex;
+    flex-direction: column; /* Все элементы в форме по вертикали */
+    align-items: center;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+    width: 80%; /* Устанавливаем ширину формы */
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-control {
+    width: 100%; /* Поля формы теперь растягиваются на 100% контейнера */
+    max-width: 400px; /* Устанавливаем максимальную ширину полей */
+    padding: 10px;
+    margin: 0 auto;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Стили кнопки отправки */
+.btn-primary {
+    background-color: green;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    max-width: 400px; /* Максимальная ширина кнопки */
+}
+
+.btn-primary:hover {
+    background-color: darkgreen;
+}
+
+/* Стили ошибок */
+.error {
+    color: red;
+    font-size: 0.9rem;
 }

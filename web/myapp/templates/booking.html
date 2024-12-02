@@ -1,3 +1,4 @@
+<!-- booking.html -->
 <!DOCTYPE html>
 <html lang="{{ lang }}">
 <head>
@@ -9,8 +10,79 @@
     <div class="booking-container">
         <h1>{{ translations['booking_event'] }}</h1>
         <p>{{ translations['booking_description'] }}</p>
+
+        <!-- Форма для ввода данных -->
+        <form method="POST" action="/ver1.0/receive-booking/{{user_id}}">
+            {{ form.hidden_tag() }}
+
+            <div class="form-group">
+                {{ form.username.label }}
+                {{ form.username(class_="form-control") }}
+                {% for error in form.username.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                {{ form.selected_date.label }}
+                {{ form.selected_date(class_="form-control", placeholder="YYYY-MM-DD") }}
+                {% for error in form.selected_date.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                {{ form.start_time.label }}
+                {{ form.start_time(class_="form-control", placeholder="HH:MM") }}
+                {% for error in form.start_time.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                {{ form.end_time.label }}
+                {{ form.end_time(class_="form-control", placeholder="HH:MM") }}
+                {% for error in form.end_time.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                {{ form.people_count.label }}
+                {{ form.people_count(class_="form-control") }}
+                {% for error in form.people_count.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                {{ form.selected_style.label }}
+                {{ form.selected_style(class_="form-control") }}
+                {% for error in form.selected_style.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                {{ form.preferences.label }}
+                {{ form.preferences(class_="form-control") }}
+                {% for error in form.preferences.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                {{ form.city.label }}
+                {{ form.city(class_="form-control") }}
+                {% for error in form.city.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="form-group">
+                {{ form.submit(class_="btn btn-primary") }}
+            </div>
+        </form>
     </div>
 </body>
 </html>
-
-
