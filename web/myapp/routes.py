@@ -11,8 +11,9 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from web.myapp.email_utils import send_email
 from web.myapp.forms import RegistrationForm
 from web.utils.calculations import get_duration, calculate_total_cost
-from web.utils.db import create_connection, insert_order  # Подключаем базу данных
-from web.myapp.translations import translations, field_labels  # Импортируем оба словаря
+from web.utils.db import create_connection, insert_order, get_order_info  # Подключаем базу данных
+from web.myapp.translations import translations, field_labels, ORDER_STATUS, \
+    order_field_labels  # Импортируем оба словаря
 
 import stripe
 
@@ -305,6 +306,67 @@ def booking_page(user_id):
     )
 
 
+# @main.route('/ver1.0/receive-booking/<int:user_id>', methods=['POST'])
+# def receive_booking(user_id):
+#     lang = request.args.get('lang', 'en')  # Получаем выбранный язык или устанавливаем 'en' по умолчанию
+#
+#     # Проверка, что lang есть в translations и field_labels
+#     if lang not in translations or lang not in field_labels:
+#         flash(f"Invalid language selected: {lang}", "danger")
+#         return redirect(url_for('main.index', lang='en'))
+#
+#     form = RegistrationForm()
+#
+#     logging.info(f"Получен form.validate_on_submit(): {form.validate_on_submit()}")
+#     logging.info(f"user_id: {user_id}")
+#
+#     if form.validate_on_submit():
+#         # user_id = form.user_id.data
+#         username = form.username.data
+#         selected_date = form.selected_date.data
+#         start_time = form.start_time.data
+#         end_time = form.end_time.data
+#         people_count = form.people_count.data
+#         selected_style = form.selected_style.data
+#         preferences = form.preferences.data
+#         city = form.city.data
+#
+#         logging.info(f"user_id: {user_id}")
+#
+#         duration = get_duration(start_time, end_time)
+#         total_cost = calculate_total_cost(duration, people_count)
+#         conn = create_connection()
+#         cursor = conn.cursor()
+#         try:
+#             cursor.execute("SELECT MAX(session_number) FROM orders WHERE user_id = %s", (user_id,))
+#             result = cursor.fetchone()
+#             if result and result[0] is not None:
+#                 session_number = result[0]
+#             else:
+#                 session_number = 1
+#         except Exception as e:
+#             conn.rollback()  # Отмена транзакции при ошибке
+#             flash(f"{translations[lang]['database_error']} ({e})", 'danger')  # Перевод + текст ошибки
+#             return redirect(url_for('main.index', lang=lang, translations=translations[lang]))
+#
+#         finally:
+#             cursor.close()
+#             conn.close()
+#
+#         logging.info(f"session_number: {session_number}")
+#
+#         order = (username, selected_date, start_time, end_time, duration, people_count,
+#                 selected_style, city, preferences, total_cost, user_id, session_number)
+#         insert_order(order)
+#
+#         return redirect(url_for('main.generate_booking_summary', lang=lang, user_id=user_id))
+#     else:
+#         if form.errors:  # Optional: Flash errors for feedback
+#             for field, error_list in form.errors.items():
+#                 for error in error_list:
+#                     logging.info(f"field {field},error{error}")
+#     return render_template('booking.html', form=form)
+
 @main.route('/ver1.0/receive-booking/<int:user_id>', methods=['POST'])
 def receive_booking(user_id):
     lang = request.args.get('lang', 'en')  # Получаем выбранный язык или устанавливаем 'en' по умолчанию
@@ -316,11 +378,8 @@ def receive_booking(user_id):
 
     form = RegistrationForm()
 
-    logging.info(f"Получен form.validate_on_submit(): {form.validate_on_submit()}")
-    logging.info(f"user_id: {user_id}")
-
     if form.validate_on_submit():
-        # user_id = form.user_id.data
+        # Получаем данные формы
         username = form.username.data
         selected_date = form.selected_date.data
         start_time = form.start_time.data
@@ -330,41 +389,33 @@ def receive_booking(user_id):
         preferences = form.preferences.data
         city = form.city.data
 
-        logging.info(f"user_id: {user_id}")
-
+        # Вычисление общей стоимости
         duration = get_duration(start_time, end_time)
         total_cost = calculate_total_cost(duration, people_count)
+
+        # Получаем session_number из базы
         conn = create_connection()
         cursor = conn.cursor()
-        try:
-            cursor.execute("SELECT MAX(session_number) FROM orders WHERE user_id = %s", (user_id,))
-            result = cursor.fetchone()
-            if result and result[0] is not None:
-                session_number = result[0]
-            else:
-                session_number = 1
-        except Exception as e:
-            conn.rollback()  # Отмена транзакции при ошибке
-            flash(f"{translations[lang]['database_error']} ({e})", 'danger')  # Перевод + текст ошибки
-            return redirect(url_for('main.index', lang=lang, translations=translations[lang]))
+        cursor.execute("SELECT MAX(session_number) FROM orders WHERE user_id = %s", (user_id,))
+        result = cursor.fetchone()
+        session_number = result[0] if result and result[0] is not None else 1
 
-        finally:
-            cursor.close()
-            conn.close()
-
-        logging.info(f"session_number: {session_number}")
-
-        order = (username, selected_date, start_time, end_time, duration, people_count,
-                selected_style, city, preferences, total_cost, user_id, session_number)
+        # Вставляем данные в заказ
+        order = (
+        username, selected_date, start_time, end_time, duration, people_count, selected_style, city, preferences,
+        total_cost, user_id, session_number)
         insert_order(order)
 
-        return redirect(url_for('main.generate_booking_summary', lang=lang, user_id=user_id))
+        # После успешной отправки формы, переходим на страницу оплаты
+        return redirect(url_for('main.order_payment', user_id=user_id, lang=lang))
     else:
-        if form.errors:  # Optional: Flash errors for feedback
-            for field, error_list in form.errors.items():
-                for error in error_list:
-                    logging.info(f"field {field},error{error}")
-    return render_template('booking.html', form=form)
+        # Если есть ошибки в форме, отобразим их
+        for field, error_list in form.errors.items():
+            for error in error_list:
+                flash(f"Error in {field}: {error}", "danger")
+
+    return render_template('booking.html', form=form, lang=lang)
+
 
 @main.route('/ver1.0/booking-summary/<int:user_id>', methods=['GET'])
 def generate_booking_summary(user_id):
@@ -381,8 +432,57 @@ def generate_booking_summary(user_id):
         user_id=user_id,
     )
 
-@main.route('/ver1.0/error_page')
-def error_page():
-    """Страница ошибки с неверным паролем."""
+@main.route('/ver1.0/order-payment/<int:user_id>', methods=['GET'])
+def order_payment(user_id):
+    # Получаем язык из параметров запроса (по умолчанию 'en')
     lang = request.args.get('lang', 'en')
-    return render_template('error.html', lang=lang, message=translations[lang]['incorrect_password'])
+
+    # Проверка, что выбранный язык существует в переводах
+    if lang not in translations:
+        lang = 'en'  # Устанавливаем язык по умолчанию
+
+    # Получаем информацию о заказе из базы данных на основе последней сессии пользователя
+    order_info = get_order_info(user_id)
+
+    if not order_info:
+        # Если ордер не найден, возвращаем ошибку или редирект на другую страницу
+        return redirect(url_for('main.error_page', lang=lang))
+
+    # Генерация текста ордера
+    order_text = f"""
+    <h3>{translations[lang]['order_check']}</h3>
+    <strong>{translations[lang]['order_number']}:</strong> {order_info['order_id']} <br>
+    <hr>
+
+    <strong>{translations[lang]['client_name']}:</strong> {order_info['user_name']}<br>
+    <strong>{translations[lang]['preferences']}:</strong> {order_info['preferences']}<br>
+    <strong>{translations[lang]['selected_style']}:</strong> {order_info['selected_style']}<br>
+    <strong>{translations[lang]['city']}:</strong> {order_info['city']}<br>
+    <strong>{translations[lang]['people_count']}:</strong> {order_info['people_count']}<br>
+    <strong>{translations[lang]['selected_date']}:</strong> {order_info['selected_date']}<br>
+    <strong>{translations[lang]['start_time']}:</strong> {order_info['start_time']}<br>
+    <strong>{translations[lang]['duration']}:</strong> {order_info['duration']} hours<br>
+    <hr>
+
+    <strong>{translations[lang]['calculated_cost']}:</strong> {order_info['calculated_cost']} EUR
+    """
+
+    # Генерация ссылки для перехода на страницу оплаты (например, Stripe)
+    stripe_payment_link = f"https://stripe.com/payment?order={user_id}"
+
+    # Ссылка для возврата на форму (если нужно вернуться)
+    back_to_form_link = url_for('main.booking_page', user_id=user_id, lang=lang)
+
+    return render_template(
+        'order_payment.html',
+        lang=lang,
+        translations=translations,  # Добавление translations в контекст
+        order=order_info,  # Передаем order_info в шаблон
+        stripe_payment_link=stripe_payment_link,
+        back_to_form_link=back_to_form_link
+    )
+
+@main.route('/ver1.0/edit-order/<int:user_id>', methods=['GET'])
+def edit_order(user_id):
+    # Логика для редактирования заказа
+    return render_template('edit_order.html', user_id=user_id)

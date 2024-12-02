@@ -1,0 +1,56 @@
+<div class="container">
+  <h1>{{ translations[lang]['order_payment_title'] }}</h1>
+
+  <div class="order-summary">
+    <h2>{{ translations[lang]['order_summary'] }}</h2>
+    <table class="table">
+      <tr>
+        <th>{{ translations[lang]['user_name'] }}</th>
+        <td>{{ order.user_name }}</td>  <!-- Данные из базы -->
+      </tr>
+      <tr>
+        <th>{{ translations[lang]['selected_date'] }}</th>
+        <td>{{ order.selected_date }}</td>
+      </tr>
+      <tr>
+        <th>{{ translations[lang]['start_time'] }}</th>
+        <td>{{ order.start_time }}</td>
+      </tr>
+      <tr>
+        <th>{{ translations[lang]['end_time'] }}</th>
+        <td>{{ order.end_time }}</td>
+      </tr>
+      <tr>
+        <th>{{ translations[lang]['people_count'] }}</th>
+        <td>{{ order.people_count }}</td>
+      </tr>
+      <tr>
+        <th>{{ translations[lang]['selected_style'] }}</th>
+        <td>{{ order.selected_style }}</td>
+      </tr>
+      <tr>
+        <th>{{ translations[lang]['preferences'] }}</th>
+        <td>{{ order.preferences }}</td>
+      </tr>
+      <tr>
+        <th>{{ translations[lang]['city'] }}</th>
+        <td>{{ order.city }}</td>
+      </tr>
+      <tr>
+        <th>{{ translations[lang]['amount_to_pay'] }}</th>
+        <td>{{ order.calculated_cost }} {{ translations[lang]['currency'] }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="payment-actions">
+    <a href="{{ url_for('main.create_payment', user_id=order.user_id) }}" class="btn btn-primary">
+      {{ translations[lang]['pay_button'] }}
+    </a>
+    <a href="{{ url_for('main.edit_order', user_id=order.user_id) }}" class="btn btn-secondary">
+      {{ translations[lang]['return_button'] }} <!-- Добавьте текст кнопки для возврата -->
+    </a>
+  </div>
+</div>
+
+

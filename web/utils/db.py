@@ -1,5 +1,6 @@
 # db.py
 # db.py
+import logging
 
 import psycopg2
 import os
@@ -64,3 +65,63 @@ def insert_order(vars_tuple):
 
     cursor.close()
     conn.close()
+
+def get_order_info(user_id):
+    # Создаем соединение с базой данных
+    conn = create_connection()  # Используем функцию для подключения к базе данных
+    cursor = conn.cursor()
+
+    try:
+        # Получаем максимальный session_number для данного пользователя
+        cursor.execute("""
+            SELECT MAX(session_number) 
+            FROM orders 
+            WHERE user_id = %s
+        """, (user_id,))
+        session_number = cursor.fetchone()[0]
+
+        if not session_number:
+            raise ValueError("Не найдено подходящего session_number для пользователя")
+
+        # Извлекаем данные ордера для последнего session_number
+        cursor.execute("""
+            SELECT order_id, user_id, session_number, user_name, language, 
+                   selected_date, start_time, end_time, duration, people_count, 
+                   selected_style, preferences, city, status, calculated_cost, 
+                   created_at, updated_at
+            FROM orders 
+            WHERE user_id = %s AND session_number = %s
+        """, (user_id, session_number))
+
+        order_info = cursor.fetchone()
+
+        if not order_info:
+            raise ValueError("Не удалось найти ордер для последнего session_number")
+
+        # Возвращаем информацию в виде словаря для дальнейшего использования
+        return {
+            'order_id': order_info[0],  # order_id
+            'user_id': order_info[1],  # user_id
+            'session_number': order_info[2],  # session_number
+            'user_name': order_info[3],  # user_name
+            'language': order_info[4],  # language
+            'selected_date': order_info[5],  # selected_date
+            'start_time': order_info[6],  # start_time
+            'end_time': order_info[7],  # end_time
+            'duration': order_info[8],  # duration
+            'people_count': order_info[9],  # people_count
+            'selected_style': order_info[10],  # selected_style
+            'preferences': order_info[11],  # preferences
+            'city': order_info[12],  # city
+            'status': order_info[13],  # status
+            'calculated_cost': order_info[14],  # calculated_cost
+            'created_at': order_info[15],  # created_at
+            'updated_at': order_info[16]  # updated_at
+        }
+
+    except Exception as e:
+        logging.error(f"Ошибка при получении данных ордера: {e}")
+        return None
+    finally:
+        cursor.close()
+        conn.close()
