@@ -15,70 +15,79 @@
         <form method="POST" action="/ver1.0/receive-booking/{{user_id}}">
             {{ form.hidden_tag() }}
 
+            <!-- Поле имени пользователя -->
             <div class="form-group">
-                {{ form.username.label }}
+                <label for="username">{{ translations['user_name'] }}</label>
                 {{ form.username(class_="form-control") }}
                 {% for error in form.username.errors %}
                     <span class="error">{{ error }}</span>
                 {% endfor %}
             </div>
 
+            <!-- Поле выбора даты -->
             <div class="form-group">
-                {{ form.selected_date.label }}
+                <label for="selected_date">{{ translations['selected_date'] }}</label>
                 {{ form.selected_date(class_="form-control", placeholder="YYYY-MM-DD") }}
                 {% for error in form.selected_date.errors %}
                     <span class="error">{{ error }}</span>
                 {% endfor %}
             </div>
 
+            <!-- Поле времени начала -->
             <div class="form-group">
-                {{ form.start_time.label }}
+                <label for="start_time">{{ translations['start_time'] }}</label>
                 {{ form.start_time(class_="form-control", placeholder="HH:MM") }}
                 {% for error in form.start_time.errors %}
                     <span class="error">{{ error }}</span>
                 {% endfor %}
             </div>
 
+            <!-- Поле времени окончания -->
             <div class="form-group">
-                {{ form.end_time.label }}
+                <label for="end_time">{{ translations['end_time'] }}</label>
                 {{ form.end_time(class_="form-control", placeholder="HH:MM") }}
                 {% for error in form.end_time.errors %}
                     <span class="error">{{ error }}</span>
                 {% endfor %}
             </div>
 
+            <!-- Поле количества участников -->
             <div class="form-group">
-                {{ form.people_count.label }}
+                <label for="people_count">{{ translations['people_count'] }}</label>
                 {{ form.people_count(class_="form-control") }}
                 {% for error in form.people_count.errors %}
                     <span class="error">{{ error }}</span>
                 {% endfor %}
             </div>
 
+            <!-- Поле стиля мероприятия -->
             <div class="form-group">
-                {{ form.selected_style.label }}
+                <label for="selected_style">{{ translations['selected_style'] }}</label>
                 {{ form.selected_style(class_="form-control") }}
                 {% for error in form.selected_style.errors %}
                     <span class="error">{{ error }}</span>
                 {% endfor %}
             </div>
 
+            <!-- Поле предпочтений -->
             <div class="form-group">
-                {{ form.preferences.label }}
+                <label for="preferences">{{ translations['preferences'] }}</label>
                 {{ form.preferences(class_="form-control") }}
                 {% for error in form.preferences.errors %}
                     <span class="error">{{ error }}</span>
                 {% endfor %}
             </div>
 
+            <!-- Поле города -->
             <div class="form-group">
-                {{ form.city.label }}
+                <label for="city">{{ translations['city'] }}</label>
                 {{ form.city(class_="form-control") }}
                 {% for error in form.city.errors %}
                     <span class="error">{{ error }}</span>
                 {% endfor %}
             </div>
 
+            <!-- Кнопка отправки -->
             <div class="form-group">
                 {{ form.submit(class_="btn btn-primary") }}
             </div>

@@ -286,7 +286,8 @@ def register():
 @main.route('/ver1.0/booking-page/<int:user_id>', methods=['GET'])
 def booking_page(user_id):
     # Получение языка из параметров запроса
-    lang = request.args.get('lang', 'en')
+
+    lang = request.args.get('lang', 'en')  # Получаем выбранный язык
 
     # Проверка, что язык есть в словаре переводов
     if lang not in translations:
