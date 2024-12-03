@@ -1,5 +1,6 @@
 import os
 import sys
+import urllib.parse
 from datetime import timedelta, datetime
 import logging
 
@@ -14,7 +15,7 @@ from web.utils.calculations import get_duration, calculate_total_cost
 from web.utils.db import create_connection, insert_order, get_order_info  # Подключаем базу данных
 from web.myapp.translations import translations, field_labels, ORDER_STATUS, \
     order_field_labels  # Импортируем оба словаря
-
+from bot.admin_bot.translations import translations as bot_translations
 import stripe
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -36,6 +37,10 @@ publishable_key = os.getenv('STRIPE_PUBLISHABLE_KEY')
 success_url = os.getenv('SUCCESS_URL')
 cancel_url = os.getenv('CANCEL_URL')
 
+WA_URL = os.getenv('WA_URL')  # Получаем ссылку из .env файла
+INSTAGRAM_URL = os.getenv('INSTAGRAM_URL')  # Получаем ссылку из .env файла
+
+
 main = Blueprint('main', __name__)
 
 # Новый корневой маршрут для непосредственного создания платежной сессии
@@ -45,6 +50,9 @@ def create_payment():
         user_id = request.args.get("c")
         if not user_id:
             return jsonify(error="no user_id"), 400
+
+        order_type = request.args.get("type", 1)
+        lang = request.args.get("lang", "en")
 
         # Получаем последний order_id из базы данных
         order = get_last_order_id(int(user_id))
@@ -86,8 +94,8 @@ def create_payment():
                 'quantity': 1,
             }],
             mode='payment',
-            success_url=success_url,
-            cancel_url=cancel_url,
+            success_url=success_url + f"?type={order_type}&user_id={user_id}&lang={lang}",
+            cancel_url=cancel_url + f"?type={order_type}",
             metadata={
                 'order_id': order[0],
                 'user_id': user_id  # Передаем user_id в метаданных для связи
@@ -100,7 +108,13 @@ def create_payment():
 
 @main.route('/payment-success')
 def payment_success():
-    # Возвращаемся в бота после успешной оплаты
+    order_type = request.args.get("type", 1)
+
+    if order_type == "2":
+        lang = request.args.get('lang', 'en')  # Получаем выбранный язык или устанавливаем 'en' по умолчанию
+        user_id = request.args.get('user_id', None)  # Получаем выбранный язык или устанавливаем 'en' по умолчанию
+        return redirect(url_for('main.proforma', user_id=user_id,  lang=lang))
+
     return redirect('https://t.me/PicnicsAlicanteBot?start=payment_success')
 
 # Маршрут для обработки отмены платежа
@@ -468,7 +482,7 @@ def order_payment(user_id):
     """
 
     # Генерация ссылки для перехода на страницу оплаты (например, Stripe)
-    stripe_payment_link = f"https://stripe.com/payment?order={user_id}"
+    stripe_payment_link = os.getenv('BASE_URL') + f"/create-payment?c={user_id}&type=2&lang={lang}"
 
     # Ссылка для возврата на форму (если нужно вернуться)
     back_to_form_link = url_for('main.booking_page', user_id=user_id, lang=lang)
@@ -482,7 +496,60 @@ def order_payment(user_id):
         back_to_form_link=back_to_form_link
     )
 
-@main.route('/ver1.0/edit-order/<int:user_id>', methods=['GET'])
-def edit_order(user_id):
-    # Логика для редактирования заказа
-    return render_template('edit_order.html', user_id=user_id)
+@main.route('/ver1.0/proforma/<int:user_id>', methods=['GET'])
+def proforma(user_id):
+    # Получаем язык из параметров запроса (по умолчанию 'en')
+    lang = request.args.get('lang', 'en')
+
+    # Проверка, что выбранный язык существует в переводах
+    if lang not in translations:
+        lang = 'en'  # Устанавливаем язык по умолчанию
+
+    # Получаем информацию о заказе из базы данных на основе последней сессии пользователя
+    order_info = get_order_info(user_id)
+
+    if not order_info:
+        # Если ордер не найден, возвращаем ошибку или редирект на другую страницу
+        return redirect(url_for('main.error_page', lang=lang))
+
+    # Генерация текста ордера
+    order_text = f"""
+    <h3>{translations[lang]['order_check']}</h3>
+    <strong>{translations[lang]['order_number']}:</strong> {order_info['order_id']} <br>
+    <hr>
+
+    <strong>{translations[lang]['client_name']}:</strong> {order_info['user_name']}<br>
+    <strong>{translations[lang]['preferences']}:</strong> {order_info['preferences']}<br>
+    <strong>{translations[lang]['selected_style']}:</strong> {order_info['selected_style']}<br>
+    <strong>{translations[lang]['city']}:</strong> {order_info['city']}<br>
+    <strong>{translations[lang]['people_count']}:</strong> {order_info['people_count']}<br>
+    <strong>{translations[lang]['selected_date']}:</strong> {order_info['selected_date']}<br>
+    <strong>{translations[lang]['start_time']}:</strong> {order_info['start_time']}<br>
+    <strong>{translations[lang]['duration']}:</strong> {order_info['duration']} hours<br>
+    <hr>
+    <strong>{translations[lang]['calculated_cost']}:</strong> {order_info['calculated_cost'] - 20} EUR
+    """
+
+    trans = bot_translations.get(lang, bot_translations['en'])  # Используем 'en' как язык по умолчанию
+
+    proforma_number = f"{order_info['user_id']}_{order_info['session_number']}_{order_info['status']}"
+    contact_message = f"{trans['whatsapp_message']} {proforma_number}. {trans['whatsapp_footer']}"
+
+    # Кодируем сообщение для использования в URL
+    encoded_message = urllib.parse.quote(contact_message)
+
+    # Генерация ссылки для перехода на страницу оплаты (например, Stripe)
+    wa_link = WA_URL + f"?text={encoded_message}"
+
+    # Ссылка для возврата на форму (если нужно вернуться)
+
+
+    return render_template(
+        'proforma.html',
+        lang=lang,
+        translations=translations,  # Добавление translations в контекст
+        order=order_info,  # Передаем order_info в шаблон
+        wa_link=wa_link,
+        instagram_link=INSTAGRAM_URL
+    )
+

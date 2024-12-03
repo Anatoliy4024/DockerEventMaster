@@ -11,8 +11,8 @@ from bot.admin_bot.helpers.database_helpers import get_full_proforma, get_latest
 from bot.admin_bot.translations import translations, button_texts
 from dotenv import load_dotenv
 BOT_TOKEN = os.getenv('TELEGRAM_TOKEN_PICNIC')  # Получаем токен из .env файла
-
-
+WA_URL = os.getenv('WA_URL')  # Получаем ссылку из .env файла
+INSTAGRAM_URL = os.getenv('INSTAGRAM_URL')  # Получаем ссылку из .env файла
 
 def irina_service_menu():
     keyboard = [
@@ -56,8 +56,8 @@ def user_options_keyboard(language, user_id):
     # Создаем клавиатуру с тремя кнопками
     keyboard = [
         [InlineKeyboardButton(button_texts[language][0], callback_data='get_proforma')],
-        [InlineKeyboardButton(button_texts[language][1], url=f'https://wa.me/34667574895?text={encoded_message}')],
-        [InlineKeyboardButton(button_texts[language][2], url='https://www.instagram.com/picnicsalicante')]
+        [InlineKeyboardButton(button_texts[language][1], url=f'{WA_URL}?text={encoded_message}')],
+        [InlineKeyboardButton(button_texts[language][2], url=INSTAGRAM_URL)]
     ]
 
     return InlineKeyboardMarkup(keyboard)
