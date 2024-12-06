@@ -562,4 +562,3 @@ def proforma(user_id):
         wa_link=wa_link,
         instagram_link=INSTAGRAM_URL
     )
-
