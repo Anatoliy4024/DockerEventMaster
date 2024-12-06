@@ -453,56 +453,36 @@ def generate_booking_summary(user_id):
         user_id=user_id,
     )
 
-
 @main.route('/ver1.0/order-payment/<int:user_id>', methods=['GET'])
 def order_payment(user_id):
-    # Получаем язык из параметров запроса (по умолчанию 'en')
-    lang = request.args.get('lang', 'en')
-
-    # Проверка, что выбранный язык существует в переводах
-    if lang not in translations:
-        lang = 'en'  # Устанавливаем язык по умолчанию
-
-    # Получаем информацию о заказе из базы данных на основе последней сессии пользователя
+    # Получаем информацию о заказе из базы данных (в том числе язык)
     order_info = get_order_info(user_id)
 
     if not order_info:
         # Если ордер не найден, возвращаем ошибку или редирект на другую страницу
-        return redirect(url_for('main.error_page', lang=lang))
+        return redirect(url_for('main.error_page', lang='en'))  # Можно по умолчанию вернуть на английский
 
-    # Генерация текста ордера
-    order_text = f"""
-    <h3>{translations[lang]['order_check']}</h3>
-    <strong>{translations[lang]['order_number']}:</strong> {order_info['order_id']} <br>
-    <hr>
+    # Извлекаем язык из информации о заказе
+    lang = order_info.get('language', 'en')  # Если язык не найден, по умолчанию будет 'en'
 
-    <strong>{translations[lang]['client_name']}:</strong> {order_info['user_name']}<br>
-    <strong>{translations[lang]['preferences']}:</strong> {order_info['preferences']}<br>
-    <strong>{translations[lang]['selected_style']}:</strong> {order_info['selected_style']}<br>
-    <strong>{translations[lang]['city']}:</strong> {order_info['city']}<br>
-    <strong>{translations[lang]['people_count']}:</strong> {order_info['people_count']}<br>
-    <strong>{translations[lang]['selected_date']}:</strong> {order_info['selected_date']}<br>
-    <strong>{translations[lang]['start_time']}:</strong> {order_info['start_time']}<br>
-    <strong>{translations[lang]['duration']}:</strong> {order_info['duration']} hours<br>
-    <hr>
-
-    <strong>{translations[lang]['calculated_cost']}:</strong> {order_info['calculated_cost']} EUR
-    """
+    # Проверка, что выбранный язык существует в переводах
+    if lang not in translations or lang not in order_field_labels:
+        lang = 'en'  # Устанавливаем язык по умолчанию, если языка нет в словарях
 
     # Генерация ссылки для перехода на страницу оплаты (например, Stripe)
     stripe_payment_link = os.getenv('BASE_URL') + f"/create-payment?c={user_id}&type=2&lang={lang}"
 
-    # Ссылка для возврата на форму (если нужно вернуться)
+    # Ссылка для возврата на форму
     back_to_form_link = url_for('main.booking_page', user_id=user_id, lang=lang)
 
-    # Передаем только переводы для текущего языка (order_field_labels[lang])
+    # Передаем переводы для текущего языка и сам заказ
     return render_template(
         'order_payment.html',
         lang=lang,
         order=order_info,  # Передаем информацию о заказе
         stripe_payment_link=stripe_payment_link,
         back_to_form_link=back_to_form_link,
-        order_field_labels=order_field_labels  # Передаем переводы для ордера
+        order_field_labels=order_field_labels[lang]  # Передаем переводы для ордера
     )
 
 
