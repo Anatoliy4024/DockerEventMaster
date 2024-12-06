@@ -1,62 +1,74 @@
-<div class="container">
-  <h1>{{ translations[lang]['order_payment_title'] }}</h1>
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ order_field_labels[lang]['order_payment_title'] }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='order_payment.css') }}">
+</head>
+<body>
+    <div class="order-container">
+        <!-- Заголовок Order check без белого фона -->
+        <h3 class="order-check-heading">{{ order_field_labels[lang]['order_check'] }}</h3>
 
-  <div class="order-summary">
-    <h2>{{ translations[lang]['order_summary'] }}</h2>
-    <table class="table">
-      <tr>
-        <th>{{ translations[lang]['order_number'] }}</th>
-        <td>{{ order.order_id }}</td>  <!-- Данные из базы -->
-      </tr>
-      <tr>
-        <th>{{ translations[lang]['client_name'] }}</th>
-        <td>{{ order.user_name }}</td>
-      </tr>
-      <tr>
-        <th>{{ translations[lang]['selected_date'] }}</th>
-        <td>{{ order.selected_date }}</td>
-      </tr>
-      <tr>
-        <th>{{ translations[lang]['start_time'] }}</th>
-        <td>{{ order.start_time }}</td>
-      </tr>
-      <tr>
-        <th>{{ translations[lang]['end_time'] }}</th>
-        <td>{{ order.end_time }}</td>
-      </tr>
-      <tr>
-        <th>{{ translations[lang]['duration'] }}</th>
-        <td>{{ order.duration }} hours</td> <!-- Assuming the duration is in hours -->
-      </tr>
-      <tr>
-        <th>{{ translations[lang]['people_count'] }}</th>
-        <td>{{ order.people_count }}</td>
-      </tr>
-      <tr>
-        <th>{{ translations[lang]['selected_style'] }}</th>
-        <td>{{ order.selected_style }}</td>
-      </tr>
-      <tr>
-        <th>{{ translations[lang]['preferences'] }}</th>
-        <td>{{ order.preferences }}</td>
-      </tr>
-      <tr>
-        <th>{{ translations[lang]['city'] }}</th>
-        <td>{{ order.city }}</td>
-      </tr>
-      <tr>
-        <th>{{ translations[lang]['calculated_cost'] }}</th>
-        <td>{{ order.calculated_cost }} {{ translations[lang]['currency'] }}</td>
-      </tr>
-    </table>
-  </div>
+        <div class="order-summary">
+            <h2>{{ order_field_labels[lang]['order_summary'] }}</h2>
+            <table class="table">
+                <tr>
+                    <th>{{ order_field_labels[lang]['order_number'] }}</th>
+                    <td>{{ order.order_id }}</td>
+                </tr>
+                <tr>
+                    <th>{{ order_field_labels[lang]['client_name'] }}</th>
+                    <td>{{ order.user_name }}</td>
+                </tr>
+                <tr>
+                    <th>{{ order_field_labels[lang]['selected_date'] }}</th>
+                    <td>{{ order.selected_date.strftime('%Y-%m-%d') }}</td>  <!-- Форматируем дату прямо в шаблоне -->
+                </tr>
 
-  <div class="payment-actions">
-    <a href="{{ stripe_payment_link }}" class="btn btn-primary">
-      {{ translations[lang]['pay_button'] }}
-    </a>
-    <a href="{{ back_to_form_link }}" class="btn btn-secondary">
-      {{ translations[lang]['return_button'] }} <!-- Добавьте текст кнопки для возврата -->
-    </a>
-  </div>
-</div>
+                <tr>
+                    <th>{{ order_field_labels[lang]['start_time'] }}</th>
+                    <td>{{ order.start_time }}</td>
+                </tr>
+                <tr>
+                    <th>{{ order_field_labels[lang]['end_time'] }}</th>
+                    <td>{{ order.end_time }}</td>
+                </tr>
+                <tr>
+                    <th>{{ order_field_labels[lang]['duration'] }}</th>
+                    <td>{{ order.duration }} hours</td>
+                </tr>
+                <tr>
+                    <th>{{ order_field_labels[lang]['people_count'] }}</th>
+                    <td>{{ order.people_count }}</td>
+                </tr>
+                <tr>
+                    <th>{{ order_field_labels[lang]['selected_style'] }}</th>
+                    <td>{{ order.selected_style }}</td>
+                </tr>
+                <tr>
+                    <th>{{ order_field_labels[lang]['preferences'] }}</th>
+                    <td>{{ order.preferences }}</td>
+                </tr>
+                <tr>
+                    <th>{{ order_field_labels[lang]['city'] }}</th>
+                    <td>{{ order.city }}</td>
+                </tr>
+                <tr>
+                    <th>{{ order_field_labels[lang]['calculated_cost'] }}</th>
+                    <td>{{ order.calculated_cost }} {{ order_field_labels[lang]['currency'] }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="payment-actions">
+            <a href="{{ stripe_payment_link }}" class="btn btn-primary">
+                {{ order_field_labels[lang]['pay_button'] }}
+            </a>
+            <a href="{{ back_to_form_link }}" class="btn btn-secondary">
+                {{ order_field_labels[lang]['return_button'] }}
+            </a>
+        </div>
+    </div>
+</body>
+</html>

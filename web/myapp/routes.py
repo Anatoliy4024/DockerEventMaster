@@ -453,12 +453,11 @@ def generate_booking_summary(user_id):
         user_id=user_id,
     )
 
+
 @main.route('/ver1.0/order-payment/<int:user_id>', methods=['GET'])
 def order_payment(user_id):
     # Получаем язык из параметров запроса (по умолчанию 'en')
     lang = request.args.get('lang', 'en')
-
-    translations = order_field_labels
 
     # Проверка, что выбранный язык существует в переводах
     if lang not in translations:
@@ -496,14 +495,16 @@ def order_payment(user_id):
     # Ссылка для возврата на форму (если нужно вернуться)
     back_to_form_link = url_for('main.booking_page', user_id=user_id, lang=lang)
 
+    # Передаем только переводы для текущего языка (order_field_labels[lang])
     return render_template(
         'order_payment.html',
         lang=lang,
-        translations=translations,  # Добавление translations в контекст
-        order=order_info,  # Передаем order_info в шаблон
+        order=order_info,  # Передаем информацию о заказе
         stripe_payment_link=stripe_payment_link,
-        back_to_form_link=back_to_form_link
+        back_to_form_link=back_to_form_link,
+        order_field_labels=order_field_labels  # Передаем переводы для ордера
     )
+
 
 @main.route('/ver1.0/proforma/<int:user_id>', methods=['GET'])
 def proforma(user_id):
@@ -511,7 +512,7 @@ def proforma(user_id):
     lang = request.args.get('lang', 'en')
 
     # Проверка, что выбранный язык существует в переводах
-    if lang not in translations:
+    if lang not in order_field_labels:
         lang = 'en'  # Устанавливаем язык по умолчанию
 
     # Получаем информацию о заказе из базы данных на основе последней сессии пользователя
