@@ -95,7 +95,7 @@ def create_payment():
             }],
             mode='payment',
             success_url=success_url + f"?type={order_type}&user_id={user_id}&lang={lang}",
-            cancel_url=cancel_url + f"?type={order_type}",
+            cancel_url=cancel_url + f"?type={order_type}&user_id={user_id}&lang={lang}",
             metadata={
                 'order_id': order[0],
                 'user_id': user_id  # Передаем user_id в метаданных для связи
@@ -120,6 +120,13 @@ def payment_success():
 # Маршрут для обработки отмены платежа
 @main.route('/payment-cancelled')
 def payment_cancelled():
+    order_type = request.args.get("type", 1)
+
+    if order_type == "2":
+        lang = request.args.get('lang', 'en')  # Получаем выбранный язык или устанавливаем 'en' по умолчанию
+        user_id = request.args.get('user_id', None)  # Получаем выбранный язык или устанавливаем 'en' по умолчанию
+        return redirect(url_for('main.booking_page', user_id=user_id,  lang=lang))
+
     # Возвращаемся в бота после отмены платежа
     return redirect('https://t.me/PicnicsAlicanteBot?start=payment_cancelled')
 
@@ -450,6 +457,8 @@ def generate_booking_summary(user_id):
 def order_payment(user_id):
     # Получаем язык из параметров запроса (по умолчанию 'en')
     lang = request.args.get('lang', 'en')
+
+    translations = order_field_labels
 
     # Проверка, что выбранный язык существует в переводах
     if lang not in translations:

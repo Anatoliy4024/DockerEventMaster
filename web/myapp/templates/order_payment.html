@@ -5,8 +5,12 @@
     <h2>{{ translations[lang]['order_summary'] }}</h2>
     <table class="table">
       <tr>
-        <th>{{ translations[lang]['user_name'] }}</th>
-        <td>{{ order.user_name }}</td>  <!-- Данные из базы -->
+        <th>{{ translations[lang]['order_number'] }}</th>
+        <td>{{ order.order_id }}</td>  <!-- Данные из базы -->
+      </tr>
+      <tr>
+        <th>{{ translations[lang]['client_name'] }}</th>
+        <td>{{ order.user_name }}</td>
       </tr>
       <tr>
         <th>{{ translations[lang]['selected_date'] }}</th>
@@ -19,6 +23,10 @@
       <tr>
         <th>{{ translations[lang]['end_time'] }}</th>
         <td>{{ order.end_time }}</td>
+      </tr>
+      <tr>
+        <th>{{ translations[lang]['duration'] }}</th>
+        <td>{{ order.duration }} hours</td> <!-- Assuming the duration is in hours -->
       </tr>
       <tr>
         <th>{{ translations[lang]['people_count'] }}</th>
@@ -37,7 +45,7 @@
         <td>{{ order.city }}</td>
       </tr>
       <tr>
-        <th>{{ translations[lang]['amount_to_pay'] }}</th>
+        <th>{{ translations[lang]['calculated_cost'] }}</th>
         <td>{{ order.calculated_cost }} {{ translations[lang]['currency'] }}</td>
       </tr>
     </table>
@@ -52,5 +60,3 @@
     </a>
   </div>
 </div>
-
-

@@ -372,13 +372,19 @@ field_labels = {
 
 # Это новый словарь, который будет использоваться только для ордера
 order_field_labels = {
-    'user_name': 'user_name',
-    'selected_date': 'selected_date',
-    'start_time': 'start_time',
-    'end_time': 'end_time',
-    'people_count': 'people_count',
-    'selected_style': 'selected_style',
-    'preferences': 'preferences',
-    'city': 'city',
-    'calculated_cost': 'calculated_cost',
+    'en': {
+        'order_check': 'Order check',
+        'order_number': 'Order number',
+        'client_name': 'Client name',
+        'selected_date': 'Selected date',
+        'start_time': 'Start time',
+        'end_time': 'End time',
+        'duration': 'Duration',
+        'people_count': 'People count',
+        'selected_style': 'Selected style',
+        'preferences': 'Preferences',
+        'city': 'City',
+        'calculated_cost': 'Calculated cost',
+    },
+
 }
