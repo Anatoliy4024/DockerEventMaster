@@ -6,26 +6,27 @@ body {
     font-family: Arial, sans-serif;
 }
 
-/* Контейнер для ордера */
+/* Контейнер для проформы */
 .order-container {
     margin: 0 auto;
     padding: 20px;
-    max-width: 360px;
+    max-width: 380px; /* Ширина контейнера */
     background-color: #f5f5dc;
 }
 
-/* Заголовок "Order check" без белого фона */
+/* Заголовок "Proforma" с уменьшенными отступами сверху и снизу */
 .order-check-heading {
     font-size: 2rem;
     font-weight: bold;
     text-align: center;
-    margin-bottom: 10px; /* Отступ снизу */
-    color: black; /* Цвет текста */
+    margin-top: 10px; /* Отступ сверху уменьшен */
+    margin-bottom: 5px; /* Отступ снизу уменьшен */
+    color: green; /* Зеленый цвет текста */
 }
 
 /* Стиль таблицы */
 .order-summary {
-    margin-top: 20px;
+    margin-top: 10px;
     background-color: #fff; /* Белый фон для таблицы */
     padding: 20px;
     border-radius: 8px;
@@ -54,20 +55,34 @@ body {
     word-break: break-all;
 }
 
+/* Информация о доставке */
+.delivery-info {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    font-size: 1rem;
+    color: #333;
+}
 
-/* Стили кнопок */
+/* Убедимся, что контейнер с кнопками имеет правильный размер */
 .payment-actions {
     text-align: center;
     margin-top: 20px;
+    width: 100%; /* Задаем 100% ширины */
 }
 
+/* Стили для кнопок */
 .btn {
     padding: 10px 20px;
     border-radius: 4px;
     cursor: pointer;
     text-decoration: none;
     display: inline-block;
-    margin: 5px;
+    width: 100%;  /* Устанавливаем ширину кнопок на 100% от родительского контейнера */
+    box-sizing: border-box; /* Чтобы padding не вылезал за пределы */
+    margin: 5px 0; /* Добавим небольшой отступ сверху и снизу для красоты */
 }
 
 .btn-primary {
@@ -87,5 +102,4 @@ body {
 .btn-secondary:hover {
     background-color: #5a6268;
 }
-
 

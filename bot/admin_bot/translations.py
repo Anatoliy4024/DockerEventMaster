@@ -33,8 +33,8 @@ translations = {
                          "To change the language — press the button with the corresponding flag.\n"
                          "Thank you for using the automatic booking service!",
         'currency': "euros",
-        'whatsapp_message': "Hi, Irina! I have a question about my order",
-        'whatsapp_footer': "(please write your question here)"
+        'whatsapp_message': "I have a question about my order",
+        'whatsapp_footer': "(Write below what you would like to inquire about the administrator)"
     },
     'ru': {
         'order_confirmed': "Ваш заказ подтвержден!",
@@ -53,8 +53,8 @@ translations = {
                          "Для изменения языка — нажмите кнопку с соответствующим флагом.\n"
                          "Благодарим вас за использование сервиса автоматического бронирования!",
         'currency': "евро",
-        'whatsapp_message': "Привет! У меня есть вопрос по поводу моего заказа",
-        'whatsapp_footer': "(напишите ваш вопрос здесь)"
+        'whatsapp_message': "У меня есть вопрос по поводу моего заказа",
+        'whatsapp_footer': "(напишите ниже, что вы хотите выяснить у администратора)"
     },
     'de': {
         'order_confirmed': "Ihre Bestellung ist bestätigt!",
@@ -73,8 +73,8 @@ translations = {
                          "Um die Sprache zu ändern — drücken Sie die Schaltfläche mit der entsprechenden Flagge.\n"
                          "Vielen Dank, dass Sie den automatischen Buchungsservice nutzen!",
         'currency': "Euro",
-        'whatsapp_message': "Hallo, Irina! Ich habe eine Frage zu meiner Bestellung",
-        'whatsapp_footer': "(bitte schreiben Sie hier Ihre Frage)"
+        'whatsapp_message': "Ich habe eine Frage zu meiner Bestellung",
+        'whatsapp_footer': "(Schreiben Sie unten, was Sie den Administrator fragen möchten)"
     },
     'es': {
         'order_confirmed': "¡Su pedido está confirmado!",
@@ -93,8 +93,8 @@ translations = {
                          "Para cambiar el idioma — presione el botón con la bandera correspondiente.\n"
                          "Gracias por utilizar el servicio de reserva automática!",
         'currency': "euros",
-        'whatsapp_message': "Hola, Irina! Tengo una pregunta sobre mi pedido",
-        'whatsapp_footer': "(por favor escribe tu pregunta aquí)"
+        'whatsapp_message': "Tengo una pregunta sobre mi pedido",
+        'whatsapp_footer': "(Escriba a continuación lo que desea preguntar al administrador)"
     },
     'fr': {
         'order_confirmed': "Votre commande est confirmée!",
@@ -113,8 +113,8 @@ translations = {
                          "Pour changer la langue — appuyez sur le bouton avec le drapeau correspondant.\n"
                          "Merci d'utiliser le service de réservation automatique!",
         'currency': "euros",
-        'whatsapp_message': "Bonjour, Irina! J'ai une question concernant ma commande",
-        'whatsapp_footer': "(veuillez écrire votre question ici)"
+        'whatsapp_message': "J'ai une question concernant ma commande",
+        'whatsapp_footer': "(Écrivez ci-dessous ce que vous souhaitez demander à l'administrateur)"
     },
     'uk': {
         'order_confirmed': "Ваше замовлення підтверджено!",
@@ -133,8 +133,8 @@ translations = {
                          "Для зміни мови — натисніть кнопку з відповідним прапором.\n"
                          "Дякуємо за використання сервісу автоматичного бронювання!",
         'currency': "євро",
-        'whatsapp_message': "Привіт, Ірино! У мене є питання щодо мого замовлення",
-        'whatsapp_footer': "(будь ласка, напишіть своє питання тут)"
+        'whatsapp_message': "У мене є питання щодо мого замовлення",
+        'whatsapp_footer': "(Напишіть нижче, що ви хочете дізнатися у адміністратора)"
     },
     'pl': {
         'order_confirmed': "Twoje zamówienie zostało potwierdzone!",
@@ -153,8 +153,8 @@ translations = {
                          "Aby zmienić język — naciśnij przycisk z odpowiednią flagą.\n"
                          "Dziękujemy za korzystanie z usługi automatycznej rezerwacji!",
         'currency': "euro",
-        'whatsapp_message': "Cześć, Irina! Mam pytanie dotyczące mojego zamówienia",
-        'whatsapp_footer': "(proszę napisz tutaj swoje pytanie)"
+        'whatsapp_message': "Mam pytanie dotyczące mojego zamówienia",
+        'whatsapp_footer': "(Napisz poniżej, co chcesz zapytać administratora)"
     },
     'it': {
         'order_confirmed': "Il tuo ordine è confermato!",
@@ -163,6 +163,7 @@ translations = {
         'time': "Ora:",
         'people_count': "Numero di persone:",
         'event_style': "Stile dell'evento:",
+        'preferences': 'Предпочтения',
         'city': "Città:",
         'amount_to_pay': "Importo da pagare:",
         'status': "Stato:",
@@ -173,8 +174,8 @@ translations = {
                          "Per cambiare la lingua — premere il pulsante con la bandiera corrispondente.\n"
                          "Grazie per aver utilizzato il servizio di prenotazione automatica.",
         'currency': "euro",
-        'whatsapp_message': "Ciao, Irina! Ho una domanda sul mio ordine",
-        'whatsapp_footer': "(per favore scrivi qui la tua domanda)"
+        'whatsapp_message': "Ho una domanda sul mio ordine",
+        'whatsapp_footer': "(Scrivi qui sotto cosa desideri chiedere all'amministratore)"
     }
 
 
