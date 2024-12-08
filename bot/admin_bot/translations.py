@@ -34,7 +34,9 @@ translations = {
                          "Thank you for using the automatic booking service!",
         'currency': "euros",
         'whatsapp_message': "I have a question about my order",
-        'whatsapp_footer': "(Write below what you would like to inquire about the administrator)"
+        'whatsapp_footer': "(Write below what you would like to inquire about the administrator)",
+        'instagram_message': 'Go to the gallery',
+        'return_home': 'Return to homepage for next order',
     },
     'ru': {
         'order_confirmed': "Ваш заказ подтвержден!",
@@ -54,7 +56,9 @@ translations = {
                          "Благодарим вас за использование сервиса автоматического бронирования!",
         'currency': "евро",
         'whatsapp_message': "У меня есть вопрос по поводу моего заказа",
-        'whatsapp_footer': "(напишите ниже, что вы хотите выяснить у администратора)"
+        'whatsapp_footer': "(напишите ниже, что вы хотите выяснить у администратора)",
+        'instagram_message': 'Перейти в галерею',
+        'return_home': 'Вернуться на страницу входа для следующего заказа',
     },
     'de': {
         'order_confirmed': "Ihre Bestellung ist bestätigt!",
@@ -74,7 +78,9 @@ translations = {
                          "Vielen Dank, dass Sie den automatischen Buchungsservice nutzen!",
         'currency': "Euro",
         'whatsapp_message': "Ich habe eine Frage zu meiner Bestellung",
-        'whatsapp_footer': "(Schreiben Sie unten, was Sie den Administrator fragen möchten)"
+        'whatsapp_footer': "(Schreiben Sie unten, was Sie den Administrator fragen möchten)",
+        'instagram_message': 'Zur Galerie gehen',
+        'return_home': 'Zur Startseite zurückkehren für die nächste Bestellung',
     },
     'es': {
         'order_confirmed': "¡Su pedido está confirmado!",
@@ -94,7 +100,9 @@ translations = {
                          "Gracias por utilizar el servicio de reserva automática!",
         'currency': "euros",
         'whatsapp_message': "Tengo una pregunta sobre mi pedido",
-        'whatsapp_footer': "(Escriba a continuación lo que desea preguntar al administrador)"
+        'whatsapp_footer': "(Escriba a continuación lo que desea preguntar al administrador)",
+        'instagram_message': 'Ir a la galería',
+        'return_home': 'Regresar a la página de inicio para el siguiente pedido',
     },
     'fr': {
         'order_confirmed': "Votre commande est confirmée!",
@@ -114,7 +122,9 @@ translations = {
                          "Merci d'utiliser le service de réservation automatique!",
         'currency': "euros",
         'whatsapp_message': "J'ai une question concernant ma commande",
-        'whatsapp_footer': "(Écrivez ci-dessous ce que vous souhaitez demander à l'administrateur)"
+        'whatsapp_footer': "(Écrivez ci-dessous ce que vous souhaitez demander à l'administrateur)",
+        'instagram_message': 'Aller à la galerie',
+        'return_home': 'Retour à la page d\'accueil pour la prochaine commande',
     },
     'uk': {
         'order_confirmed': "Ваше замовлення підтверджено!",
@@ -134,7 +144,9 @@ translations = {
                          "Дякуємо за використання сервісу автоматичного бронювання!",
         'currency': "євро",
         'whatsapp_message': "У мене є питання щодо мого замовлення",
-        'whatsapp_footer': "(Напишіть нижче, що ви хочете дізнатися у адміністратора)"
+        'whatsapp_footer': "(Напишіть нижче, що ви хочете дізнатися у адміністратора)",
+        'instagram_message': 'Перейти до галереї',
+        'return_home': 'Повернутися на головну сторінку для наступного замовлення',
     },
     'pl': {
         'order_confirmed': "Twoje zamówienie zostało potwierdzone!",
@@ -154,7 +166,9 @@ translations = {
                          "Dziękujemy za korzystanie z usługi automatycznej rezerwacji!",
         'currency': "euro",
         'whatsapp_message': "Mam pytanie dotyczące mojego zamówienia",
-        'whatsapp_footer': "(Napisz poniżej, co chcesz zapytać administratora)"
+        'whatsapp_footer': "(Napisz poniżej, co chcesz zapytać administratora)",
+        'instagram_message': 'Ir para a galeria',
+        'return_home': 'Voltar para a página inicial para o próximo pedido',
     },
     'it': {
         'order_confirmed': "Il tuo ordine è confermato!",
@@ -163,7 +177,6 @@ translations = {
         'time': "Ora:",
         'people_count': "Numero di persone:",
         'event_style': "Stile dell'evento:",
-        'preferences': 'Предпочтения',
         'city': "Città:",
         'amount_to_pay': "Importo da pagare:",
         'status': "Stato:",
@@ -175,7 +188,9 @@ translations = {
                          "Grazie per aver utilizzato il servizio di prenotazione automatica.",
         'currency': "euro",
         'whatsapp_message': "Ho una domanda sul mio ordine",
-        'whatsapp_footer': "(Scrivi qui sotto cosa desideri chiedere all'amministratore)"
+        'whatsapp_footer': "(Scrivi qui sotto cosa desideri chiedere all'amministratore)",
+        'instagram_message': 'Vai alla galleria',
+        'return_home': 'Torna alla pagina iniziale per il prossimo ordine',
     }
 
 

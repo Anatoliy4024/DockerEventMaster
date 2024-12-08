@@ -57,14 +57,14 @@
 
         <!-- Кнопки (все одинаковые по размеру) -->
         <div class="payment-actions">
-            <a href="{{ wa_link }}" class="btn btn-primary">
-                {{ bot_translations[lang]['whatsapp_message'] }}
+            <a href="{{ wa_link }}" class="btn">
+                  {{ bot_translations[lang]['whatsapp_message'] }}
             </a>
-            <a href="{{ instagram_link }}" class="btn btn-secondary">
-                {{ bot_translations[lang]['instagram_message'] }}
+            <a href="{{ instagram_link }}" class="btn">
+                  {{ bot_translations[lang]['instagram_message'] }}
             </a>
-            <a href="{{ url_for('main.index', lang=lang) }}" class="btn btn-secondary">
-                {{ bot_translations[lang]['return_home'] }}
+            <a href="{{ url_for('main.index', lang=lang) }}" class="btn">
+                  {{ bot_translations[lang]['return_home'] }}
             </a>
         </div>
     </div>

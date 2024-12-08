@@ -73,7 +73,7 @@ body {
     width: 100%; /* Задаем 100% ширины */
 }
 
-/* Стили для кнопок */
+/* Стили для кнопок *//* Стили для кнопок */
 .btn {
     padding: 10px 20px;
     border-radius: 4px;
@@ -83,23 +83,12 @@ body {
     width: 100%;  /* Устанавливаем ширину кнопок на 100% от родительского контейнера */
     box-sizing: border-box; /* Чтобы padding не вылезал за пределы */
     margin: 5px 0; /* Добавим небольшой отступ сверху и снизу для красоты */
+    background-color: #28a745;  /* Зеленый цвет для кнопок */
+    color: white;  /* Белый текст */
 }
 
-.btn-primary {
-    background-color: green;
-    color: white;
+.btn:hover {
+    background-color: #218838;  /* Темно-зеленый цвет при наведении */
 }
 
-.btn-primary:hover {
-    background-color: darkgreen;
-}
-
-.btn-secondary {
-    background-color: #6c757d;
-    color: white;
-}
-
-.btn-secondary:hover {
-    background-color: #5a6268;
-}
-
+/* Убираем стиль для btn-primary и btn-secondary, так как все кнопки теперь будут одинаковыми */
