@@ -574,3 +574,4 @@ def proforma(user_id):
         instagram_link=INSTAGRAM_URL,
         order_field_labels=order_field_labels[lang]  # Добавляем передачу order_field_labels
     )
+
