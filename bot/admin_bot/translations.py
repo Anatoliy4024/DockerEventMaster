@@ -145,8 +145,8 @@ translations = {
         'currency': "євро",
         'whatsapp_message': "У мене є питання щодо мого замовлення",
         'whatsapp_footer': "(Напишіть нижче, що ви хочете дізнатися у адміністратора)",
-        'instagram_message': 'Перейти до галереї',
-        'return_home': 'Повернутися на головну сторінку для наступного замовлення',
+        'instagram_message': "Перейти до галереї",
+        'return_home': "Повернутися на головну сторінку для наступного замовлення",
     },
     'pl': {
         'order_confirmed': "Twoje zamówienie zostało potwierdzone!",
@@ -192,8 +192,6 @@ translations = {
         'instagram_message': 'Vai alla galleria',
         'return_home': 'Torna alla pagina iniziale per il prossimo ordine',
     }
-
-
 }
 
 
