@@ -67,6 +67,8 @@ docker exec -i 148ce929210e psql -U myuser -d testdb < /root/backup.sql
 
 13.просмотр логов бота
 cat db_operations.log
+cat logs.log
+
 
 14. просмотр файлов логирования БД на сервере
 cat /var/lib/docker/volumes/dockereventmaster_postgres_data/_data/pg_log/postgresql-<дата>.log

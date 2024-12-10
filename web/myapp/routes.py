@@ -14,7 +14,7 @@ from web.myapp.forms import RegistrationForm
 from web.utils.calculations import get_duration, calculate_total_cost
 from web.utils.db import create_connection, insert_order, get_order_info  # Подключаем базу данных
 from web.myapp.translations import translations, field_labels, ORDER_STATUS, \
-    order_field_labels  # Импортируем оба словаря
+    order_field_labels, policy_links, policy_link_texts  # Импортируем оба словаря
 from bot.admin_bot.translations import translations as bot_translations
 import stripe
 
@@ -179,10 +179,28 @@ def webhook():
     return jsonify({'status': 'success'}), 200
 
 @main.route('/ver1.0/')
+# def index():
+#  """Главная страница с выбором языка и флагами."""
+#  lang = request.args.get('lang', 'en')
+#  return render_template('index.html', translations=translations[lang], labels=field_labels[lang], lang=lang)
+
+@main.route('/ver1.0/')
 def index():
- """Главная страница с выбором языка и флагами."""
- lang = request.args.get('lang', 'en')
- return render_template('index.html', translations=translations[lang], labels=field_labels[lang], lang=lang)
+    """Главная страница с выбором языка и флагами."""
+    lang = request.args.get('lang', 'en')
+
+    # Проверка, что в словарях есть нужные данные для выбранного языка
+    policy_link = policy_links.get(lang, policy_links['en'])  # Default to English
+    policy_text = policy_link_texts.get(lang, policy_link_texts['en'])  # Default to English
+
+    # Передаем все нужные данные в шаблон
+    return render_template('index.html',
+                           translations=translations[lang],
+                           labels=field_labels[lang],
+                           lang=lang,
+                           policy_link=policy_link,
+                           policy_text=policy_text)
+
 
 @main.route('/ver1.0/select-language')
 def select_language():
@@ -190,14 +208,22 @@ def select_language():
     lang = request.args.get('lang', 'en')
     message = translations[lang]['language_selected']
     current_time = int(datetime.now().timestamp())  # Получаем текущую временную метку
+
+    # Проверка, что в словарях есть нужные данные для выбранного языка
+    policy_link = policy_links.get(lang, policy_links['en'])  # Default to English
+    policy_text = policy_link_texts.get(lang, policy_link_texts['en'])  # Default to English
+
     return render_template(
         'index.html',
         message=message,
         translations=translations[lang],
         labels=field_labels[lang],
         lang=lang,
-        time=current_time
-    )
+        time=current_time,
+        policy_link = policy_link,
+        policy_text = policy_text)
+
+
 @main.route('/register', methods=['GET', 'POST'])
 def register():
     """Регистрация пользователя через email и пароль."""
@@ -288,22 +314,6 @@ def register():
             conn.close()
 
     return render_template('register.html', lang=lang, translations=translations[lang], labels=field_labels[lang])
-
-@main.route('/ver1.0/booking-page/<int:user_id>', methods=['GET'])
-# def booking_page(user_id):
-#     lang = request.args.get('lang', 'en')  # Получаем выбранный язык или устанавливаем 'en' по умолчанию
-#
-#     # Проверка, что lang есть в translations и field_labels
-#     if lang not in translations or lang not in field_labels:
-#         flash(f"Invalid language selected: {lang}", "danger")
-#         return redirect(url_for('main.index', lang='en'))
-#
-#     return render_template(
-#         'booking.html',
-#         lang=lang,
-#         user_id=user_id,
-#         form=RegistrationForm()
-#     )
 
 @main.route('/ver1.0/booking-page/<int:user_id>', methods=['GET'])
 def booking_page(user_id):
@@ -424,123 +434,6 @@ def order_payment(user_id):
     )
 
 
-# @main.route('/ver1.0/proforma/<int:user_id>', methods=['GET'])
-# def proforma(user_id):
-#     # Получаем язык из параметров запроса (по умолчанию 'en')
-#     lang = request.args.get('lang', 'en')
-#
-#         # Проверка, что выбранный язык существует в переводах
-#     if lang not in bot_translations:
-#         lang = 'en'  # Устанавливаем язык по умолчанию, если языка нет в словарях
-#
-#     # Получаем информацию о заказе из базы данных на основе последней сессии пользователя
-#     order_info = get_order_info(user_id)
-#
-#     if not order_info:
-#         # Если ордер не найден, возвращаем ошибку или редирект на другую страницу
-#         return redirect(url_for('main.error_page', lang=lang))
-#
-#     # Генерация текста ордера
-#     order_text = f"""
-#     <h3>{translations[lang]['order_confirmed']}</h3>
-#     <strong>{translations[lang]['proforma_number']}:</strong> {order_info['order_id']} <br>
-#     <hr>
-#
-#
-#     <strong>{translations[lang]['client_name']}:</strong> {order_info['user_name']}<br>
-#     <strong>{translations[lang]['preferences']}:</strong> {order_info['preferences']}<br>
-#     <strong>{translations[lang]['selected_style']}:</strong> {order_info['selected_style']}<br>
-#     <strong>{translations[lang]['city']}:</strong> {order_info['city']}<br>
-#     <strong>{translations[lang]['people_count']}:</strong> {order_info['people_count']}<br>
-#     <strong>{translations[lang]['selected_date']}:</strong> {order_info['selected_date']}<br>
-#     <strong>{translations[lang]['start_time']}:</strong> {order_info['start_time']}<br>
-#     <strong>{translations[lang]['duration']}:</strong> {order_info['duration']} hours<br>
-#     <hr>
-#     <strong>{translations[lang]['calculated_cost']}:</strong> {order_info['calculated_cost'] - 20} EUR
-#     """
-#
-#     trans = bot_translations.get(lang, bot_translations['en'])  # Используем 'en' как язык по умолчанию
-#
-#     proforma_number = f"{order_info['user_id']}_{order_info['session_number']}_{order_info['status']}"
-#     contact_message = f"{trans['whatsapp_message']} {proforma_number}. {trans['whatsapp_footer']}"
-#
-#     # Кодируем сообщение для использования в URL
-#     encoded_message = urllib.parse.quote(contact_message)
-#
-#     # Генерация ссылки для перехода на страницу оплаты (например, Stripe)
-#     wa_link = WA_URL + f"?text={encoded_message}"
-#
-#     # Ссылка для возврата на форму (если нужно вернуться)
-#
-#     return render_template(
-#         'proforma.html',  # Шаблон, который рендерим
-#         lang=lang,  # Передаем текущий язык
-#         translations=translations[lang],  # Передаем переводы для выбранного языка
-#         order=order_info,  # Передаем информацию о заказе
-#         wa_link=wa_link,  # Ссылка на WhatsApp для связи
-#         instagram_link=INSTAGRAM_URL  # Ссылка на Instagram
-#     )
-#
-# @main.route('/ver1.0/proforma/<int:user_id>', methods=['GET'])
-# def proforma(user_id):
-#     # Получаем язык из параметров запроса (по умолчанию 'en')
-#     lang = request.args.get('lang', 'en')
-#
-#     # Проверка, что выбранный язык существует в переводах
-#     if lang not in bot_translations:
-#         lang = 'en'  # Устанавливаем язык по умолчанию
-#
-#     # Получаем информацию о заказе
-#     order_info = get_order_info(user_id)
-#
-#     if not order_info:
-#         # Если ордер не найден, возвращаем ошибку или редирект на другую страницу
-#         return redirect(url_for('main.error_page', lang=lang))
-#
-#     # Генерация текста проформы с использованием переводов из словаря бота
-#     order_text = f"""
-#     <h3>{bot_translations[lang]['order_confirmed']}</h3>
-#     <strong>{bot_translations[lang]['proforma_number']}:</strong> {order_info['order_id']} <br>
-#     <hr>
-#
-#     <strong>{bot_translations[lang]['event_date']}:</strong> {order_info['selected_date']} <br>
-#     <strong>{bot_translations[lang]['time']}:</strong> {order_info['start_time']} - {order_info['end_time']} <br>
-#     <strong>{bot_translations[lang]['people_count']}:</strong> {order_info['people_count']} <br>
-#     <strong>{bot_translations[lang]['event_style']}:</strong> {order_info['selected_style']} <br>
-#     <strong>{bot_translations[lang]['city']}:</strong> {order_info['city']} <br>
-#     <strong>{bot_translations[lang]['amount_to_pay']}:</strong> {order_info['calculated_cost'] - 20} {bot_translations[lang]['currency']} <br>
-#     <hr>
-#     <strong>{bot_translations[lang]['delivery_info']}</strong>
-#     """
-#
-#     # Создаем ссылку для WhatsApp сообщения
-#     trans = bot_translations.get(lang, bot_translations['en'])  # Используем 'en' как язык по умолчанию
-#
-#     proforma_number = f"{order_info['user_id']}_{order_info['session_number']}_{order_info['status']}"
-#     contact_message = f"{trans['whatsapp_message']} {proforma_number}. {trans['whatsapp_footer']}"
-#
-#     # Кодируем сообщение для использования в URL
-#     encoded_message = urllib.parse.quote(contact_message)
-#
-#     # Генерация ссылки для перехода на WhatsApp
-#     wa_link = WA_URL + f"?text={encoded_message}"
-#
-#     # Генерация ссылки для Instagram
-#     instagram_link = INSTAGRAM_URL  # Уже передаем в шаблон
-#
-#     # Ссылка для возврата на главную страницу
-#     home_link = url_for('main.index', lang=lang)
-#
-#     # Передаем переводы и информацию о заказе в шаблон
-#     return render_template(
-#         'proforma.html',  # Шаблон, который рендерим
-#         lang=lang,  # Передаем текущий язык
-#         translations=bot_translations[lang],  # Передаем переводы для выбранного языка из словаря бота
-#         order=order_info,  # Передаем информацию о заказе
-#         wa_link=wa_link,  # Ссылка на WhatsApp для связи
-#         instagram_link=instagram_link,  # Ссылка на Instagram
-#         home_link=home_link  # Ссылка на главную страницу
-#     )
 @main.route('/ver1.0/proforma/<int:user_id>', methods=['GET'])
 def proforma(user_id):
     lang = request.args.get('lang', 'en')
